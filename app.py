@@ -25,7 +25,7 @@ def get_font(size, bold=False):
     except:
         return ImageFont.load_default()
 
-def create_posts_from_uploads(uploaded_files, post_texts, guest_name="", logo_file=None):
+def create_posts_from_uploads(uploaded_files, post_texts, guest_name, logo_file=None):
     """Create Instagram posts from uploaded images plus promotional post"""
     
     instagram_posts = []
@@ -366,7 +366,6 @@ def create_zip_from_posts(instagram_posts, original_images=None):
     zip_buffer.seek(0)
     return zip_buffer.getvalue()
 
-# Streamlit UI
 st.set_page_config(page_title="YouTube to Instagram Creator", page_icon="📸", layout="wide")
 
 st.title("📸 YouTube to Instagram Post Creator")
@@ -386,6 +385,16 @@ if method == "📤 Upload Screenshots":
         **For best results:**
         1. Go to your YouTube video
         2. Pause at the exact moments you want
+        3. Take screenshots using:
+           - **Windows:** Windows + Shift + S
+           - **Mac:** Cmd + Shift + 4
+           - **Mobile:** Power + Volume Down
+        4. Save as PNG or JPG
+        5. Upload them below in the order you want them to appear
+        
+        **Tips:**
+        - Use full screen for better quality
+        - Choose moments with clear
         3. Take screenshots using:
            - **Windows:** Windows + Shift + S
            - **Mac:** Cmd + Shift + 4
