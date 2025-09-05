@@ -1,3 +1,6 @@
+The error is because the function is expecting more parameters. Here's the complete fixed code:
+
+```python
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 import zipfile
@@ -25,7 +28,7 @@ def get_font(size, bold=False):
     except:
         return ImageFont.load_default()
 
-def create_posts_from_uploads(uploaded_files, post_texts, guest_name, logo_file=None):
+def create_posts_from_uploads(uploaded_files, post_texts, guest_name="", logo_file=None):
     """Create Instagram posts from uploaded images plus promotional post"""
     
     instagram_posts = []
@@ -366,6 +369,7 @@ def create_zip_from_posts(instagram_posts, original_images=None):
     zip_buffer.seek(0)
     return zip_buffer.getvalue()
 
+# Streamlit UI
 st.set_page_config(page_title="YouTube to Instagram Creator", page_icon="📸", layout="wide")
 
 st.title("📸 YouTube to Instagram Post Creator")
