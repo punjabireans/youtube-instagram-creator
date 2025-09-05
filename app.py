@@ -1,6 +1,3 @@
-Here's the complete, error-free code:
-
-```python
 # app.py - Complete fixed version without any errors
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
