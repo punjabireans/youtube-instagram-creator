@@ -101,7 +101,7 @@ def create_promotional_post(guest_name, logo_file=None):
     main_text = f'Listen to the full conversation with special guest {guest_name} on the "Rena Malik, MD Podcast"'
     
     # Font sizes for mobile visibility
-    main_font_size = 48
+    main_font_size = 36
     main_font = get_font(main_font_size, bold=True)
     
     # Text wrapping
