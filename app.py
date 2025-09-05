@@ -1,6 +1,3 @@
-The error is because the function is expecting more parameters. Here's the complete fixed code:
-
-```python
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 import zipfile
