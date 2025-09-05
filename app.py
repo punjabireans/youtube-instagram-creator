@@ -1,27 +1,14 @@
-# app.py - Fixed version with proper error handling and Roboto Slab font
+# app.py - Complete fixed version
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 import zipfile
 from io import BytesIO
 import math
-import requests
-
-def download_font():
-    """Download Roboto Slab font from Google Fonts"""
-    try:
-        # Download Roboto Slab Regular
-        font_url = "https://fonts.gstatic.com/s/robotoslab/v25/BngbUXZYTXPIvIBgJJSb6s3BzlRRfKOFbvjojISmb2Rm.woff2"
-        response = requests.get(font_url)
-        if response.status_code == 200:
-            return BytesIO(response.content)
-    except:
-        pass
-    return None
 
 def get_font(size):
     """Get Roboto Slab font or fallback to default"""
     try:
-        # Try to use Roboto Slab (you can also try other paths)
+        # Try different font paths
         font_paths = [
             "RobotoSlab-Regular.ttf",
             "/System/Library/Fonts/Georgia.ttf",  # macOS fallback
@@ -331,7 +318,7 @@ def create_zip_from_posts(instagram_posts, original_images=None):
 st.set_page_config(page_title="YouTube to Instagram Creator", page_icon="📸", layout="wide")
 
 st.title("📸 YouTube to Instagram Post Creator")
-st.write("Transform your YouTube screenshots into professional Instagram posts with Roboto Slab font!")
+st.write("Transform your YouTube screenshots into professional Instagram posts!")
 
 # Method selection
 method = st.radio(
@@ -359,7 +346,7 @@ if method == "📤 Upload Screenshots":
         - Use full screen for better quality
         - Choose moments with clear, interesting visuals
         - Even number of screenshots works best (2 per Instagram post)
-        - Text will be added at the bottom with Roboto Slab font
+        - Text will be added at the bottom with proper positioning
         """)
     
     uploaded_files = st.file_uploader(
@@ -379,4 +366,17 @@ if method == "📤 Upload Screenshots":
                 with cols[i % 4]:
                     img = Image.open(uploaded_file)
                     st.image(img, caption=f"Screenshot {i+1}", use_container_width=True)
-            if len(uploaded_files) > 
+            if len(uploaded_files) > 4:
+                st.write(f"... and {len(uploaded_files) - 4} more images")
+        
+        # Calculate number of posts
+        num_posts = math.ceil(len(uploaded_files) / 2)
+        st.info(f"📊 This will create **{num_posts} Instagram posts** ({len(uploaded_files)} screenshots, 2 per post)")
+        
+        # Text input for posts
+        st.write("### 📝 Add Text to Your Posts")
+        st.write(f"Enter text for each of your {num_posts} Instagram posts (one line per post):")
+        
+        post_texts_input = st.text_area(
+            "Post texts:", 
+            placeholder="Text for Instagram post 1 (will be split between 2 screenshots)\n
