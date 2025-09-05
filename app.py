@@ -377,7 +377,6 @@ method = st.radio(
     help="Upload method is recommended for best quality and reliability"
 )
 
-```python
 if method == "📤 Upload Screenshots":
     st.write("### Method 1: Upload Your Screenshots")
     
