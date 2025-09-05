@@ -363,6 +363,3 @@ if st.button("Create Instagram Posts", type="primary"):
                     # Create download package
                     zip_data = create_zip_file(screenshot_files, instagram_posts, temp_dir)
                     
-                    # Download button
-                    st.download_button(
-                        label="📥 Download All Files (ZIP)",
