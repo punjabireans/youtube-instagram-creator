@@ -25,7 +25,7 @@ def get_font(size, bold=False):
     except:
         return ImageFont.load_default()
 
-def create_posts_from_uploads(uploaded_files, post_texts, guest_name, logo_file=None, cta_text="LISTEN NOW", episode_title=""):
+def create_posts_from_uploads(uploaded_files, post_texts, guest_name="", logo_file=None):
     """Create Instagram posts from uploaded images plus promotional post"""
     
     instagram_posts = []
@@ -46,7 +46,7 @@ def create_posts_from_uploads(uploaded_files, post_texts, guest_name, logo_file=
     
     # Add promotional post at the end
     if guest_name.strip():
-        promo_post = create_promotional_post(guest_name, logo_file, cta_text, episode_title)
+        promo_post = create_promotional_post(guest_name, logo_file)
         instagram_posts.append(promo_post)
     
     return instagram_posts
@@ -88,7 +88,7 @@ def create_single_instagram_post(images, post_text):
     
     return post
 
-def create_promotional_post(guest_name, logo_file=None, cta_text="LISTEN NOW", episode_title=""):
+def create_promotional_post(guest_name, logo_file=None):
     """Create promotional post with #1A2238 background and #F4DB7D text"""
     
     POST_SIZE = 1080
@@ -97,15 +97,19 @@ def create_promotional_post(guest_name, logo_file=None, cta_text="LISTEN NOW", e
     post = Image.new('RGB', (POST_SIZE, POST_SIZE), color='#1A2238')
     draw = ImageDraw.Draw(post)
     
-    # Text content - EXACTLY as per template
-    main_text = f"{cta_text}\nListen to the full conversation with\nspecial guest {guest_name} on the \"Rena Malik,\nMD Podcast\"\n Episode: {episode_title}"
+    # Text content
+    main_text = f'Listen to the full conversation with special guest {guest_name} on the "Rena Malik, MD Podcast"'
     
     # Font sizes for mobile visibility
-    main_font_size = 48
+    main_font_size = 36
     main_font = get_font(main_font_size, bold=True)
     
+    # Text wrapping
+    max_text_width = POST_SIZE - 120  # 60px margin on each side
+    wrapped_text = wrap_text(main_text, main_font, max_text_width)
+    
     # Calculate text dimensions
-    text_bbox = draw.multiline_textbbox((0, 0), main_text, font=main_font)
+    text_bbox = draw.multiline_textbbox((0, 0), wrapped_text, font=main_font)
     text_width = text_bbox[2] - text_bbox[0]
     text_height = text_bbox[3] - text_bbox[1]
     
@@ -137,7 +141,7 @@ def create_promotional_post(guest_name, logo_file=None, cta_text="LISTEN NOW", e
     # Draw shadow (black)
     draw.multiline_text(
         (text_x + shadow_offset, text_y + shadow_offset), 
-        main_text, 
+        wrapped_text, 
         fill='black', 
         font=main_font, 
         align='center'
@@ -145,7 +149,7 @@ def create_promotional_post(guest_name, logo_file=None, cta_text="LISTEN NOW", e
     # Draw main text (#F4DB7D)
     draw.multiline_text(
         (text_x, text_y), 
-        main_text, 
+        wrapped_text, 
         fill='#F4DB7D', 
         font=main_font, 
         align='center'
@@ -362,6 +366,7 @@ def create_zip_from_posts(instagram_posts, original_images=None):
     zip_buffer.seek(0)
     return zip_buffer.getvalue()
 
+# Streamlit UI
 st.set_page_config(page_title="YouTube to Instagram Creator", page_icon="📸", layout="wide")
 
 st.title("📸 YouTube to Instagram Post Creator")
@@ -405,6 +410,7 @@ if method == "📤 Upload Screenshots":
     if uploaded_files:
         st.success(f"✅ Uploaded {len(uploaded_files)} screenshots")
         
+        # Show preview of uploaded images
         if st.checkbox("Show uploaded images preview"):
             cols = st.columns(min(4, len(uploaded_files)))
             for i, uploaded_file in enumerate(uploaded_files[:4]):
@@ -414,50 +420,20 @@ if method == "📤 Upload Screenshots":
             if len(uploaded_files) > 4:
                 st.write(f"... and {len(uploaded_files) - 4} more images")
         
+        # Calculate number of posts
         num_posts = math.ceil(len(uploaded_files) / 2)
         st.info(f"📊 This will create **{num_posts} Instagram posts** ({len(uploaded_files)} screenshots, 2 per post)")
         
+        # Text input for posts
         st.write("### 📝 Add Text to Your Posts")
         st.write(f"Enter text for each of your {num_posts} Instagram posts (one line per post):")
         
         post_texts_input = st.text_area(
             "Post texts:", 
-            placeholder="Text for Instagram post 1 (will be split between 2 screenshots)\nText for Instagram post 2\nText for Instagram post 3",
+            placeholder="Text for Instagram post 1 (will be split between 2 screenshots)\nTextfor Instagram post 2\nText for Instagram post 3",
             help="Each line will be automatically split between the 2 screenshots in that post",
             height=100
         )
-        
-        # Guest name and logo inputs for promotional post
-        st.write("### 🎙️ Promotional Post Settings")
-        st.write("Add a final promotional post for the podcast")
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            guest_name = st.text_input(
-                "Guest Name:",
-                placeholder="Dr. John Smith",
-                help="Enter the name of the guest for the promotional post"
-            )
-            episode_title = st.text_input(
-                "Episode Title:",
-                placeholder="How to Improve Your Health",
-                help="Enter the episode title for the promotional post"
-            )
-        
-        with col2:
-            cta_text = st.text_input(
-                "Call to Action (CTA):",
-                value="LISTEN NOW",
-                help="Enter the call to action text for the promotional post"
-            )
-            logo_file = st.file_uploader(
-                "Upload Podcast Logo (Optional):",
-                type=['png', 'jpg', 'jpeg'],
-                help="Upload the Rena Malik MD Podcast logo"
-            )
-        
-        if guest_name:
-            st.info(f"📢 A promotional post will be added featuring: {guest_name}")
         
         # Options
         col1, col2 = st.columns(2)
@@ -469,31 +445,27 @@ if method == "📤 Upload Screenshots":
         if st.button("🎨 Create Instagram Posts", type="primary"):
             post_texts = [line.strip() for line in post_texts_input.split('\n') if line.strip()]
             
+            # Show warning if text count doesn't match post count
             if post_texts and len(post_texts) != num_posts:
                 st.warning(f"⚠️ You have {len(post_texts)} text entries but will create {num_posts} posts. Extra texts will be ignored, missing texts will be left blank.")
             
             with st.spinner("Creating Instagram posts... Please wait."):
-                instagram_posts = create_posts_from_uploads(uploaded_files, post_texts, guest_name, logo_file, cta_text, episode_title)
+                instagram_posts = create_posts_from_uploads(uploaded_files, post_texts)
                 
-                total_posts = len(instagram_posts)
-                promo_posts = 1 if guest_name.strip() else 0
-                regular_posts = total_posts - promo_posts
+                st.success(f"✅ Created {len(instagram_posts)} Instagram posts!")
                 
-                st.success(f"✅ Created {total_posts} Instagram posts ({regular_posts} regular posts + {promo_posts} promotional post)!")
-                
+                # Show preview
                 if show_preview and instagram_posts:
                     st.write("### 👀 Preview of Your Instagram Posts:")
                     cols = st.columns(min(3, len(instagram_posts)))
                     for i, post_img in enumerate(instagram_posts[:3]):
                         with cols[i % 3]:
-                            caption = f"Post {i+1}"
-                            if i == len(instagram_posts) - 1 and guest_name.strip():
-                                caption += " (Promotional)"
-                            st.image(post_img, caption=caption, use_container_width=True)
+                            st.image(post_img, caption=f"Post {i+1}", use_container_width=True)
                     
                     if len(instagram_posts) > 3:
                         st.write(f"... and {len(instagram_posts) - 3} more posts")
                 
+                # Create download
                 original_imgs = uploaded_files if include_originals else None
                 zip_data = create_zip_from_posts(instagram_posts, original_imgs)
                 
@@ -504,16 +476,15 @@ if method == "📤 Upload Screenshots":
                     mime="application/zip"
                 )
                 
+                # Info about what's included
                 st.info(f"""
                 **Download includes:**
                 - {len(instagram_posts)} Instagram-ready posts (1080x1080px)
                 - {"Original screenshots" if include_originals else "No original screenshots"}
-                - Each regular post contains 2 screenshots split horizontally
-                - White text overlays with black shadows positioned at the bottom
-                - {"1 promotional post with podcast branding" if guest_name.strip() else "No promotional post (guest name required)"}
+                - Each Instagram post contains 2 screenshots split horizontally
+                - White text overlays positioned at the bottom
                 - Ready to upload directly to Instagram!
                 """)
 
 else:
     st.write("### Method 2: YouTube Embed + Screenshots")
-    st.info("This method is coming soon! For now, please use the Upload Screenshots method.")
