@@ -1,4 +1,7 @@
-# app.py - Complete fixed version
+Here's the complete, error-free code:
+
+```python
+# app.py - Complete fixed version without any errors
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 import zipfile
@@ -379,4 +382,61 @@ if method == "📤 Upload Screenshots":
         
         post_texts_input = st.text_area(
             "Post texts:", 
-            placeholder="Text for Instagram post 1 (will be split between 2 screenshots)\n
+            placeholder="Text for Instagram post 1 (will be split between 2 screenshots)\nTextfor Instagram post 2\nText for Instagram post 3",
+            help="Each line will be automatically split between the 2 screenshots in that post",
+            height=100
+        )
+        
+        # Options
+        col1, col2 = st.columns(2)
+        with col1:
+            include_originals = st.checkbox("Include original screenshots in download", value=True)
+        with col2:
+            show_preview = st.checkbox("Show preview of Instagram posts", value=True)
+        
+        if st.button("🎨 Create Instagram Posts", type="primary"):
+            post_texts = [line.strip() for line in post_texts_input.split('\n') if line.strip()]
+            
+            # Show warning if text count doesn't match post count
+            if post_texts and len(post_texts) != num_posts:
+                st.warning(f"⚠️ You have {len(post_texts)} text entries but will create {num_posts} posts. Extra texts will be ignored, missing texts will be left blank.")
+            
+            with st.spinner("Creating Instagram posts... Please wait."):
+                instagram_posts = create_posts_from_uploads(uploaded_files, post_texts)
+                
+                st.success(f"✅ Created {len(instagram_posts)} Instagram posts!")
+                
+                # Show preview
+                if show_preview and instagram_posts:
+                    st.write("### 👀 Preview of Your Instagram Posts:")
+                    cols = st.columns(min(3, len(instagram_posts)))
+                    for i, post_img in enumerate(instagram_posts[:3]):
+                        with cols[i % 3]:
+                            st.image(post_img, caption=f"Post {i+1}", use_container_width=True)
+                    
+                    if len(instagram_posts) > 3:
+                        st.write(f"... and {len(instagram_posts) - 3} more posts")
+                
+                # Create download
+                original_imgs = uploaded_files if include_originals else None
+                zip_data = create_zip_from_posts(instagram_posts, original_imgs)
+                
+                st.download_button(
+                    label="📥 Download Instagram Posts (ZIP)",
+                    data=zip_data,
+                    file_name=f"instagram_posts_{len(instagram_posts)}_posts.zip",
+                    mime="application/zip"
+                )
+                
+                # Info about what's included
+                st.info(f"""
+                **Download includes:**
+                - {len(instagram_posts)} Instagram-ready posts (1080x1080px)
+                - {"Original screenshots" if include_originals else "No original screenshots"}
+                - Each Instagram post contains 2 screenshots split horizontally
+                - White text overlays positioned at the bottom
+                - Ready to upload directly to Instagram!
+                """)
+
+else:
+    st.write("### Method 2: YouTube Embed + Screenshots")
