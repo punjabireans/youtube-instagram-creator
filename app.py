@@ -1,36 +1,33 @@
-# app.py - Complete Hybrid YouTube to Instagram Post Creator
+# app.py - Fixed version with proper file handling
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 import zipfile
 from io import BytesIO
-import tempfile
-import os
 import math
 
 def create_posts_from_uploads(uploaded_files, post_texts):
     """Create Instagram posts from uploaded images"""
     
-    with tempfile.TemporaryDirectory() as temp_dir:
-        instagram_posts = []
+    instagram_posts = []
+    
+    # Convert uploaded files to PIL Images
+    images = []
+    for uploaded_file in uploaded_files:
+        img = Image.open(uploaded_file)
+        images.append(img)
+    
+    # Group images in pairs and create posts
+    for i in range(0, len(images), 2):
+        post_images = images[i:i+2]
+        post_text = post_texts[i//2] if i//2 < len(post_texts) else ""
         
-        # Convert uploaded files to PIL Images
-        images = []
-        for uploaded_file in uploaded_files:
-            img = Image.open(uploaded_file)
-            images.append(img)
-        
-        # Group images in pairs and create posts
-        for i in range(0, len(images), 2):
-            post_images = images[i:i+2]
-            post_text = post_texts[i//2] if i//2 < len(post_texts) else ""
-            
-            # Create Instagram post
-            instagram_post = create_single_instagram_post(post_images, post_text, temp_dir, len(instagram_posts) + 1)
-            instagram_posts.append(instagram_post)
-        
-        return instagram_posts
+        # Create Instagram post
+        instagram_post = create_single_instagram_post(post_images, post_text)
+        instagram_posts.append(instagram_post)
+    
+    return instagram_posts
 
-def create_single_instagram_post(images, post_text, temp_dir, post_number):
+def create_single_instagram_post(images, post_text):
     """Create a single Instagram post from 1 or 2 images"""
     
     POST_SIZE = 1080
@@ -74,11 +71,7 @@ def create_single_instagram_post(images, post_text, temp_dir, post_number):
         
         post.paste(img, (0, 0))
     
-    # Save Instagram post
-    post_path = f"{temp_dir}/instagram_post_{post_number}.jpg"
-    post.save(post_path, quality=95)
-    
-    return post_path
+    return post
 
 def split_text_for_post(text):
     """Split text into two roughly equal parts for top and bottom images"""
@@ -226,13 +219,12 @@ def resize_image_to_exact(img, target_width, target_height):
     
     return cropped
 
-def extract_video_id(url):
-    """Extract video ID from YouTube URL"""
-    if "watch?v=" in url:
-        return url.split("watch?v=")[1].split("&")[0]
-    elif "youtu.be/" in url:
-        return url.split("youtu.be/")[1].split("?")[0]
-    return None
+def pil_to_bytes(img):
+    """Convert PIL Image to bytes for download"""
+    img_bytes = BytesIO()
+    img.save(img_bytes, format='JPEG', quality=95)
+    img_bytes.seek(0)
+    return img_bytes.getvalue()
 
 def create_zip_from_posts(instagram_posts, original_images=None):
     """Create zip file with Instagram posts and optionally original images"""
@@ -240,20 +232,18 @@ def create_zip_from_posts(instagram_posts, original_images=None):
     
     with zipfile.ZipFile(zip_buffer, 'w') as zip_file:
         # Add Instagram posts
-        for i, post_path in enumerate(instagram_posts):
+        for i, post_img in enumerate(instagram_posts):
             filename = f"instagram_posts/post_{i+1}.jpg"
-            zip_file.write(post_path, filename)
+            img_bytes = pil_to_bytes(post_img)
+            zip_file.writestr(filename, img_bytes)
         
         # Add original images if provided
         if original_images:
             for i, img_file in enumerate(original_images):
                 filename = f"original_screenshots/screenshot_{i+1}.jpg"
-                # Save original image to temp file and add to zip
-                with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as temp_file:
-                    img = Image.open(img_file)
-                    img.save(temp_file.name, quality=95)
-                    zip_file.write(temp_file.name, filename)
-                    os.unlink(temp_file.name)
+                img = Image.open(img_file)
+                img_bytes = pil_to_bytes(img)
+                zip_file.writestr(filename, img_bytes)
     
     return zip_buffer.getvalue()
 
@@ -307,7 +297,7 @@ if method == "📤 Upload Screenshots":
             for i, uploaded_file in enumerate(uploaded_files[:4]):
                 with cols[i % 4]:
                     img = Image.open(uploaded_file)
-                    st.image(img, caption=f"Screenshot {i+1}", use_column_width=True)
+                    st.image(img, caption=f"Screenshot {i+1}", use_container_width=True)
             if len(uploaded_files) > 4:
                 st.write(f"... and {len(uploaded_files) - 4} more images")
         
@@ -349,9 +339,9 @@ if method == "📤 Upload Screenshots":
                 if show_preview and instagram_posts:
                     st.write("### 👀 Preview of Your Instagram Posts:")
                     cols = st.columns(min(3, len(instagram_posts)))
-                    for i, post_path in enumerate(instagram_posts[:3]):
+                    for i, post_img in enumerate(instagram_posts[:3]):
                         with cols[i % 3]:
-                            st.image(post_path, caption=f"Post {i+1}", use_column_width=True)
+                            st.image(post_img, caption=f"Post {i+1}", use_container_width=True)
                     
                     if len(instagram_posts) > 3:
                         st.write(f"... and {len(instagram_posts) - 3} more posts")
@@ -366,3 +356,16 @@ if method == "📤 Upload Screenshots":
                     file_name=f"instagram_posts_{len(instagram_posts)}_posts.zip",
                     mime="application/zip"
                 )
+                
+                # Info about what's included
+                st.info(f"""
+                **Download includes:**
+                - {len(instagram_posts)} Instagram-ready posts (1080x1080px)
+                - {"Original screenshots" if include_originals else "No original screenshots"}
+                - Each Instagram post contains 2 screenshots split horizontally
+                - White text overlays positioned at the bottom
+                - Ready to upload directly to Instagram!
+                """)
+
+else:
+    st.write("### Method 2: YouTube Embed + Screenshots")
