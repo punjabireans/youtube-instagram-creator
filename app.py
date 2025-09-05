@@ -1,19 +1,18 @@
-# app.py - Complete fixed version without any errors
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 import zipfile
 from io import BytesIO
 import math
+import os
 
-def get_font(size):
-    """Get Roboto Slab font or fallback to default"""
+def get_font(size, bold=False):
+    """Get Work Sans SemiBold font or fallback to default"""
     try:
-        # Try different font paths
         font_paths = [
-            "RobotoSlab-Regular.ttf",
-            "/System/Library/Fonts/Georgia.ttf",  # macOS fallback
-            "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",  # Linux fallback
-            "arial.ttf"  # Windows fallback
+            "WorkSans-SemiBold.ttf" if not bold else "WorkSans-Bold.ttf",
+            "/System/Library/Fonts/Helvetica.ttc",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+            "arial.ttf"
         ]
         
         for font_path in font_paths:
@@ -22,33 +21,33 @@ def get_font(size):
             except:
                 continue
                 
-        # If all else fails, use default
         return ImageFont.load_default()
     except:
         return ImageFont.load_default()
 
-def create_posts_from_uploads(uploaded_files, post_texts):
-    """Create Instagram posts from uploaded images"""
+def create_posts_from_uploads(uploaded_files, post_texts, guest_name, logo_file=None):
+    """Create Instagram posts from uploaded images plus promotional post"""
     
     instagram_posts = []
     
-    # Convert uploaded files to PIL Images
     images = []
     for uploaded_file in uploaded_files:
         img = Image.open(uploaded_file)
-        # Convert to RGB if needed (fixes JPEG save issues)
         if img.mode in ('RGBA', 'LA', 'P'):
             img = img.convert('RGB')
         images.append(img)
     
-    # Group images in pairs and create posts
     for i in range(0, len(images), 2):
         post_images = images[i:i+2]
         post_text = post_texts[i//2] if i//2 < len(post_texts) else ""
         
-        # Create Instagram post
         instagram_post = create_single_instagram_post(post_images, post_text)
         instagram_posts.append(instagram_post)
+    
+    # Add promotional post at the end
+    if guest_name.strip():
+        promo_post = create_promotional_post(guest_name, logo_file)
+        instagram_posts.append(promo_post)
     
     return instagram_posts
 
@@ -57,44 +56,110 @@ def create_single_instagram_post(images, post_text):
     
     POST_SIZE = 1080
     
-    # Create new Instagram post
     post = Image.new('RGB', (POST_SIZE, POST_SIZE), color='white')
     
     if len(images) == 2:
-        # Two images - divide horizontally with no gap
         top_img = images[0]
         bottom_img = images[1]
         
-        # Each image gets exactly half the height
         img_height = POST_SIZE // 2
         
-        # Resize to fit exactly half the post
         top_img = resize_image_to_exact(top_img, POST_SIZE, img_height)
         bottom_img = resize_image_to_exact(bottom_img, POST_SIZE, img_height)
         
-        # Split text between images
         text_parts = split_text_for_post(post_text)
         
-        # Add text overlays
         if len(text_parts) >= 1 and text_parts[0].strip():
             top_img = add_text_overlay(top_img, text_parts[0])
         if len(text_parts) >= 2 and text_parts[1].strip():
             bottom_img = add_text_overlay(bottom_img, text_parts[1])
         
-        # Paste images with no gap
         post.paste(top_img, (0, 0))
         post.paste(bottom_img, (0, POST_SIZE // 2))
         
     else:
-        # Single image - fill the entire post
         img = images[0]
         img = resize_image_to_exact(img, POST_SIZE, POST_SIZE)
         
-        # Add text overlay if available
         if post_text.strip():
             img = add_text_overlay(img, post_text)
         
         post.paste(img, (0, 0))
+    
+    return post
+
+def create_promotional_post(guest_name, logo_file=None):
+    """Create promotional post with #1A2238 background and #F4DB7D text"""
+    
+    POST_SIZE = 1080
+    
+    # Create background with specified color
+    post = Image.new('RGB', (POST_SIZE, POST_SIZE), color='#1A2238')
+    draw = ImageDraw.Draw(post)
+    
+    # Text content
+    main_text = f'Listen to the full conversation with special guest {guest_name} on the "Rena Malik, MD Podcast"'
+    
+    # Font sizes for mobile visibility
+    main_font_size = 48
+    main_font = get_font(main_font_size, bold=True)
+    
+    # Text wrapping
+    max_text_width = POST_SIZE - 120  # 60px margin on each side
+    wrapped_text = wrap_text(main_text, main_font, max_text_width)
+    
+    # Calculate text dimensions
+    text_bbox = draw.multiline_textbbox((0, 0), wrapped_text, font=main_font)
+    text_width = text_bbox[2] - text_bbox[0]
+    text_height = text_bbox[3] - text_bbox[1]
+    
+    # Position text in center (accounting for logo space if present)
+    logo_height = 0
+    if logo_file:
+        try:
+            logo = Image.open(logo_file)
+            # Resize logo to reasonable size
+            logo_max_size = 200
+            logo.thumbnail((logo_max_size, logo_max_size), Image.Resampling.LANCZOS)
+            logo_height = logo.height + 40  # Add some spacing
+        except:
+            logo = None
+            logo_height = 0
+    else:
+        logo = None
+    
+    # Center text vertically, accounting for logo
+    available_height = POST_SIZE - logo_height
+    text_y = (available_height - text_height) // 2
+    if logo:
+        text_y += logo_height
+    
+    text_x = (POST_SIZE - text_width) // 2
+    
+    # Draw text with shadow effect
+    shadow_offset = 3
+    # Draw shadow (black)
+    draw.multiline_text(
+        (text_x + shadow_offset, text_y + shadow_offset), 
+        wrapped_text, 
+        fill='black', 
+        font=main_font, 
+        align='center'
+    )
+    # Draw main text (#F4DB7D)
+    draw.multiline_text(
+        (text_x, text_y), 
+        wrapped_text, 
+        fill='#F4DB7D', 
+        font=main_font, 
+        align='center'
+    )
+    
+    # Add logo if provided
+    if logo:
+        logo_x = (POST_SIZE - logo.width) // 2
+        logo_y = 60  # Top margin
+        post.paste(logo, (logo_x, logo_y), logo if logo.mode == 'RGBA' else None)
     
     return post
 
@@ -107,10 +172,8 @@ def split_text_for_post(text):
     if len(words) <= 1:
         return [text, ""]
     
-    # Split roughly in half
     mid_point = len(words) // 2
     
-    # Try to find a good break point (period, comma, etc.)
     break_point = mid_point
     for i in range(max(1, mid_point - 3), min(len(words), mid_point + 4)):
         if i < len(words) and words[i-1].endswith(('.', '!', '?', ',')):
@@ -123,59 +186,46 @@ def split_text_for_post(text):
     return [first_part, second_part]
 
 def add_text_overlay(img, text):
-    """Add white text overlay at the bottom of the image with better positioning"""
+    """Add white text with black shadow overlay at the bottom of the image"""
     if not text.strip():
         return img
     
-    # Create a copy to draw on and ensure RGB mode
     img_with_text = img.copy()
     if img_with_text.mode != 'RGB':
         img_with_text = img_with_text.convert('RGB')
     
     draw = ImageDraw.Draw(img_with_text)
     
-    # Image dimensions
     img_width, img_height = img.size
     
-    # Font size calculation (mobile-friendly but not too large)
-    font_size = max(20, min(40, img_width // 30))  # Slightly smaller for better fit
+    font_size = max(24, min(44, img_width // 25))
     
-    # Get Roboto Slab font
     font = get_font(font_size)
     
-    # Text wrapping with more conservative width
-    max_text_width = img_width - 60  # More margin (30px on each side)
+    max_text_width = img_width - 60
     wrapped_text = wrap_text(text, font, max_text_width)
     
-    # Calculate text dimensions
     text_bbox = draw.multiline_textbbox((0, 0), wrapped_text, font=font)
     text_width = text_bbox[2] - text_bbox[0]
     text_height = text_bbox[3] - text_bbox[1]
     
-    # Position text at bottom with margins
-    margin_bottom = 20
+    margin_bottom = 25
     margin_side = 30
     
-    # Center text horizontally
     text_x = (img_width - text_width) // 2
     text_y = img_height - text_height - margin_bottom
     
-    # Ensure text doesn't go too high (avoid covering faces) and stays within bounds
-    max_text_height = img_height * 0.3  # Text can use max 30% of image height
-    min_y = img_height * 0.7  # Text should start no higher than 70% down the image
+    max_text_height = img_height * 0.3
+    min_y = img_height * 0.7
     
     if text_height > max_text_height:
-        # If text is too tall, move it up but not too much
         text_y = max(min_y, img_height - max_text_height - margin_bottom)
     
-    # Ensure text doesn't go off the left or right edges
     text_x = max(margin_side, min(text_x, img_width - text_width - margin_side))
-    
-    # Ensure text doesn't go off the bottom
     text_y = min(text_y, img_height - text_height - margin_bottom)
     
-    # Draw semi-transparent background for better readability
-    bg_margin = 12
+    # Draw semi-transparent background
+    bg_margin = 15
     bg_coords = [
         max(0, text_x - bg_margin),
         max(0, text_y - bg_margin),
@@ -183,17 +233,32 @@ def add_text_overlay(img, text):
         min(img_height, text_y + text_height + bg_margin)
     ]
     
-    # Create semi-transparent overlay
     overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
     overlay_draw = ImageDraw.Draw(overlay)
-    overlay_draw.rectangle(bg_coords, fill=(0, 0, 0, 140))  # Slightly more opaque
+    overlay_draw.rectangle(bg_coords, fill=(0, 0, 0, 120))
     
-    # Composite the overlay
     img_with_text = Image.alpha_composite(img_with_text.convert('RGBA'), overlay).convert('RGB')
     
-    # Draw the white text
+    # Draw text with shadow
     draw = ImageDraw.Draw(img_with_text)
-    draw.multiline_text((text_x, text_y), wrapped_text, fill='white', font=font, align='center')
+    shadow_offset = 2
+    
+    # Draw shadow (black)
+    draw.multiline_text(
+        (text_x + shadow_offset, text_y + shadow_offset), 
+        wrapped_text, 
+        fill='black', 
+        font=font, 
+        align='center'
+    )
+    # Draw main text (white)
+    draw.multiline_text(
+        (text_x, text_y), 
+        wrapped_text, 
+        fill='white', 
+        font=font, 
+        align='center'
+    )
     
     return img_with_text
 
@@ -210,7 +275,6 @@ def wrap_text(text, font, max_width):
             bbox = font.getbbox(test_line)
             text_width = bbox[2] - bbox[0]
         except:
-            # Fallback for older PIL versions
             text_width = len(test_line) * (font.size * 0.6)
         
         if text_width <= max_width:
@@ -220,46 +284,38 @@ def wrap_text(text, font, max_width):
                 lines.append(' '.join(current_line))
                 current_line = [word]
             else:
-                # Single word too long, break it
                 lines.append(word)
     
     if current_line:
         lines.append(' '.join(current_line))
     
-    # Limit to maximum 4 lines to prevent overflow
-    if len(lines) > 4:
-        lines = lines[:3] + [lines[3] + "..."]
+    if len(lines) > 5:
+        lines = lines[:4] + [lines[4] + "..."]
     
     return '\n'.join(lines)
 
 def resize_image_to_exact(img, target_width, target_height):
     """Resize image to exact dimensions, cropping if necessary to maintain aspect ratio"""
     
-    # Ensure RGB mode
     if img.mode != 'RGB':
         img = img.convert('RGB')
     
-    # Calculate ratios
     img_ratio = img.width / img.height
     target_ratio = target_width / target_height
     
     if img_ratio > target_ratio:
-        # Image is wider than target - fit to height and crop width
         new_height = target_height
         new_width = int(target_height * img_ratio)
         resized = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
         
-        # Crop to center
         left = (new_width - target_width) // 2
         cropped = resized.crop((left, 0, left + target_width, target_height))
         
     else:
-        # Image is taller than target - fit to width and crop height
         new_width = target_width
         new_height = int(target_width / img_ratio)
         resized = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
         
-        # Crop to center
         top = (new_height - target_height) // 2
         cropped = resized.crop((0, top, target_width, top + target_height))
     
@@ -268,7 +324,6 @@ def resize_image_to_exact(img, target_width, target_height):
 def pil_to_bytes(img):
     """Convert PIL Image to bytes for download with error handling"""
     try:
-        # Ensure RGB mode for JPEG
         if img.mode != 'RGB':
             img = img.convert('RGB')
         
@@ -278,7 +333,6 @@ def pil_to_bytes(img):
         return img_bytes.getvalue()
     except Exception as e:
         st.error(f"Error converting image: {str(e)}")
-        # Fallback: try PNG format
         try:
             img_bytes = BytesIO()
             img.save(img_bytes, format='PNG', optimize=True)
@@ -292,14 +346,12 @@ def create_zip_from_posts(instagram_posts, original_images=None):
     zip_buffer = BytesIO()
     
     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-        # Add Instagram posts
         for i, post_img in enumerate(instagram_posts):
             filename = f"instagram_posts/post_{i+1}.jpg"
             img_bytes = pil_to_bytes(post_img)
             if img_bytes:
                 zip_file.writestr(filename, img_bytes)
         
-        # Add original images if provided
         if original_images:
             for i, img_file in enumerate(original_images):
                 try:
@@ -314,13 +366,11 @@ def create_zip_from_posts(instagram_posts, original_images=None):
     zip_buffer.seek(0)
     return zip_buffer.getvalue()
 
-# Streamlit UI
 st.set_page_config(page_title="YouTube to Instagram Creator", page_icon="📸", layout="wide")
 
 st.title("📸 YouTube to Instagram Post Creator")
-st.write("Transform your YouTube screenshots into professional Instagram posts!")
+st.write("Transform your YouTube screenshots into professional Instagram posts with promotional ending!")
 
-# Method selection
 method = st.radio(
     "Choose your method:",
     ["📤 Upload Screenshots", "🎥 YouTube Embed + Screenshots"],
