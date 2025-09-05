@@ -1,131 +1,84 @@
-# app.py
+# app.py - Complete Hybrid YouTube to Instagram Post Creator
 import streamlit as st
-import yt_dlp
-import cv2
-import os
-import tempfile
+from PIL import Image, ImageDraw, ImageFont
 import zipfile
 from io import BytesIO
-from PIL import Image, ImageDraw, ImageFont
+import tempfile
+import os
 import math
 
-def extract_screenshots(youtube_url, timestamps):
-    """Extract screenshots and return file paths"""
+def create_posts_from_uploads(uploaded_files, post_texts):
+    """Create Instagram posts from uploaded images"""
     
     with tempfile.TemporaryDirectory() as temp_dir:
-        try:
-            # Download video
-            ydl_opts = {
-                'format': 'best[height<=720]',
-                'outtmpl': f'{temp_dir}/video.%(ext)s'
-            }
+        instagram_posts = []
+        
+        # Convert uploaded files to PIL Images
+        images = []
+        for uploaded_file in uploaded_files:
+            img = Image.open(uploaded_file)
+            images.append(img)
+        
+        # Group images in pairs and create posts
+        for i in range(0, len(images), 2):
+            post_images = images[i:i+2]
+            post_text = post_texts[i//2] if i//2 < len(post_texts) else ""
             
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(youtube_url, download=True)
-                video_file = f"{temp_dir}/video.{info['ext']}"
-                video_title = info.get('title', 'YouTube Video')
-            
-            # Extract screenshots
-            cap = cv2.VideoCapture(video_file)
-            fps = cap.get(cv2.CAP_PROP_FPS)
-            
-            screenshot_files = []
-            
-            for i, timestamp in enumerate(timestamps):
-                # Convert MM:SS to seconds if needed
-                if ':' in str(timestamp):
-                    parts = str(timestamp).split(':')
-                    timestamp = int(parts[0]) * 60 + int(parts[1])
-                
-                frame_number = int(float(timestamp) * fps)
-                cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
-                
-                ret, frame = cap.read()
-                if ret:
-                    # Convert BGR to RGB for PIL
-                    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    screenshot_path = f"{temp_dir}/screenshot_{i+1}_{timestamp}s.jpg"
-                    
-                    # Save using PIL for better quality
-                    pil_image = Image.fromarray(frame_rgb)
-                    pil_image.save(screenshot_path, quality=95)
-                    screenshot_files.append((screenshot_path, timestamp))
-            
-            cap.release()
-            
-            return screenshot_files, video_title, temp_dir
-            
-        except Exception as e:
-            st.error(f"Error: {str(e)}")
-            return None, None, None
+            # Create Instagram post
+            instagram_post = create_single_instagram_post(post_images, post_text, temp_dir, len(instagram_posts) + 1)
+            instagram_posts.append(instagram_post)
+        
+        return instagram_posts
 
-def create_instagram_posts(screenshot_files, video_title, temp_dir, post_texts):
-    """Create Instagram posts with 2 screenshots each, divided horizontally with text overlays"""
+def create_single_instagram_post(images, post_text, temp_dir, post_number):
+    """Create a single Instagram post from 1 or 2 images"""
     
-    # Instagram post dimensions (square)
     POST_SIZE = 1080
     
-    instagram_posts = []
+    # Create new Instagram post
+    post = Image.new('RGB', (POST_SIZE, POST_SIZE), color='white')
     
-    # Group screenshots in pairs
-    for post_idx in range(0, len(screenshot_files), 2):
-        post_screenshots = screenshot_files[post_idx:post_idx+2]
+    if len(images) == 2:
+        # Two images - divide horizontally with no gap
+        top_img = images[0]
+        bottom_img = images[1]
         
-        # Get text for this post (split into two parts)
-        post_text = ""
-        if post_idx // 2 < len(post_texts):
-            post_text = post_texts[post_idx // 2]
+        # Each image gets exactly half the height
+        img_height = POST_SIZE // 2
         
-        # Split text into two parts for top and bottom images
+        # Resize to fit exactly half the post
+        top_img = resize_image_to_exact(top_img, POST_SIZE, img_height)
+        bottom_img = resize_image_to_exact(bottom_img, POST_SIZE, img_height)
+        
+        # Split text between images
         text_parts = split_text_for_post(post_text)
         
-        # Create new Instagram post
-        post = Image.new('RGB', (POST_SIZE, POST_SIZE), color='white')
+        # Add text overlays
+        if len(text_parts) >= 1 and text_parts[0].strip():
+            top_img = add_text_overlay(top_img, text_parts[0])
+        if len(text_parts) >= 2 and text_parts[1].strip():
+            bottom_img = add_text_overlay(bottom_img, text_parts[1])
         
-        if len(post_screenshots) == 2:
-            # Two screenshots - divide horizontally with no gap
-            top_img_path, top_timestamp = post_screenshots[0]
-            bottom_img_path, bottom_timestamp = post_screenshots[1]
-            
-            # Load images
-            top_img = Image.open(top_img_path)
-            bottom_img = Image.open(bottom_img_path)
-            
-            # Each image gets exactly half the height
-            img_height = POST_SIZE // 2
-            
-            # Resize to fit exactly half the post
-            top_img = resize_image_to_exact(top_img, POST_SIZE, img_height)
-            bottom_img = resize_image_to_exact(bottom_img, POST_SIZE, img_height)
-            
-            # Add text overlays
-            if len(text_parts) >= 1 and text_parts[0].strip():
-                top_img = add_text_overlay(top_img, text_parts[0])
-            if len(text_parts) >= 2 and text_parts[1].strip():
-                bottom_img = add_text_overlay(bottom_img, text_parts[1])
-            
-            # Paste images with no gap
-            post.paste(top_img, (0, 0))
-            post.paste(bottom_img, (0, POST_SIZE // 2))
-            
-        else:
-            # Single screenshot - fill the entire post
-            img_path, timestamp = post_screenshots[0]
-            img = Image.open(img_path)
-            img = resize_image_to_exact(img, POST_SIZE, POST_SIZE)
-            
-            # Add text overlay if available
-            if post_text.strip():
-                img = add_text_overlay(img, post_text)
-            
-            post.paste(img, (0, 0))
+        # Paste images with no gap
+        post.paste(top_img, (0, 0))
+        post.paste(bottom_img, (0, POST_SIZE // 2))
         
-        # Save Instagram post
-        post_path = f"{temp_dir}/instagram_post_{len(instagram_posts) + 1}.jpg"
-        post.save(post_path, quality=95)
-        instagram_posts.append(post_path)
+    else:
+        # Single image - fill the entire post
+        img = images[0]
+        img = resize_image_to_exact(img, POST_SIZE, POST_SIZE)
+        
+        # Add text overlay if available
+        if post_text.strip():
+            img = add_text_overlay(img, post_text)
+        
+        post.paste(img, (0, 0))
     
-    return instagram_posts
+    # Save Instagram post
+    post_path = f"{temp_dir}/instagram_post_{post_number}.jpg"
+    post.save(post_path, quality=95)
+    
+    return post_path
 
 def split_text_for_post(text):
     """Split text into two roughly equal parts for top and bottom images"""
@@ -273,93 +226,143 @@ def resize_image_to_exact(img, target_width, target_height):
     
     return cropped
 
-def create_zip_file(screenshot_files, instagram_posts, temp_dir):
-    """Create zip file with both original screenshots and Instagram posts"""
+def extract_video_id(url):
+    """Extract video ID from YouTube URL"""
+    if "watch?v=" in url:
+        return url.split("watch?v=")[1].split("&")[0]
+    elif "youtu.be/" in url:
+        return url.split("youtu.be/")[1].split("?")[0]
+    return None
+
+def create_zip_from_posts(instagram_posts, original_images=None):
+    """Create zip file with Instagram posts and optionally original images"""
     zip_buffer = BytesIO()
     
     with zipfile.ZipFile(zip_buffer, 'w') as zip_file:
-        # Add original screenshots
-        for file_path, timestamp in screenshot_files:
-            filename = f"original_screenshots/{os.path.basename(file_path)}"
-            zip_file.write(file_path, filename)
-        
         # Add Instagram posts
         for i, post_path in enumerate(instagram_posts):
             filename = f"instagram_posts/post_{i+1}.jpg"
             zip_file.write(post_path, filename)
+        
+        # Add original images if provided
+        if original_images:
+            for i, img_file in enumerate(original_images):
+                filename = f"original_screenshots/screenshot_{i+1}.jpg"
+                # Save original image to temp file and add to zip
+                with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as temp_file:
+                    img = Image.open(img_file)
+                    img.save(temp_file.name, quality=95)
+                    zip_file.write(temp_file.name, filename)
+                    os.unlink(temp_file.name)
     
     return zip_buffer.getvalue()
 
 # Streamlit UI
+st.set_page_config(page_title="YouTube to Instagram Creator", page_icon="📸", layout="wide")
+
 st.title("📸 YouTube to Instagram Post Creator")
-st.write("Extract screenshots from YouTube videos and create Instagram-ready posts with custom text!")
+st.write("Transform your YouTube screenshots into professional Instagram posts!")
 
-# Input fields
-youtube_url = st.text_input("YouTube URL:", placeholder="https://youtube.com/watch?v=...")
-
-st.write("**Enter timestamps** (one per line):")
-st.write("Format: seconds (e.g., 30) or MM:SS (e.g., 1:30)")
-timestamps_text = st.text_area("Timestamps:", placeholder="30\n1:45\n3:20\n5:00")
-
-# Text input for posts
-st.write("**Enter text for each Instagram post** (one per line):")
-st.write("Each line will be split between the 2 screenshots in that post")
-post_texts_input = st.text_area(
-    "Post texts:", 
-    placeholder="This is the text for post 1 - it will be split between the two screenshots\nThis is the text for post 2 - also split between two images\nPost 3 text goes here",
-    help="Enter one line of text for each Instagram post. The text will be automatically split between the top and bottom screenshots."
+# Method selection
+method = st.radio(
+    "Choose your method:",
+    ["📤 Upload Screenshots", "🎥 YouTube Embed + Screenshots"],
+    help="Upload method is recommended for best quality and reliability"
 )
 
-# Options
-col1, col2 = st.columns(2)
-with col1:
-    include_originals = st.checkbox("Include original screenshots", value=True)
-with col2:
-    show_preview = st.checkbox("Show preview", value=True)
-
-if st.button("Create Instagram Posts", type="primary"):
-    if youtube_url and timestamps_text:
-        # Parse timestamps
-        timestamps = []
-        for line in timestamps_text.strip().split('\n'):
-            line = line.strip()
-            if line:
-                timestamps.append(line)
+if method == "📤 Upload Screenshots":
+    st.write("### Method 1: Upload Your Screenshots")
+    
+    with st.expander("📋 How to take great YouTube screenshots"):
+        st.write("""
+        **For best results:**
+        1. Go to your YouTube video
+        2. Pause at the exact moments you want
+        3. Take screenshots using:
+           - **Windows:** Windows + Shift + S
+           - **Mac:** Cmd + Shift + 4
+           - **Mobile:** Power + Volume Down
+        4. Save as PNG or JPG
+        5. Upload them below in the order you want them to appear
         
-        # Parse post texts
-        post_texts = []
-        if post_texts_input.strip():
-            for line in post_texts_input.strip().split('\n'):
-                post_texts.append(line.strip())
+        **Tips:**
+        - Use full screen for better quality
+        - Choose moments with clear, interesting visuals
+        - Even number of screenshots works best (2 per Instagram post)
+        """)
+    
+    uploaded_files = st.file_uploader(
+        "Upload your YouTube screenshots", 
+        accept_multiple_files=True, 
+        type=['png', 'jpg', 'jpeg'],
+        help="Upload screenshots in the order you want them to appear in your Instagram posts"
+    )
+    
+    if uploaded_files:
+        st.success(f"✅ Uploaded {len(uploaded_files)} screenshots")
         
-        if timestamps:
-            # Calculate number of posts that will be created
-            num_posts = math.ceil(len(timestamps) / 2)
+        # Show preview of uploaded images
+        if st.checkbox("Show uploaded images preview"):
+            cols = st.columns(min(4, len(uploaded_files)))
+            for i, uploaded_file in enumerate(uploaded_files[:4]):
+                with cols[i % 4]:
+                    img = Image.open(uploaded_file)
+                    st.image(img, caption=f"Screenshot {i+1}", use_column_width=True)
+            if len(uploaded_files) > 4:
+                st.write(f"... and {len(uploaded_files) - 4} more images")
+        
+        # Calculate number of posts
+        num_posts = math.ceil(len(uploaded_files) / 2)
+        st.info(f"📊 This will create **{num_posts} Instagram posts** ({len(uploaded_files)} screenshots, 2 per post)")
+        
+        # Text input for posts
+        st.write("### 📝 Add Text to Your Posts")
+        st.write(f"Enter text for each of your {num_posts} Instagram posts (one line per post):")
+        
+        post_texts_input = st.text_area(
+            "Post texts:", 
+            placeholder=f"Text for Instagram post 1 (will be split between 2 screenshots)\nText for Instagram post 2\nText for Instagram post 3",
+            help="Each line will be automatically split between the 2 screenshots in that post",
+            height=100
+        )
+        
+        # Options
+        col1, col2 = st.columns(2)
+        with col1:
+            include_originals = st.checkbox("Include original screenshots in download", value=True)
+        with col2:
+            show_preview = st.checkbox("Show preview of Instagram posts", value=True)
+        
+        if st.button("🎨 Create Instagram Posts", type="primary"):
+            post_texts = [line.strip() for line in post_texts_input.split('\n') if line.strip()]
             
             # Show warning if text count doesn't match post count
             if post_texts and len(post_texts) != num_posts:
                 st.warning(f"⚠️ You have {len(post_texts)} text entries but will create {num_posts} posts. Extra texts will be ignored, missing texts will be left blank.")
             
-            with st.spinner("Creating Instagram posts... This may take a few minutes."):
-                screenshot_files, video_title, temp_dir = extract_screenshots(youtube_url, timestamps)
+            with st.spinner("Creating Instagram posts... Please wait."):
+                instagram_posts = create_posts_from_uploads(uploaded_files, post_texts)
                 
-                if screenshot_files and temp_dir:
-                    # Create Instagram posts
-                    instagram_posts = create_instagram_posts(screenshot_files, video_title, temp_dir, post_texts)
+                st.success(f"✅ Created {len(instagram_posts)} Instagram posts!")
+                
+                # Show preview
+                if show_preview and instagram_posts:
+                    st.write("### 👀 Preview of Your Instagram Posts:")
+                    cols = st.columns(min(3, len(instagram_posts)))
+                    for i, post_path in enumerate(instagram_posts[:3]):
+                        with cols[i % 3]:
+                            st.image(post_path, caption=f"Post {i+1}", use_column_width=True)
                     
-                    st.success(f"✅ Created {len(instagram_posts)} Instagram posts from {len(timestamps)} screenshots!")
-                    
-                    # Show preview
-                    if show_preview and instagram_posts:
-                        st.write("### Preview of Instagram Posts:")
-                        cols = st.columns(min(3, len(instagram_posts)))
-                        for i, post_path in enumerate(instagram_posts[:3]):  # Show max 3 previews
-                            with cols[i % 3]:
-                                st.image(post_path, caption=f"Post {i+1}", use_column_width=True)
-                        
-                        if len(instagram_posts) > 3:
-                            st.write(f"... and {len(instagram_posts) - 3} more posts")
-                    
-                    # Create download package
-                    zip_data = create_zip_file(screenshot_files, instagram_posts, temp_dir)
-                    
+                    if len(instagram_posts) > 3:
+                        st.write(f"... and {len(instagram_posts) - 3} more posts")
+                
+                # Create download
+                original_imgs = uploaded_files if include_originals else None
+                zip_data = create_zip_from_posts(instagram_posts, original_imgs)
+                
+                st.download_button(
+                    label="📥 Download Instagram Posts (ZIP)",
+                    data=zip_data,
+                    file_name=f"instagram_posts_{len(instagram_posts)}_posts.zip",
+                    mime="application/zip"
+                )
