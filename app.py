@@ -172,11 +172,11 @@ def check_password():
                     width: 340px !important;
                 }
                 
-                /* Style the button - EXACT SAME WIDTH AS PASSWORD */
+                /* Style the button - MATCH PASSWORD FIELD EXACTLY */
                 .stButton {
                     display: block !important;
                     margin-top: 1rem !important;
-                    width: 340px !important;
+                    width: 270px !important;
                     margin-left: auto !important;
                     margin-right: auto !important;
                 }
@@ -191,7 +191,7 @@ def check_password():
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                    width: 340px !important;
+                    width: 270px !important;
                     letter-spacing: 0.5px !important;
                 }
                 
@@ -445,11 +445,11 @@ def check_password():
                     width: 340px !important;
                 }
                 
-                /* Style the button - EXACT SAME WIDTH AS PASSWORD */
+                /* Style the button - MATCH PASSWORD FIELD EXACTLY */
                 .stButton {
                     display: block !important;
                     margin-top: 1rem !important;
-                    width: 340px !important;
+                    width: 270px !important;
                     margin-left: auto !important;
                     margin-right: auto !important;
                 }
@@ -464,7 +464,7 @@ def check_password():
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                    width: 340px !important;
+                    width: 270px !important;
                     letter-spacing: 0.5px !important;
                 }
                 
@@ -2946,6 +2946,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
