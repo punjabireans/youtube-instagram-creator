@@ -13,8 +13,6 @@ import hashlib
 # ============================================================================
 # PASSWORD PROTECTION
 # ============================================================================
-# Replace the ENTIRE check_password() function in your app.py with this:
-
 def check_password():
     """Returns `True` if the user had the correct password."""
     
@@ -145,7 +143,7 @@ def check_password():
                     text-shadow: 0 1px 3px rgba(0,0,0,0.2);
                 }
                 
-                /* Style the password input */
+                /* Style the password input - SHORTENED WIDTH */
                 .stTextInput > div > div > input {
                     background: rgba(255, 255, 255, 0.2) !important;
                     backdrop-filter: blur(10px);
@@ -157,7 +155,7 @@ def check_password():
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
                     width: 100% !important;
-                    max-width: 380px !important;
+                    max-width: 320px !important;
                     margin: 0 auto !important;
                     display: block !important;
                 }
@@ -174,10 +172,10 @@ def check_password():
                 
                 .stTextInput > div > div {
                     width: 100% !important;
-                    max-width: 380px !important;
+                    max-width: 320px !important;
                 }
                 
-                /* Style the button - FORCE proper centering */
+                /* Style the button - PERFECTLY CENTERED */
                 .stButton {
                     display: flex !important;
                     justify-content: center !important;
@@ -195,9 +193,10 @@ def check_password():
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                    width: 320px !important;
-                    max-width: 320px !important;
+                    width: 280px !important;
+                    max-width: 280px !important;
                     letter-spacing: 0.5px !important;
+                    margin: 0 auto !important;
                 }
                 
                 .stButton > button:hover {
@@ -421,7 +420,7 @@ def check_password():
                     text-shadow: 0 1px 3px rgba(0,0,0,0.2);
                 }
                 
-                /* Style the password input with error state */
+                /* Style the password input with error state - SHORTENED WIDTH */
                 .stTextInput > div > div > input {
                     background: rgba(255, 255, 255, 0.2) !important;
                     backdrop-filter: blur(10px);
@@ -433,7 +432,7 @@ def check_password():
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 6px rgba(255,0,0,0.2) !important;
                     width: 100% !important;
-                    max-width: 380px !important;
+                    max-width: 320px !important;
                     margin: 0 auto !important;
                     display: block !important;
                 }
@@ -450,10 +449,10 @@ def check_password():
                 
                 .stTextInput > div > div {
                     width: 100% !important;
-                    max-width: 380px !important;
+                    max-width: 320px !important;
                 }
                 
-                /* Style the button - FORCE proper centering */
+                /* Style the button - PERFECTLY CENTERED */
                 .stButton {
                     display: flex !important;
                     justify-content: center !important;
@@ -471,9 +470,10 @@ def check_password():
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                    width: 320px !important;
-                    max-width: 320px !important;
+                    width: 280px !important;
+                    max-width: 280px !important;
                     letter-spacing: 0.5px !important;
+                    margin: 0 auto !important;
                 }
                 
                 .stButton > button:hover {
@@ -2985,6 +2985,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
