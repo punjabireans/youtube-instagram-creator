@@ -145,11 +145,11 @@ def check_password():
                 
                 /* Style the password input - SHORTENED WIDTH */
                 .stTextInput > div > div > input {
-                    background: rgba(255, 255, 255, 0.2) !important;
+                    background: rgba(255, 255, 255, 0.9) !important;
                     backdrop-filter: blur(10px);
                     border: 2px solid rgba(255, 255, 255, 0.4) !important;
                     border-radius: 14px !important;
-                    color: white !important;
+                    color: #2d3748 !important;
                     padding: 16px 20px !important;
                     font-size: 1rem !important;
                     transition: all 0.3s ease !important;
@@ -161,13 +161,15 @@ def check_password():
                 }
                 
                 .stTextInput {
-                    max-width: 100% !important;
+                    max-width: 320px !important;
+                    margin: 0 auto !important;
                 }
                 
                 .stTextInput > div {
-                    max-width: 100% !important;
+                    max-width: 320px !important;
                     display: flex !important;
                     justify-content: center !important;
+                    margin: 0 auto !important;
                 }
                 
                 .stTextInput > div > div {
@@ -211,13 +213,13 @@ def check_password():
                 }
                 
                 .stTextInput > div > div > input::placeholder {
-                    color: rgba(255, 255, 255, 0.6) !important;
+                    color: rgba(45, 55, 72, 0.5) !important;
                 }
                 
                 .stTextInput > div > div > input:focus {
-                    border-color: rgba(255, 255, 255, 0.7) !important;
-                    background: rgba(255, 255, 255, 0.25) !important;
-                    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.15) !important;
+                    border-color: #667eea !important;
+                    background: white !important;
+                    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15) !important;
                     outline: none !important;
                 }
                 
@@ -422,11 +424,11 @@ def check_password():
                 
                 /* Style the password input with error state - SHORTENED WIDTH */
                 .stTextInput > div > div > input {
-                    background: rgba(255, 255, 255, 0.2) !important;
+                    background: rgba(255, 255, 255, 0.9) !important;
                     backdrop-filter: blur(10px);
                     border: 2px solid rgba(255, 100, 100, 0.7) !important;
                     border-radius: 14px !important;
-                    color: white !important;
+                    color: #2d3748 !important;
                     padding: 16px 20px !important;
                     font-size: 1rem !important;
                     transition: all 0.3s ease !important;
@@ -438,13 +440,15 @@ def check_password():
                 }
                 
                 .stTextInput {
-                    max-width: 100% !important;
+                    max-width: 320px !important;
+                    margin: 0 auto !important;
                 }
                 
                 .stTextInput > div {
-                    max-width: 100% !important;
+                    max-width: 320px !important;
                     display: flex !important;
                     justify-content: center !important;
+                    margin: 0 auto !important;
                 }
                 
                 .stTextInput > div > div {
@@ -488,12 +492,12 @@ def check_password():
                 }
                 
                 .stTextInput > div > div > input::placeholder {
-                    color: rgba(255, 255, 255, 0.6) !important;
+                    color: rgba(45, 55, 72, 0.5) !important;
                 }
                 
                 .stTextInput > div > div > input:focus {
-                    border-color: rgba(255, 255, 255, 0.7) !important;
-                    background: rgba(255, 255, 255, 0.25) !important;
+                    border-color: rgba(255, 100, 100, 0.9) !important;
+                    background: white !important;
                     box-shadow: 0 0 0 4px rgba(255, 100, 100, 0.15) !important;
                     outline: none !important;
                 }
@@ -2985,6 +2989,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
