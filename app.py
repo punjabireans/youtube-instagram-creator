@@ -763,10 +763,27 @@ st.markdown("""
     section[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
         border-right: none;
+        min-width: 21rem !important;
+        max-width: 21rem !important;
     }
     
     section[data-testid="stSidebar"] > div {
         background: transparent;
+    }
+    
+    /* HIDE the sidebar collapse button completely */
+    section[data-testid="stSidebar"] button[kind="header"] {
+        display: none !important;
+    }
+    
+    [data-testid="collapsedControl"] {
+        display: none !important;
+    }
+    
+    /* Make sidebar always visible */
+    section[data-testid="stSidebar"] {
+        transform: none !important;
+        margin-left: 0 !important;
     }
     
     section[data-testid="stSidebar"] .stMarkdown {
@@ -983,47 +1000,6 @@ st.markdown("""
 
 st.markdown('<h1 class="main-header">🚀 Content Posting Automations</h1>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">Streamline your content creation and multi-platform posting workflow</p>', unsafe_allow_html=True)
-
-# Add a permanent, visible button to open sidebar
-col1, col2 = st.columns([1, 9])
-with col1:
-    st.markdown("""
-    <style>
-        /* Make this button always visible and prominent */
-        div[data-testid="column"]:first-child button {
-            background: white !important;
-            color: #667eea !important;
-            border: 3px solid #667eea !important;
-            border-radius: 8px !important;
-            padding: 12px 16px !important;
-            font-size: 1.5rem !important;
-            font-weight: 700 !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
-            width: 100% !important;
-        }
-        
-        div[data-testid="column"]:first-child button:hover {
-            background: #667eea !important;
-            color: white !important;
-            transform: scale(1.1);
-            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4) !important;
-        }
-    </style>
-    """, unsafe_allow_html=True)
-    
-    if st.button("☰\n\nSettings", key="open_sidebar_btn", help="Open Settings Sidebar"):
-        st.info("💡 Look for the sidebar on the LEFT edge of your screen!")
-
-with col2:
-    st.markdown("""
-    <div style='background: #e3f2fd; padding: 1rem 1.5rem; border-radius: 12px; margin-bottom: 1rem; 
-                border-left: 4px solid #2196f3;'>
-        <p style='margin: 0; color: #1565c0; font-size: 0.95rem;'>
-            ⚙️ <strong>Need API Settings?</strong> Click the <strong>☰ Settings</strong> button on the left, 
-            or press <strong>CTRL+SHIFT+[</strong> (Windows) / <strong>CMD+SHIFT+[</strong> (Mac)
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
 
 # Hidden component to load data from localStorage
 load_storage_js = """
