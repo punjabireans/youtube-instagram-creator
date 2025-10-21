@@ -181,7 +181,7 @@ def check_password():
                 .stButton {
                     display: flex !important;
                     justify-content: center !important;
-                    margin-top: 1.5rem !important;
+                    margin-top: 1rem !important;
                 }
                 
                 .stButton > button {
@@ -195,8 +195,9 @@ def check_password():
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
                     width: 380px !important;
-                    max-width: 100% !important;
+                    max-width: 380px !important;
                     letter-spacing: 0.5px !important;
+                    margin: 0 auto !important;
                 }
                 
                 .stButton > button:hover {
@@ -262,7 +263,7 @@ def check_password():
                 </div>
             """, unsafe_allow_html=True)
             
-            st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='height: 35px;'></div>", unsafe_allow_html=True)
             
             # Password input
             password_input = st.text_input(
@@ -455,7 +456,7 @@ def check_password():
                 .stButton {
                     display: flex !important;
                     justify-content: center !important;
-                    margin-top: 1.5rem !important;
+                    margin-top: 1rem !important;
                 }
                 
                 .stButton > button {
@@ -469,8 +470,9 @@ def check_password():
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
                     width: 380px !important;
-                    max-width: 100% !important;
+                    max-width: 380px !important;
                     letter-spacing: 0.5px !important;
+                    margin: 0 auto !important;
                 }
                 
                 .stButton > button:hover {
@@ -546,7 +548,7 @@ def check_password():
                 </div>
             """, unsafe_allow_html=True)
             
-            st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='height: 35px;'></div>", unsafe_allow_html=True)
             
             # Password input
             password_input = st.text_input(
@@ -2981,6 +2983,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
