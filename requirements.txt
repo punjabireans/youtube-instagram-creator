@@ -2,3 +2,5 @@ streamlit
 yt-dlp
 opencv-python-headless
 Pillow
+requests
+pytz
