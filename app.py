@@ -14,6 +14,8 @@ import hashlib
 # PASSWORD PROTECTION
 # ============================================================================
 
+# Replace the check_password() function in your app.py with this:
+
 def check_password():
     """Returns `True` if the user had the correct password."""
     
@@ -26,28 +28,130 @@ def check_password():
             st.session_state["password_correct"] = False
 
     if "password_correct" not in st.session_state:
-        # First run, show password input
+        # First run, show password input with new design
         st.markdown("""
             <style>
+                /* Hide default Streamlit elements */
+                #MainMenu {visibility: hidden;}
+                footer {visibility: hidden;}
+                header {visibility: hidden;}
+                .block-container {padding: 0 !important; max-width: 100% !important;}
+                
+                /* Full screen purple gradient background */
                 .main {
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     padding: 0 !important;
+                    min-height: 100vh;
                 }
-                .block-container {
-                    padding-top: 5rem !important;
+                
+                /* Animated stars background */
+                @keyframes twinkle {
+                    0%, 100% { opacity: 0.3; }
+                    50% { opacity: 1; }
+                }
+                
+                .stars {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    pointer-events: none;
+                }
+                
+                .star {
+                    position: absolute;
+                    width: 2px;
+                    height: 2px;
+                    background: white;
+                    border-radius: 50%;
+                    animation: twinkle 3s infinite;
                 }
             </style>
+            
+            <div class="stars" id="stars-container"></div>
+            
+            <script>
+                // Create random stars
+                const container = document.getElementById('stars-container');
+                for(let i = 0; i < 100; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    star.style.left = Math.random() * 100 + '%';
+                    star.style.top = Math.random() * 100 + '%';
+                    star.style.animationDelay = Math.random() * 3 + 's';
+                    container.appendChild(star);
+                }
+            </script>
         """, unsafe_allow_html=True)
         
         # Center the login card
-        col1, col2, col3 = st.columns([1, 2, 1])
+        col1, col2, col3 = st.columns([1, 1.5, 1])
+        
         with col2:
+            st.markdown("<div style='height: 15vh;'></div>", unsafe_allow_html=True)
+            
             st.markdown("""
-                <div style='background: white; padding: 3rem 2rem; border-radius: 20px; 
-                            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); text-align: center; margin-top: 10vh;'>
-                    <h1 style='color: #667eea; margin-bottom: 0.5rem; font-size: 2rem;'>🔒 Content Posting Automations</h1>
-                    <p style='color: #666; margin-bottom: 2rem; font-size: 1rem;'>Please enter the password to access this tool</p>
+                <div style='background: rgba(255, 255, 255, 0.1); 
+                            backdrop-filter: blur(10px);
+                            padding: 3rem 2.5rem; 
+                            border-radius: 24px; 
+                            border: 2px solid rgba(255, 255, 255, 0.2);
+                            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                            text-align: center;'>
+                    <h1 style='color: white; 
+                               margin-bottom: 0.5rem; 
+                               font-size: 2.5rem;
+                               font-weight: 700;
+                               text-shadow: 0 2px 10px rgba(0,0,0,0.3);'>
+                        Login
+                    </h1>
+                    <p style='color: rgba(255, 255, 255, 0.9); 
+                              margin-bottom: 2rem; 
+                              font-size: 1rem;'>
+                        Enter your password to access the tool
+                    </p>
                 </div>
+            """, unsafe_allow_html=True)
+            
+            # Custom styled password input
+            st.markdown("""
+                <style>
+                    /* Style the password input */
+                    .stTextInput > div > div > input {
+                        background: rgba(255, 255, 255, 0.15) !important;
+                        backdrop-filter: blur(10px);
+                        border: 2px solid rgba(255, 255, 255, 0.3) !important;
+                        border-radius: 12px !important;
+                        color: white !important;
+                        padding: 14px 20px !important;
+                        font-size: 1rem !important;
+                        transition: all 0.3s ease !important;
+                    }
+                    
+                    .stTextInput > div > div > input::placeholder {
+                        color: rgba(255, 255, 255, 0.6) !important;
+                    }
+                    
+                    .stTextInput > div > div > input:focus {
+                        border-color: rgba(255, 255, 255, 0.6) !important;
+                        background: rgba(255, 255, 255, 0.2) !important;
+                        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1) !important;
+                    }
+                    
+                    /* Style the label */
+                    .stTextInput > label {
+                        color: white !important;
+                        font-weight: 600 !important;
+                        margin-bottom: 0.5rem !important;
+                        text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                    }
+                    
+                    /* Hide the label since we have it in the card */
+                    .stTextInput > label {
+                        display: none;
+                    }
+                </style>
             """, unsafe_allow_html=True)
             
             st.text_input(
@@ -55,41 +159,157 @@ def check_password():
                 type="password", 
                 on_change=password_entered, 
                 key="password",
-                placeholder="Enter password...",
-                label_visibility="visible"
+                placeholder="Enter your password...",
+                label_visibility="collapsed"
             )
             
             st.markdown("""
                 <div style='text-align: center; margin-top: 2rem;'>
-                    <p style='color: white; font-size: 0.9rem;'>
-                        🔐 Protected access only
+                    <p style='color: rgba(255, 255, 255, 0.7); 
+                              font-size: 0.9rem;
+                              text-shadow: 0 1px 3px rgba(0,0,0,0.2);'>
+                        🔐 Secure access • Content Posting Automations
                     </p>
                 </div>
             """, unsafe_allow_html=True)
         
         return False
+        
     elif not st.session_state["password_correct"]:
-        # Password incorrect, show error and password input again
+        # Password incorrect, show error with same design
         st.markdown("""
             <style>
+                /* Hide default Streamlit elements */
+                #MainMenu {visibility: hidden;}
+                footer {visibility: hidden;}
+                header {visibility: hidden;}
+                .block-container {padding: 0 !important; max-width: 100% !important;}
+                
+                /* Full screen purple gradient background */
                 .main {
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     padding: 0 !important;
+                    min-height: 100vh;
                 }
-                .block-container {
-                    padding-top: 5rem !important;
+                
+                /* Animated stars background */
+                @keyframes twinkle {
+                    0%, 100% { opacity: 0.3; }
+                    50% { opacity: 1; }
+                }
+                
+                .stars {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    pointer-events: none;
+                }
+                
+                .star {
+                    position: absolute;
+                    width: 2px;
+                    height: 2px;
+                    background: white;
+                    border-radius: 50%;
+                    animation: twinkle 3s infinite;
+                }
+                
+                /* Shake animation for error */
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    25% { transform: translateX(-10px); }
+                    75% { transform: translateX(10px); }
+                }
+                
+                .error-shake {
+                    animation: shake 0.5s;
                 }
             </style>
+            
+            <div class="stars" id="stars-container"></div>
+            
+            <script>
+                // Create random stars
+                const container = document.getElementById('stars-container');
+                for(let i = 0; i < 100; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    star.style.left = Math.random() * 100 + '%';
+                    star.style.top = Math.random() * 100 + '%';
+                    star.style.animationDelay = Math.random() * 3 + 's';
+                    container.appendChild(star);
+                }
+            </script>
         """, unsafe_allow_html=True)
         
-        col1, col2, col3 = st.columns([1, 2, 1])
+        col1, col2, col3 = st.columns([1, 1.5, 1])
+        
         with col2:
+            st.markdown("<div style='height: 15vh;'></div>", unsafe_allow_html=True)
+            
             st.markdown("""
-                <div style='background: white; padding: 3rem 2rem; border-radius: 20px; 
-                            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); text-align: center; margin-top: 10vh;'>
-                    <h1 style='color: #667eea; margin-bottom: 0.5rem; font-size: 2rem;'>🔒 Content Posting Automations</h1>
-                    <p style='color: #666; margin-bottom: 2rem; font-size: 1rem;'>Please enter the password to access this tool</p>
+                <div class='error-shake' style='background: rgba(255, 255, 255, 0.1); 
+                            backdrop-filter: blur(10px);
+                            padding: 3rem 2.5rem; 
+                            border-radius: 24px; 
+                            border: 2px solid rgba(255, 100, 100, 0.4);
+                            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                            text-align: center;'>
+                    <h1 style='color: white; 
+                               margin-bottom: 0.5rem; 
+                               font-size: 2.5rem;
+                               font-weight: 700;
+                               text-shadow: 0 2px 10px rgba(0,0,0,0.3);'>
+                        Login
+                    </h1>
+                    <p style='color: rgba(255, 255, 255, 0.9); 
+                              margin-bottom: 2rem; 
+                              font-size: 1rem;'>
+                        Enter your password to access the tool
+                    </p>
                 </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown("""
+                <style>
+                    /* Style the password input */
+                    .stTextInput > div > div > input {
+                        background: rgba(255, 255, 255, 0.15) !important;
+                        backdrop-filter: blur(10px);
+                        border: 2px solid rgba(255, 100, 100, 0.5) !important;
+                        border-radius: 12px !important;
+                        color: white !important;
+                        padding: 14px 20px !important;
+                        font-size: 1rem !important;
+                        transition: all 0.3s ease !important;
+                    }
+                    
+                    .stTextInput > div > div > input::placeholder {
+                        color: rgba(255, 255, 255, 0.6) !important;
+                    }
+                    
+                    .stTextInput > div > div > input:focus {
+                        border-color: rgba(255, 255, 255, 0.6) !important;
+                        background: rgba(255, 255, 255, 0.2) !important;
+                        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1) !important;
+                    }
+                    
+                    /* Hide the label */
+                    .stTextInput > label {
+                        display: none;
+                    }
+                    
+                    /* Style error message */
+                    .stAlert {
+                        background: rgba(255, 100, 100, 0.2) !important;
+                        backdrop-filter: blur(10px);
+                        border: 2px solid rgba(255, 100, 100, 0.4) !important;
+                        border-radius: 12px !important;
+                        color: white !important;
+                    }
+                </style>
             """, unsafe_allow_html=True)
             
             st.text_input(
@@ -97,20 +317,24 @@ def check_password():
                 type="password", 
                 on_change=password_entered, 
                 key="password",
-                placeholder="Enter password...",
-                label_visibility="visible"
+                placeholder="Enter your password...",
+                label_visibility="collapsed"
             )
+            
             st.error("❌ Incorrect password. Please try again.")
             
             st.markdown("""
                 <div style='text-align: center; margin-top: 2rem;'>
-                    <p style='color: white; font-size: 0.9rem;'>
-                        🔐 Protected access only
+                    <p style='color: rgba(255, 255, 255, 0.7); 
+                              font-size: 0.9rem;
+                              text-shadow: 0 1px 3px rgba(0,0,0,0.2);'>
+                        🔐 Secure access • Content Posting Automations
                     </p>
                 </div>
             """, unsafe_allow_html=True)
         
         return False
+        
     else:
         # Password correct
         return True
@@ -2592,6 +2816,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
