@@ -28,17 +28,25 @@ def check_password():
     if "password_correct" not in st.session_state:
         # First run, show password input
         st.markdown("""
-            <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                        min-height: 100vh; display: flex; align-items: center; justify-content: center;'>
+            <style>
+                .main {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    padding: 0 !important;
+                }
+                .block-container {
+                    padding-top: 5rem !important;
+                }
+            </style>
         """, unsafe_allow_html=True)
         
+        # Center the login card
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             st.markdown("""
-                <div style='background: white; padding: 3rem; border-radius: 20px; 
-                            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); text-align: center;'>
-                    <h1 style='color: #667eea; margin-bottom: 0.5rem;'>🔒 Content Posting Automations</h1>
-                    <p style='color: #666; margin-bottom: 2rem;'>Please enter the password to access this tool</p>
+                <div style='background: white; padding: 3rem 2rem; border-radius: 20px; 
+                            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); text-align: center; margin-top: 10vh;'>
+                    <h1 style='color: #667eea; margin-bottom: 0.5rem; font-size: 2rem;'>🔒 Content Posting Automations</h1>
+                    <p style='color: #666; margin-bottom: 2rem; font-size: 1rem;'>Please enter the password to access this tool</p>
                 </div>
             """, unsafe_allow_html=True)
             
@@ -47,12 +55,13 @@ def check_password():
                 type="password", 
                 on_change=password_entered, 
                 key="password",
-                placeholder="Enter password..."
+                placeholder="Enter password...",
+                label_visibility="visible"
             )
             
             st.markdown("""
                 <div style='text-align: center; margin-top: 2rem;'>
-                    <p style='color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;'>
+                    <p style='color: white; font-size: 0.9rem;'>
                         🔐 Protected access only
                     </p>
                 </div>
@@ -62,17 +71,24 @@ def check_password():
     elif not st.session_state["password_correct"]:
         # Password incorrect, show error and password input again
         st.markdown("""
-            <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                        min-height: 100vh; display: flex; align-items: center; justify-content: center;'>
+            <style>
+                .main {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    padding: 0 !important;
+                }
+                .block-container {
+                    padding-top: 5rem !important;
+                }
+            </style>
         """, unsafe_allow_html=True)
         
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             st.markdown("""
-                <div style='background: white; padding: 3rem; border-radius: 20px; 
-                            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); text-align: center;'>
-                    <h1 style='color: #667eea; margin-bottom: 0.5rem;'>🔒 Content Posting Automations</h1>
-                    <p style='color: #666; margin-bottom: 2rem;'>Please enter the password to access this tool</p>
+                <div style='background: white; padding: 3rem 2rem; border-radius: 20px; 
+                            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); text-align: center; margin-top: 10vh;'>
+                    <h1 style='color: #667eea; margin-bottom: 0.5rem; font-size: 2rem;'>🔒 Content Posting Automations</h1>
+                    <p style='color: #666; margin-bottom: 2rem; font-size: 1rem;'>Please enter the password to access this tool</p>
                 </div>
             """, unsafe_allow_html=True)
             
@@ -81,13 +97,14 @@ def check_password():
                 type="password", 
                 on_change=password_entered, 
                 key="password",
-                placeholder="Enter password..."
+                placeholder="Enter password...",
+                label_visibility="visible"
             )
             st.error("❌ Incorrect password. Please try again.")
             
             st.markdown("""
                 <div style='text-align: center; margin-top: 2rem;'>
-                    <p style='color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;'>
+                    <p style='color: white; font-size: 0.9rem;'>
                         🔐 Protected access only
                     </p>
                 </div>
@@ -603,13 +620,14 @@ st.markdown("""
     
     /* Main Container */
     .main {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #f5f7fa;
         padding: 0 !important;
     }
     
     .block-container {
         padding: 2rem 1rem !important;
         max-width: 1400px !important;
+        background: #f5f7fa;
     }
     
     /* Header Styling */
@@ -617,18 +635,14 @@ st.markdown("""
         font-size: 3.5rem;
         font-weight: 800;
         text-align: center;
-        background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #1a1a2e;
         margin-bottom: 0.5rem;
         letter-spacing: -0.02em;
-        text-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
     
     .sub-header {
         text-align: center;
-        color: rgba(255, 255, 255, 0.9);
+        color: #4a5568;
         margin-bottom: 2rem;
         font-size: 1.1rem;
         font-weight: 400;
@@ -637,11 +651,10 @@ st.markdown("""
     /* Tab Styling */
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
+        background: white;
         padding: 8px;
         border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     
     .stTabs [data-baseweb="tab"] {
@@ -649,7 +662,7 @@ st.markdown("""
         padding: 0 28px;
         background: transparent;
         border-radius: 12px;
-        color: rgba(255, 255, 255, 0.7);
+        color: #4a5568;
         font-size: 15px;
         font-weight: 600;
         border: none;
@@ -657,14 +670,14 @@ st.markdown("""
     }
     
     .stTabs [data-baseweb="tab"]:hover {
-        background: rgba(255, 255, 255, 0.15);
-        color: white;
+        background: #f5f7fa;
+        color: #667eea;
     }
     
     .stTabs [aria-selected="true"] {
-        background: white !important;
-        color: #667eea !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
     
     .stTabs [data-baseweb="tab-panel"] {
@@ -672,23 +685,7 @@ st.markdown("""
         border-radius: 20px;
         padding: 2rem;
         margin-top: 1rem;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    }
-    
-    /* Card Styling */
-    .platform-card {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        padding: 2rem;
-        border-radius: 16px;
-        margin: 1.5rem 0;
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    
-    .platform-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
     
     /* Sidebar Styling */
@@ -705,18 +702,19 @@ st.markdown("""
         color: white;
     }
     
-    section[data-testid="stSidebar"] h2 {
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3 {
         color: white !important;
         font-weight: 700;
     }
     
-    section[data-testid="stSidebar"] h3 {
-        color: rgba(255, 255, 255, 0.9) !important;
-        font-weight: 600;
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] label {
+        color: white !important;
     }
     
     section[data-testid="stSidebar"] a {
-        color: rgba(255, 255, 255, 0.8) !important;
+        color: rgba(255, 255, 255, 0.9) !important;
         text-decoration: none;
         transition: color 0.2s ease;
     }
@@ -725,20 +723,33 @@ st.markdown("""
         color: white !important;
     }
     
+    section[data-testid="stSidebar"] small {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
     /* Input Fields */
     .stTextInput > div > div > input,
     .stTextArea textarea {
         border-radius: 12px;
-        border: 2px solid #e0e0e0;
+        border: 2px solid #e2e8f0;
         padding: 12px 16px;
         font-size: 15px;
         transition: all 0.2s ease;
+        background: white;
+        color: #1a202c;
     }
     
     .stTextInput > div > div > input:focus,
     .stTextArea textarea:focus {
         border-color: #667eea;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    /* Labels */
+    label {
+        color: #2d3748 !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
     }
     
     /* Buttons */
@@ -767,31 +778,38 @@ st.markdown("""
         background: linear-gradient(135deg, #5568d3 0%, #65408b 100%);
     }
     
+    .stButton > button[kind="secondary"] {
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+    }
+    
     /* File Uploader */
     .stFileUploader {
         border-radius: 16px;
         border: 2px dashed #667eea;
         padding: 2rem;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+        background: #f7fafc;
         transition: all 0.3s ease;
     }
     
     .stFileUploader:hover {
         border-color: #764ba2;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        background: #edf2f7;
     }
     
     /* Expanders */
     .streamlit-expanderHeader {
         border-radius: 12px;
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        background: #f7fafc;
         font-weight: 600;
         border: none;
         padding: 16px 20px;
+        color: #2d3748;
     }
     
     .streamlit-expanderHeader:hover {
-        background: linear-gradient(135deg, #e8eaf6 0%, #b8c6db 100%);
+        background: #edf2f7;
     }
     
     /* Metrics */
@@ -803,7 +821,7 @@ st.markdown("""
     
     [data-testid="stMetricLabel"] {
         font-weight: 600;
-        color: #666;
+        color: #4a5568;
         font-size: 0.9rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -818,28 +836,23 @@ st.markdown("""
     }
     
     .stSuccess {
-        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        background: #d4edda;
         color: #155724;
     }
     
     .stError {
-        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        background: #f8d7da;
         color: #721c24;
     }
     
     .stInfo {
-        background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+        background: #d1ecf1;
         color: #0c5460;
     }
     
     .stWarning {
-        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        background: #fff3cd;
         color: #856404;
-    }
-    
-    /* Checkbox & Radio */
-    .stCheckbox, .stRadio {
-        font-weight: 500;
     }
     
     /* Divider */
@@ -847,20 +860,14 @@ st.markdown("""
         margin: 2rem 0;
         border: none;
         height: 1px;
-        background: linear-gradient(90deg, transparent 0%, rgba(102, 126, 234, 0.3) 50%, transparent 100%);
-    }
-    
-    /* Image containers */
-    .stImage {
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        background: #e2e8f0;
     }
     
     /* Headers in content */
     h1, h2, h3 {
         font-weight: 700;
         letter-spacing: -0.02em;
+        color: #1a202c;
     }
     
     h1 {
@@ -875,9 +882,13 @@ st.markdown("""
         color: #4a5568;
     }
     
+    p {
+        color: #4a5568;
+    }
+    
     /* Code blocks */
     code {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        background: #f7fafc;
         padding: 2px 8px;
         border-radius: 6px;
         font-size: 0.9em;
@@ -885,14 +896,9 @@ st.markdown("""
         font-weight: 500;
     }
     
-    /* Animations */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .main > div {
-        animation: fadeIn 0.5s ease;
+    /* Caption text */
+    .stCaption {
+        color: #718096 !important;
     }
 </style>
 """, unsafe_allow_html=True)
