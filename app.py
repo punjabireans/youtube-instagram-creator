@@ -117,12 +117,12 @@ def check_password():
                 }
                 
                 .login-title {
-                    color: white;
+                    color: #2d3748;
                     font-size: 2.5rem;
                     font-weight: 800;
                     text-align: center;
                     margin: 0 0 0.8rem 0;
-                    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                    text-shadow: 0 2px 10px rgba(0,0,0,0.1);
                     letter-spacing: -0.03em;
                     line-height: 1.2;
                 }
@@ -194,8 +194,8 @@ def check_password():
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                    width: 380px !important;
-                    max-width: 380px !important;
+                    width: 320px !important;
+                    max-width: 320px !important;
                     letter-spacing: 0.5px !important;
                     margin: 0 auto !important;
                 }
@@ -263,7 +263,7 @@ def check_password():
                 </div>
             """, unsafe_allow_html=True)
             
-            st.markdown("<div style='height: 35px;'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='height: 45px;'></div>", unsafe_allow_html=True)
             
             # Password input
             password_input = st.text_input(
@@ -392,12 +392,12 @@ def check_password():
                 }
                 
                 .login-title {
-                    color: white;
+                    color: #2d3748;
                     font-size: 2.5rem;
                     font-weight: 800;
                     text-align: center;
                     margin: 0 0 0.8rem 0;
-                    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                    text-shadow: 0 2px 10px rgba(0,0,0,0.1);
                     letter-spacing: -0.03em;
                     line-height: 1.2;
                 }
@@ -469,8 +469,8 @@ def check_password():
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                    width: 380px !important;
-                    max-width: 380px !important;
+                    width: 320px !important;
+                    max-width: 320px !important;
                     letter-spacing: 0.5px !important;
                     margin: 0 auto !important;
                 }
@@ -548,7 +548,7 @@ def check_password():
                 </div>
             """, unsafe_allow_html=True)
             
-            st.markdown("<div style='height: 35px;'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='height: 45px;'></div>", unsafe_allow_html=True)
             
             # Password input
             password_input = st.text_input(
@@ -2983,6 +2983,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
