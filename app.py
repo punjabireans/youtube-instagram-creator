@@ -8,6 +8,146 @@ import requests
 import json
 from datetime import datetime, timedelta
 import pytz
+import hashlib
+
+# ============================================================================
+# PASSWORD PROTECTION
+# ============================================================================
+
+def check_password():
+    """Returns `True` if the user had the correct password."""
+    
+    def password_entered():
+        """Checks whether a password entered by the user is correct."""
+        if hashlib.sha256(st.session_state["password"].encode()).hexdigest() == hashlib.sha256("RenaPostTool81".encode()).hexdigest():
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]  # Don't store password
+        else:
+            st.session_state["password_correct"] = False
+
+    if "password_correct" not in st.session_state:
+        # First run, show password input
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        min-height: 100vh; display: flex; align-items: center; justify-content: center;'>
+        """, unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown("""
+                <div style='background: white; padding: 3rem; border-radius: 20px; 
+                            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); text-align: center;'>
+                    <h1 style='color: #667eea; margin-bottom: 0.5rem;'>🔒 Content Posting Automations</h1>
+                    <p style='color: #666; margin-bottom: 2rem;'>Please enter the password to access this tool</p>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            st.text_input(
+                "Password", 
+                type="password", 
+                on_change=password_entered, 
+                key="password",
+                placeholder="Enter password..."
+            )
+            
+            st.markdown("""
+                <div style='text-align: center; margin-top: 2rem;'>
+                    <p style='color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;'>
+                        🔐 Protected access only
+                    </p>
+                </div>
+            """, unsafe_allow_html=True)
+        
+        return False
+    elif not st.session_state["password_correct"]:
+        # Password incorrect, show error and password input again
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        min-height: 100vh; display: flex; align-items: center; justify-content: center;'>
+        """, unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown("""
+                <div style='background: white; padding: 3rem; border-radius: 20px; 
+                            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); text-align: center;'>
+                    <h1 style='color: #667eea; margin-bottom: 0.5rem;'>🔒 Content Posting Automations</h1>
+                    <p style='color: #666; margin-bottom: 2rem;'>Please enter the password to access this tool</p>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            st.text_input(
+                "Password", 
+                type="password", 
+                on_change=password_entered, 
+                key="password",
+                placeholder="Enter password..."
+            )
+            st.error("❌ Incorrect password. Please try again.")
+            
+            st.markdown("""
+                <div style='text-align: center; margin-top: 2rem;'>
+                    <p style='color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;'>
+                        🔐 Protected access only
+                    </p>
+                </div>
+            """, unsafe_allow_html=True)
+        
+        return False
+    else:
+        # Password correct
+        return True
+
+# ============================================================================
+# LOCALSTORAGE UTILITIES
+# ============================================================================
+
+def load_account_ids_from_localstorage():
+    """Load account IDs from browser localStorage using JavaScript"""
+    js_code = """
+    <script>
+        // Get account IDs from localStorage
+        const igId = localStorage.getItem('ig_account_id') || '';
+        const liId = localStorage.getItem('li_account_id') || '';
+        const fbId = localStorage.getItem('fb_account_id') || '';
+        const twId = localStorage.getItem('tw_account_id') || '';
+        
+        // Send to Streamlit
+        window.parent.postMessage({
+            type: 'streamlit:setComponentValue',
+            data: {
+                ig_account_id: igId,
+                li_account_id: liId,
+                fb_account_id: fbId,
+                tw_account_id: twId
+            }
+        }, '*');
+    </script>
+    """
+    st.components.v1.html(js_code, height=0)
+
+def save_to_localstorage(key, value):
+    """Save a value to browser localStorage"""
+    js_code = f"""
+    <script>
+        localStorage.setItem('{key}', '{value}');
+    </script>
+    """
+    st.components.v1.html(js_code, height=0)
+
+def clear_localstorage():
+    """Clear all saved data from localStorage"""
+    js_code = """
+    <script>
+        localStorage.removeItem('api_key');
+        localStorage.removeItem('ig_account_id');
+        localStorage.removeItem('li_account_id');
+        localStorage.removeItem('fb_account_id');
+        localStorage.removeItem('tw_account_id');
+        window.parent.postMessage({type: 'streamlit:componentReady'}, '*');
+    </script>
+    """
+    st.components.v1.html(js_code, height=0)
 
 # ============================================================================
 # FONT UTILITIES
@@ -441,41 +581,343 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS for better styling
+# Check password first
+if not check_password():
+    st.stop()  # Stop execution if password is incorrect
+
+# Custom CSS for modern, beautiful styling
 st.markdown("""
 <style>
-    .main-header {
-        font-size: 3rem;
-        font-weight: bold;
-        text-align: center;
-        color: #1A2238;
-        margin-bottom: 1rem;
+    /* Import Google Font */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    
+    /* Global Styles */
+    * {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
+    
+    /* Hide Streamlit Branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
+    /* Main Container */
+    .main {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 0 !important;
+    }
+    
+    .block-container {
+        padding: 2rem 1rem !important;
+        max-width: 1400px !important;
+    }
+    
+    /* Header Styling */
+    .main-header {
+        font-size: 3.5rem;
+        font-weight: 800;
+        text-align: center;
+        background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.02em;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
     .sub-header {
         text-align: center;
-        color: #666;
+        color: rgba(255, 255, 255, 0.9);
         margin-bottom: 2rem;
+        font-size: 1.1rem;
+        font-weight: 400;
     }
+    
+    /* Tab Styling */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 24px;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 8px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
     }
+    
     .stTabs [data-baseweb="tab"] {
-        height: 50px;
-        padding: 0 24px;
-        font-size: 16px;
+        height: 60px;
+        padding: 0 28px;
+        background: transparent;
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 15px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .stTabs [data-baseweb="tab"]:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background: white !important;
+        color: #667eea !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stTabs [data-baseweb="tab-panel"] {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-top: 1rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Card Styling */
+    .platform-card {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 2rem;
+        border-radius: 16px;
+        margin: 1.5rem 0;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .platform-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Sidebar Styling */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        border-right: none;
+    }
+    
+    section[data-testid="stSidebar"] > div {
+        background: transparent;
+    }
+    
+    section[data-testid="stSidebar"] .stMarkdown {
+        color: white;
+    }
+    
+    section[data-testid="stSidebar"] h2 {
+        color: white !important;
+        font-weight: 700;
+    }
+    
+    section[data-testid="stSidebar"] h3 {
+        color: rgba(255, 255, 255, 0.9) !important;
         font-weight: 600;
     }
-    .platform-card {
-        background: #f0f2f6;
-        padding: 1.5rem;
-        border-radius: 10px;
-        margin: 1rem 0;
+    
+    section[data-testid="stSidebar"] a {
+        color: rgba(255, 255, 255, 0.8) !important;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    
+    section[data-testid="stSidebar"] a:hover {
+        color: white !important;
+    }
+    
+    /* Input Fields */
+    .stTextInput > div > div > input,
+    .stTextArea textarea {
+        border-radius: 12px;
+        border: 2px solid #e0e0e0;
+        padding: 12px 16px;
+        font-size: 15px;
+        transition: all 0.2s ease;
+    }
+    
+    .stTextInput > div > div > input:focus,
+    .stTextArea textarea:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    /* Buttons */
+    .stButton > button {
+        border-radius: 12px;
+        padding: 12px 28px;
+        font-weight: 600;
+        font-size: 15px;
+        border: none;
+        transition: all 0.3s ease;
+        text-transform: none;
+        letter-spacing: 0.3px;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stButton > button[kind="primary"] {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .stButton > button[kind="primary"]:hover {
+        background: linear-gradient(135deg, #5568d3 0%, #65408b 100%);
+    }
+    
+    /* File Uploader */
+    .stFileUploader {
+        border-radius: 16px;
+        border: 2px dashed #667eea;
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+        transition: all 0.3s ease;
+    }
+    
+    .stFileUploader:hover {
+        border-color: #764ba2;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    }
+    
+    /* Expanders */
+    .streamlit-expanderHeader {
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-weight: 600;
+        border: none;
+        padding: 16px 20px;
+    }
+    
+    .streamlit-expanderHeader:hover {
+        background: linear-gradient(135deg, #e8eaf6 0%, #b8c6db 100%);
+    }
+    
+    /* Metrics */
+    [data-testid="stMetricValue"] {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #667eea;
+    }
+    
+    [data-testid="stMetricLabel"] {
+        font-weight: 600;
+        color: #666;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Success/Error/Info Messages */
+    .stSuccess, .stError, .stWarning, .stInfo {
+        border-radius: 12px;
+        padding: 16px 20px;
+        border: none;
+        font-weight: 500;
+    }
+    
+    .stSuccess {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724;
+    }
+    
+    .stError {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        color: #721c24;
+    }
+    
+    .stInfo {
+        background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+        color: #0c5460;
+    }
+    
+    .stWarning {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        color: #856404;
+    }
+    
+    /* Checkbox & Radio */
+    .stCheckbox, .stRadio {
+        font-weight: 500;
+    }
+    
+    /* Divider */
+    hr {
+        margin: 2rem 0;
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, transparent 0%, rgba(102, 126, 234, 0.3) 50%, transparent 100%);
+    }
+    
+    /* Image containers */
+    .stImage {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Headers in content */
+    h1, h2, h3 {
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+    
+    h1 {
+        color: #1a1a2e;
+    }
+    
+    h2 {
+        color: #2d3748;
+    }
+    
+    h3 {
+        color: #4a5568;
+    }
+    
+    /* Code blocks */
+    code {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 0.9em;
+        color: #667eea;
+        font-weight: 500;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .main > div {
+        animation: fadeIn 0.5s ease;
     }
 </style>
 """, unsafe_allow_html=True)
 
 st.markdown('<h1 class="main-header">🚀 Content Posting Automations</h1>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">Streamline your content creation and multi-platform posting workflow</p>', unsafe_allow_html=True)
+
+# Hidden component to load data from localStorage
+load_storage_js = """
+<script>
+    const apiKey = localStorage.getItem('api_key') || '';
+    const igId = localStorage.getItem('ig_account_id') || '';
+    const liId = localStorage.getItem('li_account_id') || '';
+    const fbId = localStorage.getItem('fb_account_id') || '';
+    const twId = localStorage.getItem('tw_account_id') || '';
+    
+    // Store in hidden inputs to pass to Streamlit
+    if (apiKey) document.cookie = `api_key=${apiKey}; path=/`;
+    if (igId) document.cookie = `ig_account_id=${igId}; path=/`;
+    if (liId) document.cookie = `li_account_id=${liId}; path=/`;
+    if (fbId) document.cookie = `fb_account_id=${fbId}; path=/`;
+    if (twId) document.cookie = `tw_account_id=${twId}; path=/`;
+</script>
+"""
+st.components.v1.html(load_storage_js, height=0)
 
 # Initialize session state
 if 'api_key' not in st.session_state:
@@ -484,28 +926,96 @@ if 'master_content' not in st.session_state:
     st.session_state.master_content = ""
 if 'master_schedule' not in st.session_state:
     st.session_state.master_schedule = None
+# Save account IDs (will be loaded from localStorage)
+if 'ig_account_id' not in st.session_state:
+    st.session_state.ig_account_id = ""
+if 'li_account_id' not in st.session_state:
+    st.session_state.li_account_id = ""
+if 'fb_account_id' not in st.session_state:
+    st.session_state.fb_account_id = ""
+if 'tw_account_id' not in st.session_state:
+    st.session_state.tw_account_id = ""
+
+# Load from localStorage on first load
+if 'loaded_from_storage' not in st.session_state:
+    st.session_state.loaded_from_storage = True
 
 # API Key in sidebar
 with st.sidebar:
-    st.header("⚙️ Settings")
+    st.markdown("### ⚙️ Settings")
+    st.markdown("---")
+    
     api_key = st.text_input(
-        "GetLate API Key", 
+        "🔑 GetLate API Key", 
         type="password", 
         value=st.session_state.api_key,
-        help="Enter your GetLate API key for posting"
+        help="Enter your GetLate API key for posting",
+        placeholder="Enter your API key...",
+        key="api_key_input"
     )
-    if api_key:
-        st.session_state.api_key = api_key
-        st.success("✅ API Key saved")
     
-    st.divider()
+    # Save to both session state and localStorage
+    if api_key != st.session_state.api_key:
+        st.session_state.api_key = api_key
+        if api_key:
+            save_to_localstorage('api_key', api_key)
+    
+    if api_key:
+        st.success("✅ Connected & Saved Permanently")
+    else:
+        st.warning("⚠️ API key required")
+    
+    st.markdown("---")
     st.markdown("### 📚 Resources")
-    st.markdown("[GetLate Documentation](https://getlate.dev/docs)")
-    st.markdown("[API Reference](https://getlate.dev/api)")
+    st.markdown("🔗 [GetLate Dashboard](https://getlate.dev/dashboard)")
+    st.markdown("📖 [API Documentation](https://getlate.dev/docs)")
+    st.markdown("💬 [Support](mailto:miki@getlate.dev)")
+    
+    st.markdown("---")
+    st.markdown("### 📊 Quick Stats")
+    if st.session_state.api_key:
+        st.info("🟢 API Connected")
+    else:
+        st.error("🔴 No API Key")
+    
+    # Show saved account IDs
+    saved_accounts = []
+    if st.session_state.ig_account_id:
+        saved_accounts.append("📷 Instagram")
+    if st.session_state.li_account_id:
+        saved_accounts.append("💼 LinkedIn")
+    if st.session_state.fb_account_id:
+        saved_accounts.append("👥 Facebook")
+    if st.session_state.tw_account_id:
+        saved_accounts.append("🐦 Twitter")
+    
+    if saved_accounts:
+        st.success(f"💾 {len(saved_accounts)} accounts saved")
+        with st.expander("View Saved Accounts"):
+            for account in saved_accounts:
+                st.write(account)
+            
+            st.markdown("---")
+            st.warning("⚠️ Clearing will remove API key and all account IDs")
+            if st.button("🗑️ Clear All Saved Data", use_container_width=True):
+                st.session_state.api_key = ""
+                st.session_state.ig_account_id = ""
+                st.session_state.li_account_id = ""
+                st.session_state.fb_account_id = ""
+                st.session_state.tw_account_id = ""
+                clear_localstorage()
+                st.success("✅ All data cleared!")
+                st.rerun()
+    else:
+        st.info("No accounts saved yet")
+    
+    st.markdown("---")
+    st.markdown("<small>Made with ❤️ for content creators</small>", unsafe_allow_html=True)
 
 # Create tabs
-tab1, tab2, tab3 = st.tabs([
+tab1, tab2, tab3, tab4 = st.tabs([
     "📸 YouTube to Instagram", 
+    "🎙️ CTA Podcast Content",
     "🎨 Create Carousel/Feed Post", 
     "🎬 Create Short Form Video Post"
 ])
@@ -515,175 +1025,338 @@ tab1, tab2, tab3 = st.tabs([
 # ============================================================================
 
 with tab1:
-    st.header("📸 YouTube to Instagram Post Creator")
-    st.markdown("Transform your YouTube screenshots into professional Instagram carousel posts")
+    # Hero section
+    st.markdown("""
+        <div style='text-align: center; padding: 2rem 0;'>
+            <h1 style='font-size: 2.5rem; margin-bottom: 0.5rem;'>📸 YouTube to Instagram</h1>
+            <p style='font-size: 1.1rem; color: #666;'>Transform your YouTube screenshots into stunning Instagram carousel posts</p>
+        </div>
+    """, unsafe_allow_html=True)
     
-    col1, col2 = st.columns([2, 1])
-    
-    with col1:
-        st.subheader("📤 Upload Screenshots")
+    # Upload section with modern card
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                    padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
+            <h3 style='margin-top: 0;'>📤 Upload Your Screenshots</h3>
+        </div>
+    """, unsafe_allow_html=True)
         
-        with st.expander("💡 Tips for great screenshots", expanded=False):
-            st.markdown("""
-            **Best practices:**
-            - 🎥 Go fullscreen for better quality
-            - ⏸️ Pause at interesting moments
-            - 📸 Use 2 screenshots per Instagram post
-            - 💾 Save as PNG or JPG
-            
-            **Keyboard shortcuts:**
-            - Windows: `Win + Shift + S`
-            - Mac: `Cmd + Shift + 4`
-            - Mobile: `Power + Volume Down`
-            """)
+        with st.expander("💡 Pro Tips for Amazing Screenshots", expanded=False):
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("""
+                **📸 Taking Screenshots:**
+                - 🖥️ Go fullscreen for quality
+                - ⏸️ Pause at key moments
+                - 🎯 Use 2 screenshots per post
+                - 💾 Save as PNG or JPG
+                """)
+            with col2:
+                st.markdown("""
+                **⌨️ Keyboard Shortcuts:**
+                - **Windows:** `Win + Shift + S`
+                - **Mac:** `Cmd + Shift + 4`
+                - **Mobile:** `Power + Vol Down`
+                """)
         
         uploaded_files = st.file_uploader(
-            "Drop your screenshots here", 
+            "📁 Drop your screenshots here or click to browse", 
             accept_multiple_files=True, 
             type=['png', 'jpg', 'jpeg'],
             help="Upload in the order you want them to appear"
         )
     
-    with col2:
-        if uploaded_files:
-            st.metric("Images Uploaded", len(uploaded_files))
-            num_posts = math.ceil(len(uploaded_files) / 2)
-            st.metric("Posts to Create", num_posts)
-            st.info("2 images per post")
-    
     if uploaded_files:
-        st.divider()
+        # Stats cards
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("📷 Images Uploaded", len(uploaded_files))
+        with col2:
+            num_posts = math.ceil(len(uploaded_files) / 2)
+            st.metric("📱 Posts to Create", num_posts)
+        with col3:
+            st.metric("⚡ Images per Post", "2")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
         
         # Image preview in a nice grid
-        st.subheader("🖼️ Your Screenshots")
+        st.markdown("### 🖼️ Your Screenshots")
         cols = st.columns(4)
         for i, uploaded_file in enumerate(uploaded_files):
             with cols[i % 4]:
                 img = Image.open(uploaded_file)
-                st.image(img, caption=f"#{i+1}", use_container_width=True)
+                st.image(img, caption=f"Screenshot {i+1}", use_container_width=True)
         
-        st.divider()
+        st.markdown("<br>", unsafe_allow_html=True)
         
-        # Text input section
-        st.subheader("✍️ Add Captions")
+        # Text input section with modern styling
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                        padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
+                <h3 style='margin-top: 0;'>✍️ Add Captions to Your Posts</h3>
+            </div>
+        """, unsafe_allow_html=True)
         num_posts = math.ceil(len(uploaded_files) / 2)
         
-        col1, col2 = st.columns([3, 1])
+        col1, col2 = st.columns([2, 1])
         with col1:
             post_texts_input = st.text_area(
-                f"Enter captions for your {num_posts} posts", 
+                f"📝 Enter captions for your {num_posts} posts", 
                 placeholder="Caption for post 1 (will split across 2 images)\nCaption for post 2\nCaption for post 3...",
                 height=150,
-                help="One line per post. Text will be split between the 2 images automatically."
+                help="One line per post. Text automatically splits between images."
             )
         
         with col2:
-            st.markdown("**Options**")
-            include_originals = st.checkbox("Include originals in ZIP", value=True)
-            guest_name = st.text_input("Guest name (optional)", placeholder="Dr. Jane Smith")
-            logo_file = st.file_uploader("Podcast logo", type=['png', 'jpg', 'jpeg'])
+            st.markdown("**🎨 Customization Options**")
+            include_originals = st.checkbox("📦 Include originals in ZIP", value=True)
+            guest_name = st.text_input("👤 Guest name (optional)", placeholder="Dr. Jane Smith")
+            logo_file = st.file_uploader("🎭 Podcast logo (optional)", type=['png', 'jpg', 'jpeg'])
         
-        # Create button
-        if st.button("🎨 Generate Instagram Posts", type="primary", use_container_width=True):
-            post_texts = [line.strip() for line in post_texts_input.split('\n') if line.strip()]
-            
-            with st.spinner("✨ Creating your Instagram posts..."):
-                instagram_posts = create_posts_from_uploads(
-                    uploaded_files, 
-                    post_texts, 
-                    guest_name, 
-                    logo_file
-                )
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Create button with modern styling
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button("🎨 ✨ Generate Instagram Posts", type="primary", use_container_width=True):
+                post_texts = [line.strip() for line in post_texts_input.split('\n') if line.strip()]
                 
-                st.success(f"🎉 Created {len(instagram_posts)} Instagram posts!")
-                
-                # Show preview in a beautiful grid
-                st.subheader("👀 Preview Your Posts")
-                cols = st.columns(3)
-                for i, post_img in enumerate(instagram_posts):
-                    with cols[i % 3]:
-                        st.image(post_img, caption=f"Post {i+1}", use_container_width=True)
-                
-                # Download section
-                st.divider()
-                original_imgs = uploaded_files if include_originals else None
-                zip_data = create_zip_from_posts(instagram_posts, original_imgs)
-                
-                col1, col2, col3 = st.columns([1, 2, 1])
-                with col2:
-                    st.download_button(
-                        label="📥 Download All Posts (ZIP)",
-                        data=zip_data,
-                        file_name=f"instagram_posts_{len(instagram_posts)}.zip",
-                        mime="application/zip",
-                        use_container_width=True
+                with st.spinner("✨ Creating your beautiful Instagram posts..."):
+                    instagram_posts = create_posts_from_uploads(
+                        uploaded_files, 
+                        post_texts, 
+                        guest_name, 
+                        logo_file
                     )
-                
-                st.info(f"""
-                **📦 Your download includes:**
-                - {len(instagram_posts)} Instagram-ready posts (1080x1080px)
-                - {"✅ Original screenshots" if include_originals else ""}
-                - Ready to upload to Instagram!
-                """)
+                    
+                    st.success(f"🎉 Successfully created {len(instagram_posts)} Instagram posts!")
+                    
+                    # Show preview in a beautiful grid
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    st.markdown("### 👀 Preview Your Amazing Posts")
+                    cols = st.columns(3)
+                    for i, post_img in enumerate(instagram_posts):
+                        with cols[i % 3]:
+                            st.image(post_img, caption=f"Post {i+1}", use_container_width=True)
+                    
+                    # Download section with modern card
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    st.markdown("""
+                        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); 
+                                    padding: 2rem; border-radius: 16px; text-align: center;'>
+                            <h3 style='margin-top: 0;'>📥 Download Your Posts</h3>
+                        </div>
+                    """, unsafe_allow_html=True)
+                    
+                    original_imgs = uploaded_files if include_originals else None
+                    zip_data = create_zip_from_posts(instagram_posts, original_imgs)
+                    
+                    col1, col2, col3 = st.columns([1, 2, 1])
+                    with col2:
+                        st.download_button(
+                            label="⬇️ Download All Posts (ZIP)",
+                            data=zip_data,
+                            file_name=f"instagram_posts_{len(instagram_posts)}.zip",
+                            mime="application/zip",
+                            use_container_width=True
+                        )
+                    
+                    st.info(f"""
+                    **📦 Your download includes:**
+                    - ✅ {len(instagram_posts)} Instagram-ready posts (1080x1080px)
+                    - {"✅ Original screenshots included" if include_originals else ""}
+                    - ✅ Ready to upload to Instagram instantly!
+                    """)
 
 # ============================================================================
-# TAB 2: CREATE CAROUSEL/FEED POST
+# TAB 2: CTA PODCAST CONTENT CREATION
 # ============================================================================
 
 with tab2:
-    st.header("🎨 Create Carousel/Feed Post")
-    st.markdown("Upload images, add captions, and post to multiple platforms simultaneously")
+    # Hero section
+    st.markdown("""
+        <div style='text-align: center; padding: 2rem 0;'>
+            <h1 style='font-size: 2.5rem; margin-bottom: 0.5rem;'>🎙️ CTA Podcast Content Creation</h1>
+            <p style='font-size: 1.1rem; color: #666;'>Create engaging call-to-action content for your podcast episodes</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); 
+                    padding: 3rem; border-radius: 16px; text-align: center; margin: 2rem 0;'>
+            <h2 style='margin: 0; color: #667eea;'>🚧 Coming Soon</h2>
+            <p style='color: #666; margin: 1rem 0 0 0; font-size: 1.1rem;'>This feature is currently under development</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Placeholder content
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                    padding: 2rem; border-radius: 16px; margin: 2rem 0;'>
+            <h3 style='margin-top: 0;'>📋 Planned Features:</h3>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        ### 🎨 Content Creation
+        - 📝 Custom CTA templates
+        - 🖼️ Branded graphics generator
+        - ✂️ Podcast clip creator
+        - 📊 Episode highlights extractor
+        - 🎯 Audience engagement tools
+        """)
+        
+        st.markdown("""
+        ### 🎙️ Podcast Specific
+        - 🎵 Audio waveform visualizer
+        - 📢 Guest spotlight creator
+        - 🔊 Episode teaser generator
+        - 💬 Quote card maker
+        - 🎧 Listen now CTAs
+        """)
+    
+    with col2:
+        st.markdown("""
+        ### 📱 Social Media Ready
+        - 📸 Instagram story templates
+        - 🎬 Reel/Short form video CTAs
+        - 🖼️ Carousel post builder
+        - 📝 Caption suggestions
+        - #️⃣ Hashtag recommendations
+        """)
+        
+        st.markdown("""
+        ### 🚀 Automation
+        - ⏰ Scheduled content drops
+        - 🔄 Auto-post episode releases
+        - 📧 Email newsletter integration
+        - 📊 Analytics tracking
+        - 🎯 A/B testing CTAs
+        """)
+    
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    # Interactive placeholder
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                    padding: 2rem; border-radius: 16px; margin: 2rem 0;'>
+            <h3 style='margin-top: 0; text-align: center;'>💡 Got Ideas?</h3>
+            <p style='text-align: center; color: #666;'>Help shape this feature! What podcast CTA tools would you find most valuable?</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    user_suggestions = st.text_area(
+        "Share your suggestions (optional)",
+        placeholder="What features would make your podcast content creation easier?",
+        height=100
+    )
+    
+    if st.button("📧 Send Suggestions", type="primary", use_container_width=True):
+        if user_suggestions:
+            st.success("✅ Thank you! Your suggestions have been noted.")
+            st.balloons()
+        else:
+            st.info("💡 Please enter your suggestions above")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Call to action
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                    padding: 3rem; border-radius: 16px; text-align: center; color: white;'>
+            <h2 style='margin: 0 0 1rem 0; color: white;'>🎙️ Stay Tuned!</h2>
+            <p style='margin: 0 0 1.5rem 0; font-size: 1.1rem;'>We're working hard to bring you the best podcast CTA tools</p>
+            <p style='margin: 0; font-size: 0.9rem; opacity: 0.9;'>Expected release: Coming Soon</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+# ============================================================================
+# TAB 3: CREATE CAROUSEL/FEED POST
+# ============================================================================
+
+with tab3:
+    # Hero section
+    st.markdown("""
+        <div style='text-align: center; padding: 2rem 0;'>
+            <h1 style='font-size: 2.5rem; margin-bottom: 0.5rem;'>🎨 Multi-Platform Post Creator</h1>
+            <p style='font-size: 1.1rem; color: #666;'>Upload once, post everywhere. Reach your audience across all platforms</p>
+        </div>
+    """, unsafe_allow_html=True)
     
     # Check API key
     if not st.session_state.api_key:
-        st.warning("⚠️ Please enter your GetLate API Key in the sidebar to use this feature")
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); 
+                        padding: 2rem; border-radius: 16px; text-align: center; margin: 2rem 0;'>
+                <h3 style='margin: 0; color: #856404;'>⚠️ API Key Required</h3>
+                <p style='color: #856404; margin: 0.5rem 0 0 0;'>Please enter your GetLate API Key in the sidebar to use this feature</p>
+            </div>
+        """, unsafe_allow_html=True)
     
-    st.divider()
-    
-    # Image upload section
-    st.subheader("📤 Upload Media")
+    # Image upload section with modern card
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                    padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
+            <h3 style='margin-top: 0;'>📤 Upload Your Media</h3>
+        </div>
+    """, unsafe_allow_html=True)    
     carousel_images = st.file_uploader(
-        "Upload images for your post",
+        "📁 Drop your images here or click to browse",
         accept_multiple_files=True,
         type=['png', 'jpg', 'jpeg'],
-        key="carousel_images"
+        key="carousel_images",
+        help="Upload images for your carousel or feed post"
     )
     
     if carousel_images:
-        st.success(f"✅ {len(carousel_images)} image(s) uploaded")
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.success(f"✅ {len(carousel_images)} image(s) uploaded successfully")
+        with col2:
+            st.metric("📷 Total Images", len(carousel_images))
+        
+        # Image preview
         cols = st.columns(min(5, len(carousel_images)))
         for i, img_file in enumerate(carousel_images[:5]):
             with cols[i]:
                 img = Image.open(img_file)
-                st.image(img, use_container_width=True)
+                st.image(img, use_container_width=True, caption=f"#{i+1}")
         if len(carousel_images) > 5:
-            st.info(f"... and {len(carousel_images) - 5} more images")
+            st.info(f"➕ ... and {len(carousel_images) - 5} more images")
     
-    st.divider()
+    st.markdown("<br>", unsafe_allow_html=True)
     
-    # Master content editor
-    st.subheader("📝 Master Content Editor")
-    st.markdown("Edit your post content here, then push to specific platforms")
+    # Master content editor with modern styling
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                    padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
+            <h3 style='margin-top: 0;'>📝 Master Content Editor</h3>
+            <p style='color: #666; margin: 0;'>Create your content once, then customize for each platform</p>
+        </div>
+    """, unsafe_allow_html=True)
     
-    col1, col2 = st.columns([3, 1])
+    col1, col2 = st.columns([2, 1])
     
     with col1:
         master_content = st.text_area(
-            "Post Content",
+            "✍️ Post Content",
             value=st.session_state.master_content,
             height=150,
-            placeholder="Write your post content here...",
+            placeholder="Write your post content here... This will be your default content for all platforms.",
             key="master_content_input"
         )
         st.session_state.master_content = master_content
     
     with col2:
-        st.markdown("**Master Schedule**")
+        st.markdown("**📅 Master Schedule (PDT)**")
         
         # Date and time picker
         default_date = datetime.now() + timedelta(hours=1)
-        master_date = st.date_input("Date", value=default_date)
-        master_time = st.time_input("Time (PDT)", value=default_date.time())
+        master_date = st.date_input("📆 Date", value=default_date)
+        master_time = st.time_input("🕐 Time", value=default_date.time())
         
         # Combine date and time
         master_datetime = datetime.combine(master_date, master_time)
@@ -693,59 +1366,83 @@ with tab2:
         
         st.session_state.master_schedule = master_schedule_iso
         
-        if st.button("📋 Push to All Platforms", use_container_width=True):
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        if st.button("📋 Push to All Platforms", use_container_width=True, type="secondary"):
             st.session_state.push_to_all = True
-            st.success("Content pushed to all platforms!")
+            st.success("✅ Content pushed!")
     
-    st.divider()
+    st.markdown("<br>", unsafe_allow_html=True)
     
-    # Platform selection
-    st.subheader("🌐 Select Platforms")
+    # Platform selection with modern cards
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                    padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
+            <h3 style='margin-top: 0;'>🌐 Select Your Platforms</h3>
+            <p style='color: #666; margin: 0;'>Choose which platforms to post to</p>
+        </div>
+    """, unsafe_allow_html=True)
     
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        enable_instagram = st.checkbox("📷 Instagram", value=False)
+        enable_instagram = st.checkbox("📷 **Instagram**", value=False, key="enable_ig")
     with col2:
-        enable_linkedin = st.checkbox("💼 LinkedIn", value=False)
+        enable_linkedin = st.checkbox("💼 **LinkedIn**", value=False, key="enable_li")
     with col3:
-        enable_facebook = st.checkbox("👥 Facebook", value=False)
+        enable_facebook = st.checkbox("👥 **Facebook**", value=False, key="enable_fb")
     with col4:
-        enable_twitter = st.checkbox("🐦 Twitter", value=False)
+        enable_twitter = st.checkbox("🐦 **Twitter**", value=False, key="enable_tw")
     
-    st.divider()
+    st.markdown("<br>", unsafe_allow_html=True)
     
     # Platform-specific configurations
     platforms_config = []
     
     # Instagram Configuration
     if enable_instagram:
-        with st.expander("📷 Instagram Configuration", expanded=True):
-            st.markdown("### Instagram Post Settings")
-            
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); 
+                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
+                <div style='background: white; padding: 2rem; border-radius: 15px;'>
+                    <h3 style='margin-top: 0; color: #bc1888;'>📷 Instagram Configuration</h3>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        with st.container():
             col1, col2 = st.columns([2, 1])
             
             with col1:
                 ig_account_id = st.text_input(
-                    "Account ID",
-                    key="ig_account",
-                    placeholder="INSTAGRAM_ACCOUNT_ID"
+                    "🆔 Instagram Account ID",
+                    key="ig_account_input",
+                    value=st.session_state.ig_account_id,
+                    placeholder="Enter your Instagram account ID"
                 )
+                # Save to both session state and localStorage
+                if ig_account_id != st.session_state.ig_account_id:
+                    st.session_state.ig_account_id = ig_account_id
+                    if ig_account_id:
+                        save_to_localstorage('ig_account_id', ig_account_id)
+                
+                if ig_account_id:
+                    st.caption("✅ Account ID saved permanently")
                 
                 ig_content = st.text_area(
-                    "Caption",
+                    "💬 Caption",
                     value=st.session_state.master_content if st.session_state.get('push_to_all') else "",
                     height=100,
                     key="ig_content",
-                    placeholder="Your Instagram caption..."
+                    placeholder="Your Instagram caption with hashtags..."
                 )
             
             with col2:
-                if st.button("📋 Use Master Content", key="ig_use_master"):
+                if st.button("📋 Use Master", key="ig_use_master", use_container_width=True):
                     st.session_state.ig_content = st.session_state.master_content
                     st.rerun()
                 
-                st.markdown("**Schedule**")
+                st.markdown("**📅 Schedule**")
                 use_master_schedule = st.checkbox("Use master schedule", value=True, key="ig_master_sched")
                 
                 if not use_master_schedule:
@@ -761,7 +1458,7 @@ with tab2:
                 # Upload images to GetLate first
                 media_items = []
                 if carousel_images:
-                    with st.spinner("Uploading images to GetLate..."):
+                    with st.spinner("📤 Uploading images to GetLate..."):
                         for img in carousel_images:
                             url = upload_image_to_getlate(img, st.session_state.api_key)
                             if url:
@@ -777,32 +1474,48 @@ with tab2:
     
     # LinkedIn Configuration
     if enable_linkedin:
-        with st.expander("💼 LinkedIn Configuration", expanded=True):
-            st.markdown("### LinkedIn Post Settings")
-            
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%); 
+                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
+                <div style='background: white; padding: 2rem; border-radius: 15px;'>
+                    <h3 style='margin-top: 0; color: #0077b5;'>💼 LinkedIn Configuration</h3>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        with st.container():
             col1, col2 = st.columns([2, 1])
             
             with col1:
                 li_account_id = st.text_input(
-                    "Account ID",
-                    key="li_account",
-                    placeholder="LINKEDIN_ACCOUNT_ID"
+                    "🆔 LinkedIn Account ID",
+                    key="li_account_input",
+                    value=st.session_state.li_account_id,
+                    placeholder="Enter your LinkedIn account ID"
                 )
+                # Save to both session state and localStorage
+                if li_account_id != st.session_state.li_account_id:
+                    st.session_state.li_account_id = li_account_id
+                    if li_account_id:
+                        save_to_localstorage('li_account_id', li_account_id)
+                
+                if li_account_id:
+                    st.caption("✅ Account ID saved permanently")
                 
                 li_content = st.text_area(
-                    "Post Content",
+                    "💬 Post Content",
                     value=st.session_state.master_content if st.session_state.get('push_to_all') else "",
                     height=100,
                     key="li_content",
-                    placeholder="Your LinkedIn post..."
+                    placeholder="Your professional LinkedIn post..."
                 )
             
             with col2:
-                if st.button("📋 Use Master Content", key="li_use_master"):
+                if st.button("📋 Use Master", key="li_use_master", use_container_width=True):
                     st.session_state.li_content = st.session_state.master_content
                     st.rerun()
                 
-                st.markdown("**Schedule**")
+                st.markdown("**📅 Schedule**")
                 use_master_schedule_li = st.checkbox("Use master schedule", value=True, key="li_master_sched")
                 
                 if not use_master_schedule_li:
@@ -818,7 +1531,7 @@ with tab2:
                 # Upload images to GetLate first
                 media_items = []
                 if carousel_images:
-                    with st.spinner("Uploading images to GetLate..."):
+                    with st.spinner("📤 Uploading images to GetLate..."):
                         for img in carousel_images:
                             url = upload_image_to_getlate(img, st.session_state.api_key)
                             if url:
@@ -834,20 +1547,36 @@ with tab2:
     
     # Facebook Configuration
     if enable_facebook:
-        with st.expander("👥 Facebook Configuration", expanded=True):
-            st.markdown("### Facebook Post Settings")
-            
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #1877f2 0%, #0c63d4 100%); 
+                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
+                <div style='background: white; padding: 2rem; border-radius: 15px;'>
+                    <h3 style='margin-top: 0; color: #1877f2;'>👥 Facebook Configuration</h3>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        with st.container():
             col1, col2 = st.columns([2, 1])
             
             with col1:
                 fb_account_id = st.text_input(
-                    "Account ID",
-                    key="fb_account",
-                    placeholder="FACEBOOK_ACCOUNT_ID"
+                    "🆔 Facebook Account ID",
+                    key="fb_account_input",
+                    value=st.session_state.fb_account_id,
+                    placeholder="Enter your Facebook account ID"
                 )
+                # Save to both session state and localStorage
+                if fb_account_id != st.session_state.fb_account_id:
+                    st.session_state.fb_account_id = fb_account_id
+                    if fb_account_id:
+                        save_to_localstorage('fb_account_id', fb_account_id)
+                
+                if fb_account_id:
+                    st.caption("✅ Account ID saved permanently")
                 
                 fb_content = st.text_area(
-                    "Post Content",
+                    "💬 Post Content",
                     value=st.session_state.master_content if st.session_state.get('push_to_all') else "",
                     height=100,
                     key="fb_content",
@@ -855,11 +1584,11 @@ with tab2:
                 )
             
             with col2:
-                if st.button("📋 Use Master Content", key="fb_use_master"):
+                if st.button("📋 Use Master", key="fb_use_master", use_container_width=True):
                     st.session_state.fb_content = st.session_state.master_content
                     st.rerun()
                 
-                st.markdown("**Schedule**")
+                st.markdown("**📅 Schedule**")
                 use_master_schedule_fb = st.checkbox("Use master schedule", value=True, key="fb_master_sched")
                 
                 if not use_master_schedule_fb:
@@ -875,7 +1604,7 @@ with tab2:
                 # Upload images to GetLate first
                 media_items = []
                 if carousel_images:
-                    with st.spinner("Uploading images to GetLate..."):
+                    with st.spinner("📤 Uploading images to GetLate..."):
                         for img in carousel_images:
                             url = upload_image_to_getlate(img, st.session_state.api_key)
                             if url:
@@ -891,39 +1620,57 @@ with tab2:
     
     # Twitter Configuration
     if enable_twitter:
-        with st.expander("🐦 Twitter Configuration", expanded=True):
-            st.markdown("### Twitter Post Settings")
-            
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #1DA1F2 0%, #0c85d0 100%); 
+                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
+                <div style='background: white; padding: 2rem; border-radius: 15px;'>
+                    <h3 style='margin-top: 0; color: #1DA1F2;'>🐦 Twitter Configuration</h3>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        with st.container():
             col1, col2 = st.columns([2, 1])
             
             with col1:
                 tw_account_id = st.text_input(
-                    "Account ID",
-                    key="tw_account",
-                    placeholder="TWITTER_ACCOUNT_ID"
+                    "🆔 Twitter Account ID",
+                    key="tw_account_input",
+                    value=st.session_state.tw_account_id,
+                    placeholder="Enter your Twitter account ID"
                 )
+                # Save to both session state and localStorage
+                if tw_account_id != st.session_state.tw_account_id:
+                    st.session_state.tw_account_id = tw_account_id
+                    if tw_account_id:
+                        save_to_localstorage('tw_account_id', tw_account_id)
+                
+                if tw_account_id:
+                    st.caption("✅ Account ID saved permanently")
                 
                 tw_content = st.text_area(
-                    "Tweet Content",
+                    "💬 Tweet Content",
                     value=st.session_state.master_content if st.session_state.get('push_to_all') else "",
                     height=100,
                     key="tw_content",
-                    placeholder="Your tweet...",
+                    placeholder="Your tweet (max 280 characters)...",
                     max_chars=280
                 )
                 
                 char_count = len(tw_content)
                 if char_count > 280:
                     st.error(f"⚠️ Tweet is {char_count - 280} characters over the limit!")
+                elif char_count > 250:
+                    st.warning(f"⚡ {280 - char_count} characters remaining")
                 else:
-                    st.info(f"Characters: {char_count}/280")
+                    st.info(f"✍️ {char_count}/280 characters used")
             
             with col2:
-                if st.button("📋 Use Master Content", key="tw_use_master"):
+                if st.button("📋 Use Master", key="tw_use_master", use_container_width=True):
                     st.session_state.tw_content = st.session_state.master_content
                     st.rerun()
                 
-                st.markdown("**Schedule**")
+                st.markdown("**📅 Schedule**")
                 use_master_schedule_tw = st.checkbox("Use master schedule", value=True, key="tw_master_sched")
                 
                 if not use_master_schedule_tw:
@@ -939,7 +1686,7 @@ with tab2:
                 # Upload images to GetLate first
                 media_items = []
                 if carousel_images:
-                    with st.spinner("Uploading images to GetLate..."):
+                    with st.spinner("📤 Uploading images to GetLate..."):
                         for img in carousel_images:
                             url = upload_image_to_getlate(img, st.session_state.api_key)
                             if url:
@@ -955,33 +1702,66 @@ with tab2:
     
     # Preview and Submit Section
     if platforms_config:
-        st.divider()
-        st.subheader("👀 Preview Your Posts")
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); 
+                        padding: 2rem; border-radius: 16px; margin: 2rem 0;'>
+                <h3 style='margin-top: 0;'>👀 Preview Your Posts</h3>
+                <p style='color: #666; margin: 0;'>Review your content before scheduling</p>
+            </div>
+        """, unsafe_allow_html=True)
         
         # Show preview for each platform
         for platform_data in platforms_config:
-            with st.expander(f"Preview: {platform_data['platform']}", expanded=False):
-                col1, col2 = st.columns([2, 1])
+            platform_colors = {
+                "Instagram": "linear-gradient(135deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%)",
+                "LinkedIn": "linear-gradient(135deg, #0077b5 0%, #00a0dc 100%)",
+                "Facebook": "linear-gradient(135deg, #1877f2 0%, #0c63d4 100%)",
+                "Twitter": "linear-gradient(135deg, #1DA1F2 0%, #0c85d0 100%)"
+            }
+            
+            platform_icons = {
+                "Instagram": "📷",
+                "LinkedIn": "💼",
+                "Facebook": "👥",
+                "Twitter": "🐦"
+            }
+            
+            st.markdown(f"""
+                <div style='background: {platform_colors.get(platform_data["platform"], "#667eea")}; 
+                            padding: 0.1rem; border-radius: 12px; margin: 1rem 0;'>
+                    <div style='background: white; padding: 1.5rem; border-radius: 11px;'>
+                        <h4 style='margin: 0; color: #333;'>{platform_icons.get(platform_data["platform"], "📱")} {platform_data["platform"]}</h4>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            col1, col2 = st.columns([2, 1])
+            
+            with col1:
+                st.markdown("**📝 Content:**")
+                if platform_data['content']:
+                    st.info(platform_data['content'])
+                else:
+                    st.warning("_No content provided_")
                 
-                with col1:
-                    st.markdown(f"**Content:**")
-                    st.info(platform_data['content'] if platform_data['content'] else "_No content_")
-                    
-                    if platform_data['mediaItems']:
-                        st.markdown(f"**Media:** {len(platform_data['mediaItems'])} image(s)")
+                if platform_data['mediaItems']:
+                    st.success(f"📷 {len(platform_data['mediaItems'])} image(s) attached")
+            
+            with col2:
+                st.markdown("**🆔 Account ID:**")
+                st.code(platform_data['accountId'], language=None)
                 
-                with col2:
-                    st.markdown(f"**Account ID:**")
-                    st.code(platform_data['accountId'])
-                    
-                    st.markdown(f"**Scheduled for:**")
-                    schedule_time = datetime.fromisoformat(platform_data['schedule'])
-                    st.write(schedule_time.strftime("%B %d, %Y at %I:%M %p PDT"))
+                st.markdown("**📅 Scheduled for:**")
+                schedule_time = datetime.fromisoformat(platform_data['schedule'])
+                st.write(schedule_time.strftime("%B %d, %Y"))
+                st.write(schedule_time.strftime("%I:%M %p PDT"))
         
-        st.divider()
+        st.markdown("<br>", unsafe_allow_html=True)
         
         # Final API payload preview
-        with st.expander("🔍 View API Payload", expanded=False):
+        with st.expander("🔍 View Technical Details (API Payload)", expanded=False):
             # Create individual payloads for each platform
             for platform_data in platforms_config:
                 payload = build_post_payload(
@@ -994,23 +1774,41 @@ with tab2:
                     }]
                 )
                 
-                st.markdown(f"**{platform_data['platform']} Payload:**")
+                st.markdown(f"**{platform_data['platform']} API Payload:**")
                 st.json(payload)
-                st.divider()
+                st.markdown("---")
         
-        # Submit button
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Submit button with modern styling
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                        padding: 2rem; border-radius: 16px; text-align: center;'>
+                <h3 style='margin-top: 0;'>🚀 Ready to Launch?</h3>
+                <p style='color: #666; margin: 0;'>Schedule your posts across all selected platforms</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             if st.button("🚀 Schedule Posts to All Platforms", type="primary", use_container_width=True):
                 if not st.session_state.api_key:
                     st.error("❌ Please enter your API key in the sidebar!")
                 else:
-                    with st.spinner("📤 Scheduling your posts..."):
+                    with st.spinner("📤 Scheduling your posts across platforms..."):
                         success_count = 0
                         error_count = 0
                         
+                        # Progress bar
+                        progress_bar = st.progress(0)
+                        status_text = st.empty()
+                        
                         # Send request for each platform
-                        for platform_data in platforms_config:
+                        for idx, platform_data in enumerate(platforms_config):
+                            status_text.text(f"Posting to {platform_data['platform']}...")
+                            
                             payload = build_post_payload(
                                 content=platform_data['content'],
                                 scheduled_time=platform_data['schedule'],
@@ -1030,63 +1828,183 @@ with tab2:
                                 error_count += 1
                                 error_msg = response.json() if response else "Connection error"
                                 st.error(f"❌ {platform_data['platform']}: Failed to schedule post")
-                                st.error(f"Error: {error_msg}")
+                                with st.expander("View Error Details"):
+                                    st.error(f"Error: {error_msg}")
+                            
+                            # Update progress
+                            progress_bar.progress((idx + 1) / len(platforms_config))
                         
-                        st.divider()
+                        status_text.empty()
+                        progress_bar.empty()
+                        
+                        st.markdown("<br>", unsafe_allow_html=True)
                         
                         if error_count == 0:
                             st.balloons()
-                            st.success(f"🎉 All {success_count} posts scheduled successfully!")
+                            st.markdown("""
+                                <div style='background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); 
+                                            padding: 2rem; border-radius: 16px; text-align: center;'>
+                                    <h2 style='margin: 0; color: #155724;'>🎉 Success!</h2>
+                                    <p style='color: #155724; margin: 0.5rem 0 0 0;'>All {success_count} posts scheduled successfully!</p>
+                                </div>
+                            """, unsafe_allow_html=True)
                         else:
-                            st.warning(f"⚠️ {success_count} successful, {error_count} failed")
+                            st.markdown(f"""
+                                <div style='background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); 
+                                            padding: 2rem; border-radius: 16px; text-align: center;'>
+                                    <h3 style='margin: 0; color: #856404;'>⚠️ Partial Success</h3>
+                                    <p style='color: #856404; margin: 0.5rem 0 0 0;'>{success_count} successful, {error_count} failed</p>
+                                </div>
+                            """, unsafe_allow_html=True)
     
     else:
-        st.info("👆 Select at least one platform above to get started")
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); 
+                        padding: 3rem; border-radius: 16px; text-align: center; margin: 3rem 0;'>
+                <h3 style='margin: 0; color: #0c5460;'>👆 Select at least one platform to get started</h3>
+                <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
+            </div>
+        """, unsafe_allow_html=True)
 
 # ============================================================================
-# TAB 3: CREATE SHORT FORM VIDEO POST
+# TAB 4: CREATE SHORT FORM VIDEO POST
 # ============================================================================
 
-with tab3:
-    st.header("🎬 Create Short Form Video Post")
-    st.markdown("Post short-form videos to TikTok, Instagram Reels, YouTube Shorts, and more")
+with tab4:
+    # Hero section
+    st.markdown("""
+        <div style='text-align: center; padding: 2rem 0;'>
+            <h1 style='font-size: 2.5rem; margin-bottom: 0.5rem;'>🎬 Short Form Video Creator</h1>
+            <p style='font-size: 1.1rem; color: #666;'>TikTok, Reels, YouTube Shorts - Coming Soon!</p>
+        </div>
+    """, unsafe_allow_html=True)
     
-    st.info("🚧 This feature is coming soon! Stay tuned for updates.")
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); 
+                    padding: 3rem; border-radius: 16px; text-align: center; margin: 2rem 0;'>
+            <h2 style='margin: 0; color: #667eea;'>🚧 Feature In Development</h2>
+            <p style='color: #666; margin: 1rem 0 0 0; font-size: 1.1rem;'>We're working hard to bring you the best short-form video posting experience!</p>
+        </div>
+    """, unsafe_allow_html=True)
     
-    # Placeholder content
+    # Feature cards
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.markdown("### 📱 TikTok")
-        st.markdown("Upload and schedule TikTok videos")
-        st.button("Coming Soon", disabled=True, key="tiktok_btn")
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        padding: 0.1rem; border-radius: 16px; margin: 1rem 0;'>
+                <div style='background: white; padding: 2rem; border-radius: 15px; text-align: center; min-height: 200px;'>
+                    <h2 style='font-size: 3rem; margin: 0;'>📱</h2>
+                    <h3 style='margin: 1rem 0; color: #667eea;'>TikTok</h3>
+                    <p style='color: #666; margin: 0;'>Upload and schedule TikTok videos with captions and hashtags</p>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
     
     with col2:
-        st.markdown("### 🎥 Instagram Reels")
-        st.markdown("Create and post Instagram Reels")
-        st.button("Coming Soon", disabled=True, key="reels_btn")
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #f09433 0%, #bc1888 100%); 
+                        padding: 0.1rem; border-radius: 16px; margin: 1rem 0;'>
+                <div style='background: white; padding: 2rem; border-radius: 15px; text-align: center; min-height: 200px;'>
+                    <h2 style='font-size: 3rem; margin: 0;'>🎥</h2>
+                    <h3 style='margin: 1rem 0; color: #bc1888;'>Instagram Reels</h3>
+                    <p style='color: #666; margin: 0;'>Create and post engaging Instagram Reels instantly</p>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
     
     with col3:
-        st.markdown("### ▶️ YouTube Shorts")
-        st.markdown("Upload YouTube Shorts")
-        st.button("Coming Soon", disabled=True, key="shorts_btn")
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%); 
+                        padding: 0.1rem; border-radius: 16px; margin: 1rem 0;'>
+                <div style='background: white; padding: 2rem; border-radius: 15px; text-align: center; min-height: 200px;'>
+                    <h2 style='font-size: 3rem; margin: 0;'>▶️</h2>
+                    <h3 style='margin: 1rem 0; color: #FF0000;'>YouTube Shorts</h3>
+                    <p style='color: #666; margin: 0;'>Upload vertical videos as YouTube Shorts</p>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
     
-    st.divider()
+    st.markdown("<br><br>", unsafe_allow_html=True)
     
+    # Planned features
     st.markdown("""
-    ### 🎯 Planned Features:
-    - 📤 Upload video files (MP4, MOV, etc.)
-    - ✂️ Video trimming and editing
-    - 📝 Add captions and hashtags
-    - 🎵 Background music selection
-    - 📊 Cross-platform analytics
-    - ⏰ Optimal posting time suggestions
-    """)
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                    padding: 2rem; border-radius: 16px; margin: 2rem 0;'>
+            <h3 style='margin-top: 0; text-align: center;'>🎯 Planned Features</h3>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        ### 📤 Upload & Management
+        - 📹 Video file upload (MP4, MOV, etc.)
+        - ✂️ Built-in video trimming
+        - 🖼️ Custom thumbnail selection
+        - 📏 Automatic aspect ratio detection
+        - 💾 Draft saving
+        """)
+        
+        st.markdown("""
+        ### 🎨 Customization
+        - 📝 Caption & hashtag editor
+        - 🎵 Background music library
+        - 🎭 Filter & effects
+        - 📍 Location tagging
+        - 👥 Collaborator tagging
+        """)
+    
+    with col2:
+        st.markdown("""
+        ### 📊 Analytics & Insights
+        - 📈 Cross-platform analytics
+        - ⏰ Best time to post suggestions
+        - 🎯 Engagement predictions
+        - 📉 Performance tracking
+        - 🔄 A/B testing
+        """)
+        
+        st.markdown("""
+        ### 🚀 Advanced Features
+        - 📅 Bulk scheduling
+        - 🔄 Auto-repost to multiple platforms
+        - 📱 Mobile app integration
+        - 🤖 AI caption generator
+        - 🎬 Video templates
+        """)
+    
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    # Call to action
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                    padding: 3rem; border-radius: 16px; text-align: center; color: white;'>
+            <h2 style='margin: 0 0 1rem 0; color: white;'>Want Early Access?</h2>
+            <p style='margin: 0 0 1.5rem 0; font-size: 1.1rem;'>Be the first to know when short-form video posting goes live!</p>
+            <a href='mailto:miki@getlate.dev?subject=Early Access Request' 
+               style='display: inline-block; background: white; color: #667eea; padding: 12px 32px; 
+                      border-radius: 8px; text-decoration: none; font-weight: 600; transition: transform 0.2s;'>
+                📧 Request Early Access
+            </a>
+        </div>
+    """, unsafe_allow_html=True)
 
 # Footer
-st.divider()
+st.markdown("<br><br>", unsafe_allow_html=True)
 st.markdown("""
-<div style='text-align: center; color: #666; padding: 2rem;'>
-    <p>Made with ❤️ for content creators | <a href='https://getlate.dev' target='_blank'>Powered by GetLate</a></p>
+<div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+            padding: 2rem; border-radius: 16px; text-align: center; margin: 2rem 0;'>
+    <p style='margin: 0; color: #666; font-size: 0.9rem;'>
+        Made with ❤️ for content creators | 
+        <a href='https://getlate.dev' target='_blank' style='color: #667eea; text-decoration: none; font-weight: 600;'>
+            Powered by GetLate
+        </a>
+    </p>
+    <p style='margin: 0.5rem 0 0 0; color: #999; font-size: 0.8rem;'>
+        © 2025 Content Posting Automations | All rights reserved
+    </p>
 </div>
 """, unsafe_allow_html=True)
