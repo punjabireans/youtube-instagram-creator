@@ -109,12 +109,12 @@ def check_password():
                 
                 .login-title {
                     color: white;
-                    font-size: 2.8rem;
+                    font-size: 2.2rem;
                     font-weight: 700;
                     text-align: center;
                     margin: 0 0 0.5rem 0;
                     text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-                    letter-spacing: -0.02em;
+                    letter-spacing: -0.01em;
                 }
                 
                 .login-subtitle {
@@ -169,7 +169,7 @@ def check_password():
             </style>
         """, unsafe_allow_html=True)
         
-        # Full screen container with stars
+        # Full screen container with stars - FIXED: Proper closing tags
         st.markdown("""
             <div class="login-container">
                 <div class="stars">
@@ -192,29 +192,35 @@ def check_password():
                     <div class="star" style="left: 35%; top: 65%;"></div>
                     <div class="star" style="left: 65%; top: 35%;"></div>
                 </div>
-                
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Centered login card wrapper
+        col1, col2, col3 = st.columns([1, 2, 1])
+        
+        with col2:
+            st.markdown("""
                 <div class="login-card">
-                    <h1 class="login-title">Login</h1>
+                    <h1 class="login-title">All-in-One Content Tool</h1>
                     <p class="login-subtitle">Enter your password to access the tool</p>
                 </div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # Password input (will appear inside the card due to Streamlit's layout)
-        st.text_input(
-            "Password", 
-            type="password", 
-            on_change=password_entered, 
-            key="password",
-            placeholder="Enter your password...",
-            label_visibility="collapsed"
-        )
-        
-        st.markdown("""
-            <div class="login-footer">
-                🔐 Secure access • Content Posting Automations
-            </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+            
+            # Password input (will appear inside the card due to Streamlit's layout)
+            st.text_input(
+                "Password", 
+                type="password", 
+                on_change=password_entered, 
+                key="password",
+                placeholder="Enter your password...",
+                label_visibility="collapsed"
+            )
+            
+            st.markdown("""
+                <div class="login-footer">
+                    🔐 Secure access • Content Posting Automations
+                </div>
+            """, unsafe_allow_html=True)
         
         return False
         
@@ -308,12 +314,12 @@ def check_password():
                 
                 .login-title {
                     color: white;
-                    font-size: 2.8rem;
+                    font-size: 2.2rem;
                     font-weight: 700;
                     text-align: center;
                     margin: 0 0 0.5rem 0;
                     text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-                    letter-spacing: -0.02em;
+                    letter-spacing: -0.01em;
                 }
                 
                 .login-subtitle {
@@ -378,7 +384,7 @@ def check_password():
             </style>
         """, unsafe_allow_html=True)
         
-        # Full screen container with stars
+        # Full screen container with stars - FIXED
         st.markdown("""
             <div class="login-container">
                 <div class="stars">
@@ -401,31 +407,37 @@ def check_password():
                     <div class="star" style="left: 35%; top: 65%;"></div>
                     <div class="star" style="left: 65%; top: 35%;"></div>
                 </div>
-                
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Centered login card wrapper
+        col1, col2, col3 = st.columns([1, 2, 1])
+        
+        with col2:
+            st.markdown("""
                 <div class="login-card">
-                    <h1 class="login-title">Login</h1>
+                    <h1 class="login-title">All-in-One Content Tool</h1>
                     <p class="login-subtitle">Enter your password to access the tool</p>
                 </div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # Password input
-        st.text_input(
-            "Password", 
-            type="password", 
-            on_change=password_entered, 
-            key="password",
-            placeholder="Enter your password...",
-            label_visibility="collapsed"
-        )
-        
-        st.error("❌ Incorrect password. Please try again.")
-        
-        st.markdown("""
-            <div class="login-footer">
-                🔐 Secure access • Content Posting Automations
-            </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+            
+            # Password input
+            st.text_input(
+                "Password", 
+                type="password", 
+                on_change=password_entered, 
+                key="password",
+                placeholder="Enter your password...",
+                label_visibility="collapsed"
+            )
+            
+            st.error("❌ Incorrect password. Please try again.")
+            
+            st.markdown("""
+                <div class="login-footer">
+                    🔐 Secure access • Content Posting Automations
+                </div>
+            """, unsafe_allow_html=True)
         
         return False
         
@@ -2910,6 +2922,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
