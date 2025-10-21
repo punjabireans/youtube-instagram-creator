@@ -167,13 +167,13 @@ def check_password():
                     margin: 0 auto !important;
                 }
                 
-                /* Style the button - MATCH CONTAINER WIDTH */
+                /* Style the button - NARROWER TO MATCH PASSWORD BETTER */
                 .stButton {
                     display: flex !important;
                     justify-content: center !important;
                     margin-top: 1rem !important;
                     width: 100% !important;
-                    max-width: 440px !important;
+                    max-width: 340px !important;
                     margin-left: auto !important;
                     margin-right: auto !important;
                 }
@@ -437,13 +437,13 @@ def check_password():
                     margin: 0 auto !important;
                 }
                 
-                /* Style the button - MATCH CONTAINER WIDTH */
+                /* Style the button - NARROWER TO MATCH PASSWORD BETTER */
                 .stButton {
                     display: flex !important;
                     justify-content: center !important;
                     margin-top: 1rem !important;
                     width: 100% !important;
-                    max-width: 440px !important;
+                    max-width: 340px !important;
                     margin-left: auto !important;
                     margin-right: auto !important;
                 }
@@ -2940,6 +2940,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
