@@ -595,7 +595,8 @@ def build_post_payload(content, scheduled_time, timezone, platforms_config):
 st.set_page_config(
     page_title="Content Posting Automations", 
     page_icon="🚀", 
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"  # Force sidebar to be open by default
 )
 
 # Check password first
@@ -635,18 +636,42 @@ st.markdown("""
         transform: scale(1.05);
     }
     
-    /* Sidebar collapse/expand button */
+    /* Sidebar collapse/expand button - ENHANCED VISIBILITY */
     [data-testid="collapsedControl"] {
         background: white !important;
         color: #667eea !important;
-        border: 2px solid #667eea !important;
-        border-radius: 8px !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+        border: 3px solid #667eea !important;
+        border-radius: 0 8px 8px 0 !important;
+        box-shadow: 2px 2px 12px rgba(0,0,0,0.2) !important;
+        width: 40px !important;
+        height: 60px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
     
     [data-testid="collapsedControl"]:hover {
         background: #667eea !important;
         color: white !important;
+        border-color: #764ba2 !important;
+        box-shadow: 2px 2px 16px rgba(102, 126, 234, 0.4) !important;
+    }
+    
+    [data-testid="collapsedControl"] svg {
+        width: 24px !important;
+        height: 24px !important;
+    }
+    
+    /* Make sidebar toggle arrow more visible when sidebar is open */
+    [data-testid="stSidebar"] button[kind="header"] {
+        background: rgba(255,255,255,0.2) !important;
+        color: white !important;
+        border: 2px solid rgba(255,255,255,0.5) !important;
+    }
+    
+    [data-testid="stSidebar"] button[kind="header"]:hover {
+        background: rgba(255,255,255,0.3) !important;
+        border-color: white !important;
     }
     
     /* Main Container */
@@ -959,34 +984,18 @@ st.markdown("""
 st.markdown('<h1 class="main-header">🚀 Content Posting Automations</h1>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">Streamline your content creation and multi-platform posting workflow</p>', unsafe_allow_html=True)
 
-# Add visible sidebar toggle at the top
-col1, col2, col3 = st.columns([0.5, 8, 0.5])
-with col1:
-    if st.button("☰", key="sidebar_toggle", help="Toggle Sidebar"):
-        st.rerun()
-
-# Add custom styling for the toggle button
+# Add clear instructions to access sidebar
 st.markdown("""
-<style>
-    /* Style the sidebar toggle button */
-    div[data-testid="column"]:first-child button[kind="secondary"] {
-        background: white !important;
-        color: #667eea !important;
-        border: 2px solid #667eea !important;
-        border-radius: 8px !important;
-        padding: 8px 16px !important;
-        font-size: 1.5rem !important;
-        font-weight: 600 !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
-        width: 100% !important;
-    }
-    
-    div[data-testid="column"]:first-child button[kind="secondary"]:hover {
-        background: #667eea !important;
-        color: white !important;
-        transform: scale(1.05);
-    }
-</style>
+<div style='background: #fff3cd; padding: 1rem 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; 
+            border-left: 4px solid #ffc107; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
+    <p style='margin: 0; color: #856404; font-size: 1rem; font-weight: 600;'>
+        ⚙️ <strong>Important:</strong> The sidebar with API Key settings is on the LEFT side of your screen.
+        <br>
+        <span style='font-size: 0.9rem;'>
+        Look for the <strong style='color: #667eea;'>[&gt;]</strong> arrow button on the far left edge, or press <strong>CTRL+SHIFT+[</strong> (or <strong>CMD+SHIFT+[</strong> on Mac) to toggle it.
+        </span>
+    </p>
+</div>
 """, unsafe_allow_html=True)
 
 # Hidden component to load data from localStorage
