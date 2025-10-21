@@ -143,7 +143,7 @@ def check_password():
                     text-shadow: 0 1px 3px rgba(0,0,0,0.2);
                 }
                 
-                /* Style the password input - SHORTENED WIDTH */
+                /* Style the password input - KEEP AS IS */
                 .stTextInput > div > div > input {
                     background: rgba(255, 255, 255, 0.9) !important;
                     backdrop-filter: blur(10px);
@@ -154,30 +154,19 @@ def check_password():
                     font-size: 1rem !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
-                    width: 100% !important;
-                    max-width: 280px !important;
-                    margin: 0 auto !important;
-                    display: block !important;
                 }
                 
                 .stTextInput {
-                    max-width: 280px !important;
                     margin: 0 auto !important;
                 }
                 
                 .stTextInput > div {
-                    max-width: 280px !important;
                     display: flex !important;
                     justify-content: center !important;
                     margin: 0 auto !important;
                 }
                 
-                .stTextInput > div > div {
-                    width: 100% !important;
-                    max-width: 280px !important;
-                }
-                
-                /* Style the button - PERFECTLY ALIGNED */
+                /* Style the button - MATCH PASSWORD CONTAINER WIDTH */
                 .stButton {
                     display: flex !important;
                     justify-content: center !important;
@@ -195,10 +184,9 @@ def check_password():
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                    width: 280px !important;
-                    max-width: 280px !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
                     letter-spacing: 0.5px !important;
-                    margin: 0 auto !important;
                 }
                 
                 .stButton > button:hover {
@@ -422,7 +410,7 @@ def check_password():
                     text-shadow: 0 1px 3px rgba(0,0,0,0.2);
                 }
                 
-                /* Style the password input with error state - SHORTENED WIDTH */
+                /* Style the password input with error state - KEEP AS IS */
                 .stTextInput > div > div > input {
                     background: rgba(255, 255, 255, 0.9) !important;
                     backdrop-filter: blur(10px);
@@ -433,30 +421,19 @@ def check_password():
                     font-size: 1rem !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 6px rgba(255,0,0,0.2) !important;
-                    width: 100% !important;
-                    max-width: 280px !important;
-                    margin: 0 auto !important;
-                    display: block !important;
                 }
                 
                 .stTextInput {
-                    max-width: 280px !important;
                     margin: 0 auto !important;
                 }
                 
                 .stTextInput > div {
-                    max-width: 280px !important;
                     display: flex !important;
                     justify-content: center !important;
                     margin: 0 auto !important;
                 }
                 
-                .stTextInput > div > div {
-                    width: 100% !important;
-                    max-width: 280px !important;
-                }
-                
-                /* Style the button - PERFECTLY ALIGNED */
+                /* Style the button - MATCH PASSWORD CONTAINER WIDTH */
                 .stButton {
                     display: flex !important;
                     justify-content: center !important;
@@ -474,10 +451,9 @@ def check_password():
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                    width: 280px !important;
-                    max-width: 280px !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
                     letter-spacing: 0.5px !important;
-                    margin: 0 auto !important;
                 }
                 
                 .stButton > button:hover {
@@ -2958,6 +2934,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
