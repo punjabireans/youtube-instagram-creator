@@ -1776,8 +1776,29 @@ with tab3:
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         if st.button("📋 Post to All Selected Platforms", use_container_width=True, type="primary", key="push_to_all_btn"):
-            st.session_state.push_to_all = True
-            st.success("✅ Content will be posted to all platforms below!")
+            # Check if any platforms are actually configured
+            has_configured_platforms = (
+                (enable_instagram and st.session_state.ig_account_id) or
+                (enable_linkedin and st.session_state.li_account_id) or
+                (enable_facebook and st.session_state.fb_account_id) or
+                (enable_twitter and st.session_state.tw_account_id)
+            )
+            
+            if has_configured_platforms:
+                # Copy master content to all enabled platforms
+                if enable_instagram and st.session_state.ig_account_id:
+                    st.session_state.ig_content_value = st.session_state.master_content
+                if enable_linkedin and st.session_state.li_account_id:
+                    st.session_state.li_content_value = st.session_state.master_content
+                if enable_facebook and st.session_state.fb_account_id:
+                    st.session_state.fb_content_value = st.session_state.master_content
+                if enable_twitter and st.session_state.tw_account_id:
+                    st.session_state.tw_content_value = st.session_state.master_content
+                
+                st.success("✅ Master content copied to all configured platforms!")
+                st.rerun()
+            else:
+                st.error("❌ Please select platforms and enter their Account IDs first!")
     
     st.markdown("<br>", unsafe_allow_html=True)
     
@@ -1849,7 +1870,7 @@ with tab3:
                 )
             
             with col2:
-                # FIXED: Use callback to update content without causing rerun issues
+                # FIXED: Simple button that copies master content
                 if st.button("📋 Use Master", key="ig_use_master_btn", use_container_width=True):
                     st.session_state.ig_content_value = st.session_state.master_content
                     st.rerun()
@@ -1927,7 +1948,7 @@ with tab3:
                 )
             
             with col2:
-                # FIXED: Use callback pattern
+                # FIXED: Simple button that copies master content
                 if st.button("📋 Use Master", key="li_use_master_btn", use_container_width=True):
                     st.session_state.li_content_value = st.session_state.master_content
                     st.rerun()
@@ -2005,7 +2026,7 @@ with tab3:
                 )
             
             with col2:
-                # FIXED: Use callback pattern
+                # FIXED: Simple button that copies master content
                 if st.button("📋 Use Master", key="fb_use_master_btn", use_container_width=True):
                     st.session_state.fb_content_value = st.session_state.master_content
                     st.rerun()
@@ -2092,7 +2113,7 @@ with tab3:
                     st.info(f"✍️ {char_count}/280 characters used")
             
             with col2:
-                # FIXED: Use callback pattern
+                # FIXED: Simple button that copies master content
                 if st.button("📋 Use Master", key="tw_use_master_btn", use_container_width=True):
                     st.session_state.tw_content_value = st.session_state.master_content
                     st.rerun()
@@ -2431,5 +2452,6 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
