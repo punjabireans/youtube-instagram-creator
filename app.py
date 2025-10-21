@@ -177,7 +177,7 @@ def check_password():
                     max-width: 280px !important;
                 }
                 
-                /* Style the button - PERFECTLY CENTERED */
+                /* Style the button - PERFECTLY ALIGNED */
                 .stButton {
                     display: flex !important;
                     justify-content: center !important;
@@ -190,7 +190,7 @@ def check_password():
                     color: #667eea !important;
                     border: 2px solid rgba(200, 200, 220, 0.3) !important;
                     border-radius: 14px !important;
-                    padding: 14px 40px !important;
+                    padding: 16px 20px !important;
                     font-size: 1rem !important;
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
@@ -456,7 +456,7 @@ def check_password():
                     max-width: 280px !important;
                 }
                 
-                /* Style the button - PERFECTLY CENTERED */
+                /* Style the button - PERFECTLY ALIGNED */
                 .stButton {
                     display: flex !important;
                     justify-content: center !important;
@@ -469,7 +469,7 @@ def check_password():
                     color: #667eea !important;
                     border: 2px solid rgba(200, 200, 220, 0.3) !important;
                     border-radius: 14px !important;
-                    padding: 14px 40px !important;
+                    padding: 16px 20px !important;
                     font-size: 1rem !important;
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
@@ -2051,8 +2051,9 @@ with tab2:
 # ============================================================================
 # TAB 3: CREATE CAROUSEL/FEED POST
 # ============================================================================
-
-# Replace the entire TAB 3 section (starting from "with tab3:") with this code:
+# ============================================================================
+# TAB 3: CREATE CAROUSEL/FEED POST - COMPLETE CODE WITH FIXES
+# ============================================================================
 
 with tab3:
     # Hero section
@@ -2179,7 +2180,7 @@ with tab3:
                 # Build list of platforms to post to
                 platforms_to_post = []
                 
-                if enable_instagram and st.session_state.ig_account_id:
+                if enable_instagram and st.session_state.get('ig_account_id'):
                     # Upload images first
                     media_items = []
                     if carousel_images:
@@ -2197,7 +2198,7 @@ with tab3:
                         "mediaItems": media_items
                     })
                 
-                if enable_linkedin and st.session_state.li_account_id:
+                if enable_linkedin and st.session_state.get('li_account_id'):
                     # Upload images first
                     media_items = []
                     if carousel_images:
@@ -2215,7 +2216,7 @@ with tab3:
                         "mediaItems": media_items
                     })
                 
-                if enable_facebook and st.session_state.fb_account_id:
+                if enable_facebook and st.session_state.get('fb_account_id'):
                     # Upload images first
                     media_items = []
                     if carousel_images:
@@ -2233,7 +2234,7 @@ with tab3:
                         "mediaItems": media_items
                     })
                 
-                if enable_twitter and st.session_state.tw_account_id:
+                if enable_twitter and st.session_state.get('tw_account_id'):
                     # Upload images first
                     media_items = []
                     if carousel_images:
@@ -2324,7 +2325,7 @@ with tab3:
     # Platform-specific configurations
     platforms_config = []
     
-    # Instagram Configuration
+    # Instagram Configuration - FIXED
     if enable_instagram:
         st.markdown("""
             <div style='background: linear-gradient(135deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); 
@@ -2339,21 +2340,17 @@ with tab3:
             col1, col2 = st.columns([2, 1])
             
             with col1:
+                # FIXED: Use session state directly through key parameter
                 ig_account_id = st.text_input(
                     "🆔 Instagram Account ID",
-                    key="ig_account_input",
-                    value=st.session_state.ig_account_id,
+                    key="ig_account_id",
                     placeholder="Enter your Instagram account ID"
                 )
-                if ig_account_id != st.session_state.ig_account_id:
-                    st.session_state.ig_account_id = ig_account_id
-                    if ig_account_id:
-                        save_to_localstorage('ig_account_id', ig_account_id)
                 
                 if ig_account_id:
-                    st.caption("✅ Account ID saved permanently")
+                    st.caption("✅ Account ID saved")
                 
-                # FIXED: Initialize in session state if not exists
+                # Initialize content value in session state
                 if 'ig_content_value' not in st.session_state:
                     st.session_state.ig_content_value = ""
                 if 'ig_refresh_counter' not in st.session_state:
@@ -2366,17 +2363,14 @@ with tab3:
                     key=f"ig_content_area_{st.session_state.ig_refresh_counter}",
                     placeholder="Your Instagram caption with hashtags..."
                 )
-                # Update session state with current value
                 if ig_content != st.session_state.ig_content_value:
                     st.session_state.ig_content_value = ig_content
             
             with col2:
-                # FIXED: Button clears and resets the text area by changing its key
                 use_master_ig = st.button("📋 Use Master", key="ig_use_master_btn", use_container_width=True)
                 
                 if use_master_ig:
                     st.session_state.ig_content_value = st.session_state.master_content
-                    # Force widget refresh by incrementing a counter
                     if 'ig_refresh_counter' not in st.session_state:
                         st.session_state.ig_refresh_counter = 0
                     st.session_state.ig_refresh_counter += 1
@@ -2386,7 +2380,6 @@ with tab3:
                 use_master_schedule = st.checkbox("Use master schedule", value=True, key="ig_master_sched")
                 
                 if not use_master_schedule:
-                    # FIXED: Use unique keys for Instagram schedule
                     ig_date = st.date_input("Date", value=default_date, key="ig_schedule_date")
                     ig_time = st.time_input("Time (PDT)", value=default_date.time(), key="ig_schedule_time")
                     ig_datetime = datetime.combine(ig_date, ig_time)
@@ -2412,7 +2405,7 @@ with tab3:
                     "mediaItems": media_items
                 })
     
-    # LinkedIn Configuration
+    # LinkedIn Configuration - FIXED
     if enable_linkedin:
         st.markdown("""
             <div style='background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%); 
@@ -2427,21 +2420,17 @@ with tab3:
             col1, col2 = st.columns([2, 1])
             
             with col1:
+                # FIXED: Use session state directly through key parameter
                 li_account_id = st.text_input(
                     "🆔 LinkedIn Account ID",
-                    key="li_account_input",
-                    value=st.session_state.li_account_id,
+                    key="li_account_id",
                     placeholder="Enter your LinkedIn account ID"
                 )
-                if li_account_id != st.session_state.li_account_id:
-                    st.session_state.li_account_id = li_account_id
-                    if li_account_id:
-                        save_to_localstorage('li_account_id', li_account_id)
                 
                 if li_account_id:
-                    st.caption("✅ Account ID saved permanently")
+                    st.caption("✅ Account ID saved")
                 
-                # FIXED: Initialize in session state
+                # Initialize content value in session state
                 if 'li_content_value' not in st.session_state:
                     st.session_state.li_content_value = ""
                 if 'li_refresh_counter' not in st.session_state:
@@ -2454,17 +2443,14 @@ with tab3:
                     key=f"li_content_area_{st.session_state.li_refresh_counter}",
                     placeholder="Your professional LinkedIn post..."
                 )
-                # Update session state with current value
                 if li_content != st.session_state.li_content_value:
                     st.session_state.li_content_value = li_content
             
             with col2:
-                # FIXED: Button clears and resets the text area by changing its key
                 use_master_li = st.button("📋 Use Master", key="li_use_master_btn", use_container_width=True)
                 
                 if use_master_li:
                     st.session_state.li_content_value = st.session_state.master_content
-                    # Force widget refresh by incrementing a counter
                     if 'li_refresh_counter' not in st.session_state:
                         st.session_state.li_refresh_counter = 0
                     st.session_state.li_refresh_counter += 1
@@ -2474,7 +2460,6 @@ with tab3:
                 use_master_schedule_li = st.checkbox("Use master schedule", value=True, key="li_master_sched")
                 
                 if not use_master_schedule_li:
-                    # FIXED: Unique keys
                     li_date = st.date_input("Date", value=default_date, key="li_schedule_date")
                     li_time = st.time_input("Time (PDT)", value=default_date.time(), key="li_schedule_time")
                     li_datetime = datetime.combine(li_date, li_time)
@@ -2500,7 +2485,7 @@ with tab3:
                     "mediaItems": media_items
                 })
     
-    # Facebook Configuration
+    # Facebook Configuration - FIXED
     if enable_facebook:
         st.markdown("""
             <div style='background: linear-gradient(135deg, #1877f2 0%, #0c63d4 100%); 
@@ -2515,21 +2500,17 @@ with tab3:
             col1, col2 = st.columns([2, 1])
             
             with col1:
+                # FIXED: Use session state directly through key parameter
                 fb_account_id = st.text_input(
                     "🆔 Facebook Account ID",
-                    key="fb_account_input",
-                    value=st.session_state.fb_account_id,
+                    key="fb_account_id",
                     placeholder="Enter your Facebook account ID"
                 )
-                if fb_account_id != st.session_state.fb_account_id:
-                    st.session_state.fb_account_id = fb_account_id
-                    if fb_account_id:
-                        save_to_localstorage('fb_account_id', fb_account_id)
                 
                 if fb_account_id:
-                    st.caption("✅ Account ID saved permanently")
+                    st.caption("✅ Account ID saved")
                 
-                # FIXED: Initialize in session state
+                # Initialize content value in session state
                 if 'fb_content_value' not in st.session_state:
                     st.session_state.fb_content_value = ""
                 if 'fb_refresh_counter' not in st.session_state:
@@ -2542,17 +2523,14 @@ with tab3:
                     key=f"fb_content_area_{st.session_state.fb_refresh_counter}",
                     placeholder="Your Facebook post..."
                 )
-                # Update session state with current value
                 if fb_content != st.session_state.fb_content_value:
                     st.session_state.fb_content_value = fb_content
             
             with col2:
-                # FIXED: Button clears and resets the text area by changing its key
                 use_master_fb = st.button("📋 Use Master", key="fb_use_master_btn", use_container_width=True)
                 
                 if use_master_fb:
                     st.session_state.fb_content_value = st.session_state.master_content
-                    # Force widget refresh by incrementing a counter
                     if 'fb_refresh_counter' not in st.session_state:
                         st.session_state.fb_refresh_counter = 0
                     st.session_state.fb_refresh_counter += 1
@@ -2562,7 +2540,6 @@ with tab3:
                 use_master_schedule_fb = st.checkbox("Use master schedule", value=True, key="fb_master_sched")
                 
                 if not use_master_schedule_fb:
-                    # FIXED: Unique keys
                     fb_date = st.date_input("Date", value=default_date, key="fb_schedule_date")
                     fb_time = st.time_input("Time (PDT)", value=default_date.time(), key="fb_schedule_time")
                     fb_datetime = datetime.combine(fb_date, fb_time)
@@ -2588,7 +2565,7 @@ with tab3:
                     "mediaItems": media_items
                 })
     
-    # Twitter Configuration
+    # Twitter Configuration - FIXED
     if enable_twitter:
         st.markdown("""
             <div style='background: linear-gradient(135deg, #1DA1F2 0%, #0c85d0 100%); 
@@ -2603,21 +2580,17 @@ with tab3:
             col1, col2 = st.columns([2, 1])
             
             with col1:
+                # FIXED: Use session state directly through key parameter
                 tw_account_id = st.text_input(
                     "🆔 Twitter Account ID",
-                    key="tw_account_input",
-                    value=st.session_state.tw_account_id,
+                    key="tw_account_id",
                     placeholder="Enter your Twitter account ID"
                 )
-                if tw_account_id != st.session_state.tw_account_id:
-                    st.session_state.tw_account_id = tw_account_id
-                    if tw_account_id:
-                        save_to_localstorage('tw_account_id', tw_account_id)
                 
                 if tw_account_id:
-                    st.caption("✅ Account ID saved permanently")
+                    st.caption("✅ Account ID saved")
                 
-                # FIXED: Initialize in session state
+                # Initialize content value in session state
                 if 'tw_content_value' not in st.session_state:
                     st.session_state.tw_content_value = ""
                 if 'tw_refresh_counter' not in st.session_state:
@@ -2631,7 +2604,6 @@ with tab3:
                     placeholder="Your tweet (max 280 characters)...",
                     max_chars=280
                 )
-                # Update session state with current value
                 if tw_content != st.session_state.tw_content_value:
                     st.session_state.tw_content_value = tw_content
                 
@@ -2644,12 +2616,10 @@ with tab3:
                     st.info(f"✍️ {char_count}/280 characters used")
             
             with col2:
-                # FIXED: Button clears and resets the text area by changing its key
                 use_master_tw = st.button("📋 Use Master", key="tw_use_master_btn", use_container_width=True)
                 
                 if use_master_tw:
                     st.session_state.tw_content_value = st.session_state.master_content
-                    # Force widget refresh by incrementing a counter
                     if 'tw_refresh_counter' not in st.session_state:
                         st.session_state.tw_refresh_counter = 0
                     st.session_state.tw_refresh_counter += 1
@@ -2659,7 +2629,6 @@ with tab3:
                 use_master_schedule_tw = st.checkbox("Use master schedule", value=True, key="tw_master_sched")
                 
                 if not use_master_schedule_tw:
-                    # FIXED: Unique keys
                     tw_date = st.date_input("Date", value=default_date, key="tw_schedule_date")
                     tw_time = st.time_input("Time (PDT)", value=default_date.time(), key="tw_schedule_time")
                     tw_datetime = datetime.combine(tw_date, tw_time)
@@ -2989,6 +2958,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
