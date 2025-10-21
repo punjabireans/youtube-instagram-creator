@@ -36,26 +36,6 @@ def check_password():
                 header {visibility: hidden !important;}
                 .stDeployButton {visibility: hidden !important;}
                 
-                /* FORCE full screen layout */
-                .main .block-container {
-                    padding: 0 !important; 
-                    max-width: 100% !important;
-                    margin: 0 !important;
-                    display: flex !important;
-                    flex-direction: column !important;
-                    justify-content: center !important;
-                    min-height: 100vh !important;
-                }
-                
-                /* Force all child elements to center */
-                .main .block-container > div {
-                    display: flex !important;
-                    flex-direction: column !important;
-                    justify-content: center !important;
-                    align-items: center !important;
-                    flex: 1 !important;
-                }
-                
                 /* CRITICAL: Override Streamlit's default background */
                 .stApp {
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
@@ -63,21 +43,36 @@ def check_password():
                 
                 .main {
                     background: transparent !important;
+                    padding: 0 !important;
+                }
+                
+                /* FORCE full screen layout - POSITIONED AT TOP */
+                .main .block-container {
+                    padding: 2rem 1rem !important; 
+                    padding-top: 3rem !important;
+                    max-width: 100% !important;
+                    margin: 0 !important;
+                }
+                
+                /* Remove ALL default Streamlit spacing */
+                [data-testid="stVerticalBlock"] {
+                    gap: 0 !important;
+                }
+                
+                .element-container {
+                    margin: 0 !important;
                 }
                 
                 /* Full viewport height container */
                 .login-container {
                     min-height: 100vh;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
                     position: relative;
                     overflow: hidden;
                 }
                 
                 /* Animated stars */
                 .stars {
-                    position: absolute;
+                    position: fixed;
                     top: 0;
                     left: 0;
                     width: 100%;
@@ -185,37 +180,30 @@ def check_password():
                 .stTextInput > label {
                     display: none !important;
                 }
-                
-                /* Remove default Streamlit padding */
-                [data-testid="stVerticalBlock"] > [style*="flex-direction: column;"] > [data-testid="stVerticalBlock"] {
-                    gap: 0 !important;
-                }
             </style>
         """, unsafe_allow_html=True)
         
-        # Full screen container with stars - REMOVED extra spacing
+        # Stars background
         st.markdown("""
-            <div class="login-container">
-                <div class="stars">
-                    <div class="star" style="left: 10%; top: 20%;"></div>
-                    <div class="star" style="left: 20%; top: 40%;"></div>
-                    <div class="star" style="left: 30%; top: 10%;"></div>
-                    <div class="star" style="left: 40%; top: 60%;"></div>
-                    <div class="star" style="left: 50%; top: 30%;"></div>
-                    <div class="star" style="left: 60%; top: 70%;"></div>
-                    <div class="star" style="left: 70%; top: 15%;"></div>
-                    <div class="star" style="left: 80%; top: 50%;"></div>
-                    <div class="star" style="left: 15%; top: 80%;"></div>
-                    <div class="star" style="left: 85%; top: 25%;"></div>
-                    <div class="star" style="left: 25%; top: 75%;"></div>
-                    <div class="star" style="left: 75%; top: 85%;"></div>
-                    <div class="star" style="left: 45%; top: 5%;"></div>
-                    <div class="star" style="left: 55%; top: 90%;"></div>
-                    <div class="star" style="left: 5%; top: 45%;"></div>
-                    <div class="star" style="left: 90%; top: 55%;"></div>
-                    <div class="star" style="left: 35%; top: 65%;"></div>
-                    <div class="star" style="left: 65%; top: 35%;"></div>
-                </div>
+            <div class="stars">
+                <div class="star" style="left: 10%; top: 20%;"></div>
+                <div class="star" style="left: 20%; top: 40%;"></div>
+                <div class="star" style="left: 30%; top: 10%;"></div>
+                <div class="star" style="left: 40%; top: 60%;"></div>
+                <div class="star" style="left: 50%; top: 30%;"></div>
+                <div class="star" style="left: 60%; top: 70%;"></div>
+                <div class="star" style="left: 70%; top: 15%;"></div>
+                <div class="star" style="left: 80%; top: 50%;"></div>
+                <div class="star" style="left: 15%; top: 80%;"></div>
+                <div class="star" style="left: 85%; top: 25%;"></div>
+                <div class="star" style="left: 25%; top: 75%;"></div>
+                <div class="star" style="left: 75%; top: 85%;"></div>
+                <div class="star" style="left: 45%; top: 5%;"></div>
+                <div class="star" style="left: 55%; top: 90%;"></div>
+                <div class="star" style="left: 5%; top: 45%;"></div>
+                <div class="star" style="left: 90%; top: 55%;"></div>
+                <div class="star" style="left: 35%; top: 65%;"></div>
+                <div class="star" style="left: 65%; top: 35%;"></div>
             </div>
         """, unsafe_allow_html=True)
         
@@ -232,7 +220,7 @@ def check_password():
             
             st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
             
-            # Password input (will appear inside the card due to Streamlit's layout)
+            # Password input
             st.text_input(
                 "Password", 
                 type="password", 
@@ -260,26 +248,6 @@ def check_password():
                 header {visibility: hidden !important;}
                 .stDeployButton {visibility: hidden !important;}
                 
-                /* FORCE full screen layout */
-                .main .block-container {
-                    padding: 0 !important; 
-                    max-width: 100% !important;
-                    margin: 0 !important;
-                    display: flex !important;
-                    flex-direction: column !important;
-                    justify-content: center !important;
-                    min-height: 100vh !important;
-                }
-                
-                /* Force all child elements to center */
-                .main .block-container > div {
-                    display: flex !important;
-                    flex-direction: column !important;
-                    justify-content: center !important;
-                    align-items: center !important;
-                    flex: 1 !important;
-                }
-                
                 /* CRITICAL: Override Streamlit's default background */
                 .stApp {
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
@@ -287,21 +255,36 @@ def check_password():
                 
                 .main {
                     background: transparent !important;
+                    padding: 0 !important;
+                }
+                
+                /* FORCE full screen layout - POSITIONED AT TOP */
+                .main .block-container {
+                    padding: 2rem 1rem !important; 
+                    padding-top: 3rem !important;
+                    max-width: 100% !important;
+                    margin: 0 !important;
+                }
+                
+                /* Remove ALL default Streamlit spacing */
+                [data-testid="stVerticalBlock"] {
+                    gap: 0 !important;
+                }
+                
+                .element-container {
+                    margin: 0 !important;
                 }
                 
                 /* Full viewport height container */
                 .login-container {
                     min-height: 100vh;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
                     position: relative;
                     overflow: hidden;
                 }
                 
                 /* Animated stars */
                 .stars {
-                    position: absolute;
+                    position: fixed;
                     top: 0;
                     left: 0;
                     width: 100%;
@@ -426,37 +409,30 @@ def check_password():
                     color: white !important;
                     font-weight: 600 !important;
                 }
-                
-                /* Remove default Streamlit padding */
-                [data-testid="stVerticalBlock"] > [style*="flex-direction: column;"] > [data-testid="stVerticalBlock"] {
-                    gap: 0 !important;
-                }
             </style>
         """, unsafe_allow_html=True)
         
-        # Full screen container with stars - REMOVED extra spacing
+        # Stars background
         st.markdown("""
-            <div class="login-container">
-                <div class="stars">
-                    <div class="star" style="left: 10%; top: 20%;"></div>
-                    <div class="star" style="left: 20%; top: 40%;"></div>
-                    <div class="star" style="left: 30%; top: 10%;"></div>
-                    <div class="star" style="left: 40%; top: 60%;"></div>
-                    <div class="star" style="left: 50%; top: 30%;"></div>
-                    <div class="star" style="left: 60%; top: 70%;"></div>
-                    <div class="star" style="left: 70%; top: 15%;"></div>
-                    <div class="star" style="left: 80%; top: 50%;"></div>
-                    <div class="star" style="left: 15%; top: 80%;"></div>
-                    <div class="star" style="left: 85%; top: 25%;"></div>
-                    <div class="star" style="left: 25%; top: 75%;"></div>
-                    <div class="star" style="left: 75%; top: 85%;"></div>
-                    <div class="star" style="left: 45%; top: 5%;"></div>
-                    <div class="star" style="left: 55%; top: 90%;"></div>
-                    <div class="star" style="left: 5%; top: 45%;"></div>
-                    <div class="star" style="left: 90%; top: 55%;"></div>
-                    <div class="star" style="left: 35%; top: 65%;"></div>
-                    <div class="star" style="left: 65%; top: 35%;"></div>
-                </div>
+            <div class="stars">
+                <div class="star" style="left: 10%; top: 20%;"></div>
+                <div class="star" style="left: 20%; top: 40%;"></div>
+                <div class="star" style="left: 30%; top: 10%;"></div>
+                <div class="star" style="left: 40%; top: 60%;"></div>
+                <div class="star" style="left: 50%; top: 30%;"></div>
+                <div class="star" style="left: 60%; top: 70%;"></div>
+                <div class="star" style="left: 70%; top: 15%;"></div>
+                <div class="star" style="left: 80%; top: 50%;"></div>
+                <div class="star" style="left: 15%; top: 80%;"></div>
+                <div class="star" style="left: 85%; top: 25%;"></div>
+                <div class="star" style="left: 25%; top: 75%;"></div>
+                <div class="star" style="left: 75%; top: 85%;"></div>
+                <div class="star" style="left: 45%; top: 5%;"></div>
+                <div class="star" style="left: 55%; top: 90%;"></div>
+                <div class="star" style="left: 5%; top: 45%;"></div>
+                <div class="star" style="left: 90%; top: 55%;"></div>
+                <div class="star" style="left: 35%; top: 65%;"></div>
+                <div class="star" style="left: 65%; top: 35%;"></div>
             </div>
         """, unsafe_allow_html=True)
         
@@ -2898,6 +2874,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
