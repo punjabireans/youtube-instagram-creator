@@ -984,106 +984,46 @@ st.markdown("""
 st.markdown('<h1 class="main-header">🚀 Content Posting Automations</h1>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">Streamline your content creation and multi-platform posting workflow</p>', unsafe_allow_html=True)
 
-# Add API Key and Settings at the TOP of main area (always accessible)
-with st.expander("⚙️ **Settings - API Key & Account IDs** (Click to expand)", expanded=False):
-    st.markdown("### 🔑 API Configuration")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        api_key_main = st.text_input(
-            "🔑 GetLate API Key", 
-            type="password", 
-            value=st.session_state.api_key,
-            help="Enter your GetLate API key for posting",
-            placeholder="Enter your API key...",
-            key="api_key_main_input"
-        )
+# Add a permanent, visible button to open sidebar
+col1, col2 = st.columns([1, 9])
+with col1:
+    st.markdown("""
+    <style>
+        /* Make this button always visible and prominent */
+        div[data-testid="column"]:first-child button {
+            background: white !important;
+            color: #667eea !important;
+            border: 3px solid #667eea !important;
+            border-radius: 8px !important;
+            padding: 12px 16px !important;
+            font-size: 1.5rem !important;
+            font-weight: 700 !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+            width: 100% !important;
+        }
         
-        # Save to both session state and localStorage
-        if api_key_main != st.session_state.api_key:
-            st.session_state.api_key = api_key_main
-            if api_key_main:
-                save_to_localstorage('api_key', api_key_main)
-        
-        if api_key_main:
-            st.success("✅ API Key Saved")
-        else:
-            st.warning("⚠️ API key required for posting")
+        div[data-testid="column"]:first-child button:hover {
+            background: #667eea !important;
+            color: white !important;
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4) !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
     
-    with col2:
-        st.markdown("**📊 Quick Stats**")
-        if st.session_state.api_key:
-            st.info("🟢 API Connected")
-        else:
-            st.error("🔴 No API Key")
-        
-        # Show saved accounts
-        saved_accounts = []
-        if st.session_state.ig_account_id:
-            saved_accounts.append("📷 Instagram")
-        if st.session_state.li_account_id:
-            saved_accounts.append("💼 LinkedIn")
-        if st.session_state.fb_account_id:
-            saved_accounts.append("👥 Facebook")
-        if st.session_state.tw_account_id:
-            saved_accounts.append("🐦 Twitter")
-        
-        if saved_accounts:
-            st.success(f"💾 {len(saved_accounts)} accounts saved")
-    
-    st.markdown("---")
-    st.markdown("### 🆔 Platform Account IDs")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        ig_id = st.text_input("📷 Instagram Account ID", value=st.session_state.ig_account_id, key="ig_id_main")
-        if ig_id != st.session_state.ig_account_id:
-            st.session_state.ig_account_id = ig_id
-            if ig_id:
-                save_to_localstorage('ig_account_id', ig_id)
-        
-        fb_id = st.text_input("👥 Facebook Account ID", value=st.session_state.fb_account_id, key="fb_id_main")
-        if fb_id != st.session_state.fb_account_id:
-            st.session_state.fb_account_id = fb_id
-            if fb_id:
-                save_to_localstorage('fb_account_id', fb_id)
-    
-    with col2:
-        li_id = st.text_input("💼 LinkedIn Account ID", value=st.session_state.li_account_id, key="li_id_main")
-        if li_id != st.session_state.li_account_id:
-            st.session_state.li_account_id = li_id
-            if li_id:
-                save_to_localstorage('li_account_id', li_id)
-        
-        tw_id = st.text_input("🐦 Twitter Account ID", value=st.session_state.tw_account_id, key="tw_id_main")
-        if tw_id != st.session_state.tw_account_id:
-            st.session_state.tw_account_id = tw_id
-            if tw_id:
-                save_to_localstorage('tw_account_id', tw_id)
-    
-    st.markdown("---")
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.markdown("[📖 GetLate Documentation](https://getlate.dev/docs)")
-    
-    with col2:
-        st.markdown("[🔗 API Reference](https://getlate.dev/api)")
-    
-    with col3:
-        if st.button("🗑️ Clear All Saved Data", use_container_width=True):
-            st.session_state.api_key = ""
-            st.session_state.ig_account_id = ""
-            st.session_state.li_account_id = ""
-            st.session_state.fb_account_id = ""
-            st.session_state.tw_account_id = ""
-            clear_localstorage()
-            st.success("✅ All data cleared!")
-            st.rerun()
+    if st.button("☰\n\nSettings", key="open_sidebar_btn", help="Open Settings Sidebar"):
+        st.info("💡 Look for the sidebar on the LEFT edge of your screen!")
 
-st.markdown("<br>", unsafe_allow_html=True)
+with col2:
+    st.markdown("""
+    <div style='background: #e3f2fd; padding: 1rem 1.5rem; border-radius: 12px; margin-bottom: 1rem; 
+                border-left: 4px solid #2196f3;'>
+        <p style='margin: 0; color: #1565c0; font-size: 0.95rem;'>
+            ⚙️ <strong>Need API Settings?</strong> Click the <strong>☰ Settings</strong> button on the left, 
+            or press <strong>CTRL+SHIFT+[</strong> (Windows) / <strong>CMD+SHIFT+[</strong> (Mac)
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
 # Hidden component to load data from localStorage
 load_storage_js = """
