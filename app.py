@@ -31,149 +31,408 @@ def check_password():
         # First run, show password input with new design
         st.markdown("""
             <style>
-                /* Hide default Streamlit elements */
-                #MainMenu {visibility: hidden;}
-                footer {visibility: hidden;}
-                header {visibility: hidden;}
-                .block-container {padding: 0 !important; max-width: 100% !important;}
+                /* CRITICAL: Force hide ALL Streamlit default elements */
+                #MainMenu {visibility: hidden !important;}
+                footer {visibility: hidden !important;}
+                header {visibility: hidden !important;}
+                .stDeployButton {visibility: hidden !important;}
                 
-                /* Full screen purple gradient background */
+                /* FORCE full screen layout */
+                .main .block-container {
+                    padding: 0 !important; 
+                    max-width: 100% !important;
+                    margin: 0 !important;
+                }
+                
+                /* CRITICAL: Override Streamlit's default background */
+                .stApp {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                }
+                
                 .main {
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    padding: 0 !important;
+                    background: transparent !important;
+                }
+                
+                /* Full viewport height container */
+                .login-container {
                     min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                    overflow: hidden;
                 }
                 
-                /* Animated stars background */
-                @keyframes twinkle {
-                    0%, 100% { opacity: 0.3; }
-                    50% { opacity: 1; }
-                }
-                
+                /* Animated stars */
                 .stars {
-                    position: fixed;
+                    position: absolute;
                     top: 0;
                     left: 0;
                     width: 100%;
                     height: 100%;
                     pointer-events: none;
+                    z-index: 1;
                 }
                 
                 .star {
                     position: absolute;
-                    width: 2px;
-                    height: 2px;
+                    width: 3px;
+                    height: 3px;
                     background: white;
                     border-radius: 50%;
-                    animation: twinkle 3s infinite;
+                    box-shadow: 0 0 4px rgba(255,255,255,0.8);
+                }
+                
+                @keyframes twinkle {
+                    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+                    50% { opacity: 1; transform: scale(1.2); }
+                }
+                
+                .star:nth-child(1) { animation: twinkle 2s infinite; }
+                .star:nth-child(2) { animation: twinkle 3s infinite 0.5s; }
+                .star:nth-child(3) { animation: twinkle 2.5s infinite 1s; }
+                .star:nth-child(4) { animation: twinkle 3.5s infinite 1.5s; }
+                
+                /* Login card */
+                .login-card {
+                    position: relative;
+                    z-index: 10;
+                    background: rgba(255, 255, 255, 0.15);
+                    backdrop-filter: blur(20px);
+                    -webkit-backdrop-filter: blur(20px);
+                    padding: 3rem 3rem;
+                    border-radius: 24px;
+                    border: 2px solid rgba(255, 255, 255, 0.3);
+                    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+                    width: 420px;
+                    max-width: 90vw;
+                }
+                
+                .login-title {
+                    color: white;
+                    font-size: 2.8rem;
+                    font-weight: 700;
+                    text-align: center;
+                    margin: 0 0 0.5rem 0;
+                    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                    letter-spacing: -0.02em;
+                }
+                
+                .login-subtitle {
+                    color: rgba(255, 255, 255, 0.9);
+                    text-align: center;
+                    margin: 0 0 2.5rem 0;
+                    font-size: 1rem;
+                    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                }
+                
+                .login-footer {
+                    text-align: center;
+                    margin-top: 2rem;
+                    color: rgba(255, 255, 255, 0.7);
+                    font-size: 0.9rem;
+                    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                }
+                
+                /* Style the password input */
+                .stTextInput > div > div > input {
+                    background: rgba(255, 255, 255, 0.2) !important;
+                    backdrop-filter: blur(10px);
+                    border: 2px solid rgba(255, 255, 255, 0.4) !important;
+                    border-radius: 14px !important;
+                    color: white !important;
+                    padding: 16px 20px !important;
+                    font-size: 1rem !important;
+                    transition: all 0.3s ease !important;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+                }
+                
+                .stTextInput > div > div > input::placeholder {
+                    color: rgba(255, 255, 255, 0.6) !important;
+                }
+                
+                .stTextInput > div > div > input:focus {
+                    border-color: rgba(255, 255, 255, 0.7) !important;
+                    background: rgba(255, 255, 255, 0.25) !important;
+                    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.15) !important;
+                    outline: none !important;
+                }
+                
+                /* Hide label */
+                .stTextInput > label {
+                    display: none !important;
+                }
+                
+                /* Remove default Streamlit padding */
+                [data-testid="stVerticalBlock"] > [style*="flex-direction: column;"] > [data-testid="stVerticalBlock"] {
+                    gap: 0 !important;
                 }
             </style>
-            
-            <div class="stars" id="stars-container"></div>
-            
-            <script>
-                // Create random stars
-                const container = document.getElementById('stars-container');
-                for(let i = 0; i < 100; i++) {
-                    const star = document.createElement('div');
-                    star.className = 'star';
-                    star.style.left = Math.random() * 100 + '%';
-                    star.style.top = Math.random() * 100 + '%';
-                    star.style.animationDelay = Math.random() * 3 + 's';
-                    container.appendChild(star);
-                }
-            </script>
         """, unsafe_allow_html=True)
         
-        # Center the login card
-        col1, col2, col3 = st.columns([1, 1.5, 1])
+        # Full screen container with stars
+        st.markdown("""
+            <div class="login-container">
+                <div class="stars">
+                    <div class="star" style="left: 10%; top: 20%;"></div>
+                    <div class="star" style="left: 20%; top: 40%;"></div>
+                    <div class="star" style="left: 30%; top: 10%;"></div>
+                    <div class="star" style="left: 40%; top: 60%;"></div>
+                    <div class="star" style="left: 50%; top: 30%;"></div>
+                    <div class="star" style="left: 60%; top: 70%;"></div>
+                    <div class="star" style="left: 70%; top: 15%;"></div>
+                    <div class="star" style="left: 80%; top: 50%;"></div>
+                    <div class="star" style="left: 15%; top: 80%;"></div>
+                    <div class="star" style="left: 85%; top: 25%;"></div>
+                    <div class="star" style="left: 25%; top: 75%;"></div>
+                    <div class="star" style="left: 75%; top: 85%;"></div>
+                    <div class="star" style="left: 45%; top: 5%;"></div>
+                    <div class="star" style="left: 55%; top: 90%;"></div>
+                    <div class="star" style="left: 5%; top: 45%;"></div>
+                    <div class="star" style="left: 90%; top: 55%;"></div>
+                    <div class="star" style="left: 35%; top: 65%;"></div>
+                    <div class="star" style="left: 65%; top: 35%;"></div>
+                </div>
+                
+                <div class="login-card">
+                    <h1 class="login-title">Login</h1>
+                    <p class="login-subtitle">Enter your password to access the tool</p>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
         
-        with col2:
-            st.markdown("<div style='height: 15vh;'></div>", unsafe_allow_html=True)
-            
-            st.markdown("""
-                <div style='background: rgba(255, 255, 255, 0.1); 
-                            backdrop-filter: blur(10px);
-                            padding: 3rem 2.5rem; 
-                            border-radius: 24px; 
-                            border: 2px solid rgba(255, 255, 255, 0.2);
-                            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-                            text-align: center;'>
-                    <h1 style='color: white; 
-                               margin-bottom: 0.5rem; 
-                               font-size: 2.5rem;
-                               font-weight: 700;
-                               text-shadow: 0 2px 10px rgba(0,0,0,0.3);'>
-                        Login
-                    </h1>
-                    <p style='color: rgba(255, 255, 255, 0.9); 
-                              margin-bottom: 2rem; 
-                              font-size: 1rem;'>
-                        Enter your password to access the tool
-                    </p>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            # Custom styled password input
-            st.markdown("""
-                <style>
-                    /* Style the password input */
-                    .stTextInput > div > div > input {
-                        background: rgba(255, 255, 255, 0.15) !important;
-                        backdrop-filter: blur(10px);
-                        border: 2px solid rgba(255, 255, 255, 0.3) !important;
-                        border-radius: 12px !important;
-                        color: white !important;
-                        padding: 14px 20px !important;
-                        font-size: 1rem !important;
-                        transition: all 0.3s ease !important;
-                    }
-                    
-                    .stTextInput > div > div > input::placeholder {
-                        color: rgba(255, 255, 255, 0.6) !important;
-                    }
-                    
-                    .stTextInput > div > div > input:focus {
-                        border-color: rgba(255, 255, 255, 0.6) !important;
-                        background: rgba(255, 255, 255, 0.2) !important;
-                        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1) !important;
-                    }
-                    
-                    /* Style the label */
-                    .stTextInput > label {
-                        color: white !important;
-                        font-weight: 600 !important;
-                        margin-bottom: 0.5rem !important;
-                        text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-                    }
-                    
-                    /* Hide the label since we have it in the card */
-                    .stTextInput > label {
-                        display: none;
-                    }
-                </style>
-            """, unsafe_allow_html=True)
-            
-            st.text_input(
-                "Password", 
-                type="password", 
-                on_change=password_entered, 
-                key="password",
-                placeholder="Enter your password...",
-                label_visibility="collapsed"
-            )
-            
-            st.markdown("""
-                <div style='text-align: center; margin-top: 2rem;'>
-                    <p style='color: rgba(255, 255, 255, 0.7); 
-                              font-size: 0.9rem;
-                              text-shadow: 0 1px 3px rgba(0,0,0,0.2);'>
-                        🔐 Secure access • Content Posting Automations
-                    </p>
-                </div>
-            """, unsafe_allow_html=True)
+        # Password input (will appear inside the card due to Streamlit's layout)
+        st.text_input(
+            "Password", 
+            type="password", 
+            on_change=password_entered, 
+            key="password",
+            placeholder="Enter your password...",
+            label_visibility="collapsed"
+        )
+        
+        st.markdown("""
+            <div class="login-footer">
+                🔐 Secure access • Content Posting Automations
+            </div>
+        """, unsafe_allow_html=True)
         
         return False
+        
+    elif not st.session_state["password_correct"]:
+        # Password incorrect
+        st.markdown("""
+            <style>
+                /* CRITICAL: Force hide ALL Streamlit default elements */
+                #MainMenu {visibility: hidden !important;}
+                footer {visibility: hidden !important;}
+                header {visibility: hidden !important;}
+                .stDeployButton {visibility: hidden !important;}
+                
+                /* FORCE full screen layout */
+                .main .block-container {
+                    padding: 0 !important; 
+                    max-width: 100% !important;
+                    margin: 0 !important;
+                }
+                
+                /* CRITICAL: Override Streamlit's default background */
+                .stApp {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                }
+                
+                .main {
+                    background: transparent !important;
+                }
+                
+                /* Full viewport height container */
+                .login-container {
+                    min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                    overflow: hidden;
+                }
+                
+                /* Animated stars */
+                .stars {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    pointer-events: none;
+                    z-index: 1;
+                }
+                
+                .star {
+                    position: absolute;
+                    width: 3px;
+                    height: 3px;
+                    background: white;
+                    border-radius: 50%;
+                    box-shadow: 0 0 4px rgba(255,255,255,0.8);
+                }
+                
+                @keyframes twinkle {
+                    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+                    50% { opacity: 1; transform: scale(1.2); }
+                }
+                
+                .star:nth-child(1) { animation: twinkle 2s infinite; }
+                .star:nth-child(2) { animation: twinkle 3s infinite 0.5s; }
+                .star:nth-child(3) { animation: twinkle 2.5s infinite 1s; }
+                .star:nth-child(4) { animation: twinkle 3.5s infinite 1.5s; }
+                
+                /* Shake animation */
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+                    20%, 40%, 60%, 80% { transform: translateX(8px); }
+                }
+                
+                .login-card {
+                    position: relative;
+                    z-index: 10;
+                    background: rgba(255, 255, 255, 0.15);
+                    backdrop-filter: blur(20px);
+                    -webkit-backdrop-filter: blur(20px);
+                    padding: 3rem 3rem;
+                    border-radius: 24px;
+                    border: 2px solid rgba(255, 100, 100, 0.5);
+                    box-shadow: 0 8px 32px rgba(255, 0, 0, 0.2);
+                    width: 420px;
+                    max-width: 90vw;
+                    animation: shake 0.6s;
+                }
+                
+                .login-title {
+                    color: white;
+                    font-size: 2.8rem;
+                    font-weight: 700;
+                    text-align: center;
+                    margin: 0 0 0.5rem 0;
+                    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                    letter-spacing: -0.02em;
+                }
+                
+                .login-subtitle {
+                    color: rgba(255, 255, 255, 0.9);
+                    text-align: center;
+                    margin: 0 0 2.5rem 0;
+                    font-size: 1rem;
+                    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                }
+                
+                .login-footer {
+                    text-align: center;
+                    margin-top: 2rem;
+                    color: rgba(255, 255, 255, 0.7);
+                    font-size: 0.9rem;
+                    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                }
+                
+                /* Style the password input with error state */
+                .stTextInput > div > div > input {
+                    background: rgba(255, 255, 255, 0.2) !important;
+                    backdrop-filter: blur(10px);
+                    border: 2px solid rgba(255, 100, 100, 0.7) !important;
+                    border-radius: 14px !important;
+                    color: white !important;
+                    padding: 16px 20px !important;
+                    font-size: 1rem !important;
+                    transition: all 0.3s ease !important;
+                    box-shadow: 0 4px 6px rgba(255,0,0,0.2) !important;
+                }
+                
+                .stTextInput > div > div > input::placeholder {
+                    color: rgba(255, 255, 255, 0.6) !important;
+                }
+                
+                .stTextInput > div > div > input:focus {
+                    border-color: rgba(255, 255, 255, 0.7) !important;
+                    background: rgba(255, 255, 255, 0.25) !important;
+                    box-shadow: 0 0 0 4px rgba(255, 100, 100, 0.15) !important;
+                    outline: none !important;
+                }
+                
+                /* Hide label */
+                .stTextInput > label {
+                    display: none !important;
+                }
+                
+                /* Style error message */
+                .stAlert {
+                    background: rgba(255, 100, 100, 0.25) !important;
+                    backdrop-filter: blur(10px);
+                    border: 2px solid rgba(255, 100, 100, 0.5) !important;
+                    border-radius: 12px !important;
+                    color: white !important;
+                    font-weight: 600 !important;
+                }
+                
+                /* Remove default Streamlit padding */
+                [data-testid="stVerticalBlock"] > [style*="flex-direction: column;"] > [data-testid="stVerticalBlock"] {
+                    gap: 0 !important;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+        
+        # Full screen container with stars
+        st.markdown("""
+            <div class="login-container">
+                <div class="stars">
+                    <div class="star" style="left: 10%; top: 20%;"></div>
+                    <div class="star" style="left: 20%; top: 40%;"></div>
+                    <div class="star" style="left: 30%; top: 10%;"></div>
+                    <div class="star" style="left: 40%; top: 60%;"></div>
+                    <div class="star" style="left: 50%; top: 30%;"></div>
+                    <div class="star" style="left: 60%; top: 70%;"></div>
+                    <div class="star" style="left: 70%; top: 15%;"></div>
+                    <div class="star" style="left: 80%; top: 50%;"></div>
+                    <div class="star" style="left: 15%; top: 80%;"></div>
+                    <div class="star" style="left: 85%; top: 25%;"></div>
+                    <div class="star" style="left: 25%; top: 75%;"></div>
+                    <div class="star" style="left: 75%; top: 85%;"></div>
+                    <div class="star" style="left: 45%; top: 5%;"></div>
+                    <div class="star" style="left: 55%; top: 90%;"></div>
+                    <div class="star" style="left: 5%; top: 45%;"></div>
+                    <div class="star" style="left: 90%; top: 55%;"></div>
+                    <div class="star" style="left: 35%; top: 65%;"></div>
+                    <div class="star" style="left: 65%; top: 35%;"></div>
+                </div>
+                
+                <div class="login-card">
+                    <h1 class="login-title">Login</h1>
+                    <p class="login-subtitle">Enter your password to access the tool</p>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Password input
+        st.text_input(
+            "Password", 
+            type="password", 
+            on_change=password_entered, 
+            key="password",
+            placeholder="Enter your password...",
+            label_visibility="collapsed"
+        )
+        
+        st.error("❌ Incorrect password. Please try again.")
+        
+        st.markdown("""
+            <div class="login-footer">
+                🔐 Secure access • Content Posting Automations
+            </div>
+        """, unsafe_allow_html=True)
+        
+        return False
+        
+    else:
+        # Password correct
+        return True
         
     elif not st.session_state["password_correct"]:
         # Password incorrect, show error with same design
@@ -2816,6 +3075,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
