@@ -143,7 +143,7 @@ def check_password():
                     text-shadow: 0 1px 3px rgba(0,0,0,0.2);
                 }
                 
-                /* Style the password input - KEEP AS IS */
+                /* Style the password input - FIXED WIDTH */
                 .stTextInput > div > div > input {
                     background: rgba(255, 255, 255, 0.9) !important;
                     backdrop-filter: blur(10px);
@@ -158,6 +158,7 @@ def check_password():
                 
                 .stTextInput {
                     margin: 0 auto !important;
+                    max-width: 440px !important;
                 }
                 
                 .stTextInput > div {
@@ -166,13 +167,15 @@ def check_password():
                     margin: 0 auto !important;
                 }
                 
-                /* Style the button - ALIGNED WITH PASSWORD */
+                /* Style the button - MATCH CONTAINER WIDTH */
                 .stButton {
                     display: flex !important;
-                    justify-content: flex-start !important;
+                    justify-content: center !important;
                     margin-top: 1rem !important;
                     width: 100% !important;
-                    padding-left: 0 !important;
+                    max-width: 440px !important;
+                    margin-left: auto !important;
+                    margin-right: auto !important;
                 }
                 
                 .stButton > button {
@@ -185,8 +188,7 @@ def check_password():
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                    width: auto !important;
-                    min-width: 150px !important;
+                    width: 100% !important;
                     letter-spacing: 0.5px !important;
                 }
                 
@@ -411,7 +413,7 @@ def check_password():
                     text-shadow: 0 1px 3px rgba(0,0,0,0.2);
                 }
                 
-                /* Style the password input with error state - KEEP AS IS */
+                /* Style the password input with error state - FIXED WIDTH */
                 .stTextInput > div > div > input {
                     background: rgba(255, 255, 255, 0.9) !important;
                     backdrop-filter: blur(10px);
@@ -426,6 +428,7 @@ def check_password():
                 
                 .stTextInput {
                     margin: 0 auto !important;
+                    max-width: 440px !important;
                 }
                 
                 .stTextInput > div {
@@ -434,13 +437,15 @@ def check_password():
                     margin: 0 auto !important;
                 }
                 
-                /* Style the button - ALIGNED WITH PASSWORD */
+                /* Style the button - MATCH CONTAINER WIDTH */
                 .stButton {
                     display: flex !important;
-                    justify-content: flex-start !important;
+                    justify-content: center !important;
                     margin-top: 1rem !important;
                     width: 100% !important;
-                    padding-left: 0 !important;
+                    max-width: 440px !important;
+                    margin-left: auto !important;
+                    margin-right: auto !important;
                 }
                 
                 .stButton > button {
@@ -453,8 +458,7 @@ def check_password():
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                    width: auto !important;
-                    min-width: 150px !important;
+                    width: 100% !important;
                     letter-spacing: 0.5px !important;
                 }
                 
@@ -2936,6 +2940,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
