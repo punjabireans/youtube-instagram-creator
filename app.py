@@ -1844,9 +1844,9 @@ with tab3:
                     value=st.session_state.ig_content_value,
                     height=100,
                     key="ig_content_area",
-                    placeholder="Your Instagram caption with hashtags..."
+                    placeholder="Your Instagram caption with hashtags...",
+                    on_change=lambda: setattr(st.session_state, 'ig_content_value', st.session_state.ig_content_area)
                 )
-                st.session_state.ig_content_value = ig_content
             
             with col2:
                 # FIXED: Use callback to update content without causing rerun issues
@@ -1879,7 +1879,7 @@ with tab3:
                 platforms_config.append({
                     "platform": "Instagram",
                     "accountId": ig_account_id,
-                    "content": ig_content,
+                    "content": st.session_state.ig_content_value,
                     "schedule": ig_schedule,
                     "mediaItems": media_items
                 })
@@ -1922,9 +1922,9 @@ with tab3:
                     value=st.session_state.li_content_value,
                     height=100,
                     key="li_content_area",
-                    placeholder="Your professional LinkedIn post..."
+                    placeholder="Your professional LinkedIn post...",
+                    on_change=lambda: setattr(st.session_state, 'li_content_value', st.session_state.li_content_area)
                 )
-                st.session_state.li_content_value = li_content
             
             with col2:
                 # FIXED: Use callback pattern
@@ -1957,7 +1957,7 @@ with tab3:
                 platforms_config.append({
                     "platform": "LinkedIn",
                     "accountId": li_account_id,
-                    "content": li_content,
+                    "content": st.session_state.li_content_value,
                     "schedule": li_schedule,
                     "mediaItems": media_items
                 })
@@ -2000,9 +2000,9 @@ with tab3:
                     value=st.session_state.fb_content_value,
                     height=100,
                     key="fb_content_area",
-                    placeholder="Your Facebook post..."
+                    placeholder="Your Facebook post...",
+                    on_change=lambda: setattr(st.session_state, 'fb_content_value', st.session_state.fb_content_area)
                 )
-                st.session_state.fb_content_value = fb_content
             
             with col2:
                 # FIXED: Use callback pattern
@@ -2035,7 +2035,7 @@ with tab3:
                 platforms_config.append({
                     "platform": "Facebook",
                     "accountId": fb_account_id,
-                    "content": fb_content,
+                    "content": st.session_state.fb_content_value,
                     "schedule": fb_schedule,
                     "mediaItems": media_items
                 })
@@ -2079,9 +2079,9 @@ with tab3:
                     height=100,
                     key="tw_content_area",
                     placeholder="Your tweet (max 280 characters)...",
-                    max_chars=280
+                    max_chars=280,
+                    on_change=lambda: setattr(st.session_state, 'tw_content_value', st.session_state.tw_content_area)
                 )
-                st.session_state.tw_content_value = tw_content
                 
                 char_count = len(tw_content)
                 if char_count > 280:
@@ -2122,7 +2122,7 @@ with tab3:
                 platforms_config.append({
                     "platform": "Twitter",
                     "accountId": tw_account_id,
-                    "content": tw_content,
+                    "content": st.session_state.tw_content_value,
                     "schedule": tw_schedule,
                     "mediaItems": media_items
                 })
@@ -2431,4 +2431,5 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
