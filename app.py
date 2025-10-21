@@ -678,12 +678,34 @@ st.markdown("""
     .main {
         background: #f5f7fa;
         padding: 0 !important;
+        transition: margin-left 0.3s ease;
     }
     
     .block-container {
         padding: 2rem 1rem !important;
         max-width: 1400px !important;
         background: #f5f7fa;
+        margin: 0 auto !important;
+        transition: all 0.3s ease;
+    }
+    
+    /* When sidebar is collapsed, center the main content */
+    section[data-testid="stSidebar"][aria-expanded="false"] ~ .main .block-container,
+    body:not(:has(section[data-testid="stSidebar"][aria-expanded="true"])) .main .block-container {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        padding-left: 3rem !important;
+        padding-right: 3rem !important;
+    }
+    
+    /* Adjust main content margin when sidebar is visible */
+    .main {
+        margin-left: 0 !important;
+    }
+    
+    /* Smooth transition for content reflow */
+    .main, .block-container, section[data-testid="stSidebar"] {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     /* Header Styling */
@@ -1092,6 +1114,23 @@ st.markdown("""
 
 st.markdown('<h1 class="main-header">🚀 Content Posting Automations</h1>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">Streamline your content creation and multi-platform posting workflow</p>', unsafe_allow_html=True)
+
+# Add floating sidebar toggle button with JavaScript
+st.markdown("""
+<button class="floating-sidebar-toggle" onclick="
+    const sidebar = window.parent.document.querySelector('[data-testid=stSidebar]');
+    const collapseBtn = window.parent.document.querySelector('[data-testid=collapsedControl]');
+    const expandBtn = window.parent.document.querySelector('section[data-testid=stSidebar] button[kind=header]');
+    
+    if (sidebar && sidebar.getAttribute('aria-expanded') === 'true') {
+        // Sidebar is open, close it
+        if (expandBtn) expandBtn.click();
+    } else {
+        // Sidebar is closed, open it
+        if (collapseBtn) collapseBtn.click();
+    }
+">☰</button>
+""", unsafe_allow_html=True)
 
 # Hidden component to load data from localStorage
 load_storage_js = """
