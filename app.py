@@ -143,38 +143,42 @@ def check_password():
                     text-shadow: 0 1px 3px rgba(0,0,0,0.2);
                 }
                 
-                /* Style the password input - PROPER WIDTH */
+                /* Style the password input - SET CONTAINER WIDTH */
                 .stTextInput > div > div > input {
                     background: rgba(255, 255, 255, 0.9) !important;
                     backdrop-filter: blur(10px);
                     border: 2px solid rgba(255, 255, 255, 0.4) !important;
                     border-radius: 14px !important;
                     color: #2d3748 !important;
-                    padding: 14px 18px !important;
+                    padding: 16px 20px !important;
                     font-size: 1rem !important;
-                    line-height: 1.5 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
                 }
                 
                 .stTextInput {
                     margin: 0 auto !important;
-                    max-width: 320px !important;
+                    width: 340px !important;
                 }
                 
                 .stTextInput > div {
-                    display: block !important;
+                    display: flex !important;
+                    justify-content: center !important;
                     margin: 0 auto !important;
-                    max-width: 320px !important;
+                    width: 340px !important;
                 }
                 
-                /* Style the button - SAME WIDTH AS PASSWORD */
+                .stTextInput > div > div {
+                    width: 340px !important;
+                }
+                
+                /* Style the button - EXACT SAME WIDTH AS PASSWORD */
                 .stButton {
                     display: block !important;
                     margin-top: 1rem !important;
+                    width: 340px !important;
                     margin-left: auto !important;
                     margin-right: auto !important;
-                    max-width: 320px !important;
                 }
                 
                 .stButton > button {
@@ -182,12 +186,12 @@ def check_password():
                     color: #667eea !important;
                     border: 2px solid rgba(200, 200, 220, 0.3) !important;
                     border-radius: 14px !important;
-                    padding: 14px 18px !important;
+                    padding: 16px 20px !important;
                     font-size: 1rem !important;
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                    width: 100% !important;
+                    width: 340px !important;
                     letter-spacing: 0.5px !important;
                 }
                 
@@ -266,7 +270,7 @@ def check_password():
                 label_visibility="collapsed"
             )
             
-            # Login button - INSIDE col2
+            # Login button
             if st.button("🔓 Login", use_container_width=False, type="primary"):
                 if password_input:
                     if hashlib.sha256(password_input.encode()).hexdigest() == hashlib.sha256("RenaPostTool81".encode()).hexdigest():
@@ -412,38 +416,42 @@ def check_password():
                     text-shadow: 0 1px 3px rgba(0,0,0,0.2);
                 }
                 
-                /* Style the password input with error state - PROPER WIDTH */
+                /* Style the password input with error state - SET CONTAINER WIDTH */
                 .stTextInput > div > div > input {
                     background: rgba(255, 255, 255, 0.9) !important;
                     backdrop-filter: blur(10px);
                     border: 2px solid rgba(255, 100, 100, 0.7) !important;
                     border-radius: 14px !important;
                     color: #2d3748 !important;
-                    padding: 14px 18px !important;
+                    padding: 16px 20px !important;
                     font-size: 1rem !important;
-                    line-height: 1.5 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 6px rgba(255,0,0,0.2) !important;
                 }
                 
                 .stTextInput {
                     margin: 0 auto !important;
-                    max-width: 320px !important;
+                    width: 340px !important;
                 }
                 
                 .stTextInput > div {
-                    display: block !important;
+                    display: flex !important;
+                    justify-content: center !important;
                     margin: 0 auto !important;
-                    max-width: 320px !important;
+                    width: 340px !important;
                 }
                 
-                /* Style the button - SAME WIDTH AS PASSWORD */
+                .stTextInput > div > div {
+                    width: 340px !important;
+                }
+                
+                /* Style the button - EXACT SAME WIDTH AS PASSWORD */
                 .stButton {
                     display: block !important;
                     margin-top: 1rem !important;
+                    width: 340px !important;
                     margin-left: auto !important;
                     margin-right: auto !important;
-                    max-width: 320px !important;
                 }
                 
                 .stButton > button {
@@ -451,12 +459,12 @@ def check_password():
                     color: #667eea !important;
                     border: 2px solid rgba(200, 200, 220, 0.3) !important;
                     border-radius: 14px !important;
-                    padding: 14px 18px !important;
+                    padding: 16px 20px !important;
                     font-size: 1rem !important;
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                    width: 100% !important;
+                    width: 340px !important;
                     letter-spacing: 0.5px !important;
                 }
                 
@@ -2938,6 +2946,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
