@@ -180,7 +180,7 @@ def check_password():
             </style>
         """, unsafe_allow_html=True)
         
-        # Full screen container with stars - FIXED: Proper closing tags
+        # Full screen container with stars - FIXED: Proper vertical centering
         st.markdown("""
             <div class="login-container">
                 <div class="stars">
@@ -205,6 +205,9 @@ def check_password():
                 </div>
             </div>
         """, unsafe_allow_html=True)
+        
+        # Add vertical spacing to center content
+        st.markdown("<div style='height: 25vh;'></div>", unsafe_allow_html=True)
         
         # Centered login card wrapper - FIXED: Better centering
         col1, col2, col3 = st.columns([1, 1, 1])
@@ -316,12 +319,13 @@ def check_password():
                     background: rgba(255, 255, 255, 0.15);
                     backdrop-filter: blur(20px);
                     -webkit-backdrop-filter: blur(20px);
-                    padding: 3rem 3rem;
+                    padding: 3rem 2.5rem;
                     border-radius: 24px;
                     border: 2px solid rgba(255, 100, 100, 0.5);
                     box-shadow: 0 8px 32px rgba(255, 0, 0, 0.2);
-                    width: 420px;
-                    max-width: 90vw;
+                    width: 100%;
+                    max-width: 450px;
+                    margin: 0 auto;
                     animation: shake 0.6s;
                 }
                 
@@ -358,10 +362,20 @@ def check_password():
                     border: 2px solid rgba(255, 100, 100, 0.7) !important;
                     border-radius: 14px !important;
                     color: white !important;
-                    padding: 16px 20px !important;
-                    font-size: 1rem !important;
+                    padding: 14px 18px !important;
+                    font-size: 0.95rem !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 6px rgba(255,0,0,0.2) !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                }
+                
+                .stTextInput {
+                    max-width: 100% !important;
+                }
+                
+                .stTextInput > div {
+                    max-width: 100% !important;
                 }
                 
                 .stTextInput > div > div > input::placeholder {
@@ -423,8 +437,11 @@ def check_password():
             </div>
         """, unsafe_allow_html=True)
         
-        # Centered login card wrapper
-        col1, col2, col3 = st.columns([1, 2, 1])
+        # Add vertical spacing to center content
+        st.markdown("<div style='height: 25vh;'></div>", unsafe_allow_html=True)
+        
+        # Centered login card wrapper - FIXED: Better centering
+        col1, col2, col3 = st.columns([1, 1, 1])
         
         with col2:
             st.markdown("""
@@ -433,6 +450,8 @@ def check_password():
                     <p class="login-subtitle">Enter your password to access the tool</p>
                 </div>
             """, unsafe_allow_html=True)
+            
+            st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
             
             # Password input
             st.text_input(
@@ -457,7 +476,6 @@ def check_password():
     else:
         # Password correct
         return True
-
 # ============================================================================
 # LOCALSTORAGE UTILITIES
 # ============================================================================
@@ -2935,6 +2953,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
