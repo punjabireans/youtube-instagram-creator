@@ -737,11 +737,15 @@ st.markdown("""
     }
     
     /* Force tab text colors - CRITICAL FIX */
-    .stTabs [data-baseweb="tab"] span {
+    .stTabs [data-baseweb="tab"] span,
+    .stTabs [data-baseweb="tab"] p,
+    .stTabs [data-baseweb="tab"] div {
         color: #2d3748 !important;
     }
     
-    .stTabs [aria-selected="true"] span {
+    .stTabs [aria-selected="true"] span,
+    .stTabs [aria-selected="true"] p,
+    .stTabs [aria-selected="true"] div {
         color: #ffffff !important;
         text-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
@@ -749,6 +753,11 @@ st.markdown("""
     .stTabs [data-baseweb="tab"] > div,
     .stTabs [data-baseweb="tab"] > div > div {
         color: inherit !important;
+    }
+    
+    /* Additional override for any nested elements */
+    .stTabs [aria-selected="true"] * {
+        color: #ffffff !important;
     }
     
     .stTabs [data-baseweb="tab-panel"] {
@@ -771,19 +780,102 @@ st.markdown("""
         background: transparent;
     }
     
-    /* HIDE the sidebar collapse button completely */
+    /* Style the sidebar collapse/expand button - Make it VISIBLE and working */
     section[data-testid="stSidebar"] button[kind="header"] {
-        display: none !important;
+        background: rgba(255,255,255,0.2) !important;
+        color: white !important;
+        border: 2px solid rgba(255,255,255,0.5) !important;
+        border-radius: 8px !important;
+        padding: 8px 12px !important;
+        font-weight: 600 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+        transition: all 0.3s ease !important;
+        position: relative !important;
     }
     
+    section[data-testid="stSidebar"] button[kind="header"]:hover {
+        background: rgba(255,255,255,0.3) !important;
+        border-color: white !important;
+        transform: scale(1.05);
+    }
+    
+    /* Add tooltip text to sidebar button */
+    section[data-testid="stSidebar"] button[kind="header"]::after {
+        content: "Hide Sidebar";
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        margin-left: 10px;
+        background: #2d3748;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        z-index: 999;
+    }
+    
+    section[data-testid="stSidebar"] button[kind="header"]:hover::after {
+        opacity: 1;
+    }
+    
+    /* Sidebar collapse/expand button when sidebar is CLOSED */
     [data-testid="collapsedControl"] {
-        display: none !important;
+        background: white !important;
+        color: #667eea !important;
+        border: 3px solid #667eea !important;
+        border-radius: 0 8px 8px 0 !important;
+        box-shadow: 2px 2px 12px rgba(0,0,0,0.2) !important;
+        width: 40px !important;
+        height: 60px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.3s ease !important;
+        position: relative !important;
     }
     
-    /* Make sidebar always visible */
-    section[data-testid="stSidebar"] {
-        transform: none !important;
-        margin-left: 0 !important;
+    [data-testid="collapsedControl"]:hover {
+        background: #667eea !important;
+        color: white !important;
+        border-color: #764ba2 !important;
+        box-shadow: 2px 2px 16px rgba(102, 126, 234, 0.4) !important;
+        transform: scale(1.05);
+    }
+    
+    [data-testid="collapsedControl"] svg {
+        width: 24px !important;
+        height: 24px !important;
+    }
+    
+    /* Add tooltip text to collapsed control */
+    [data-testid="collapsedControl"]::after {
+        content: "Open Sidebar";
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        margin-left: 10px;
+        background: #2d3748;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        z-index: 999;
+    }
+    
+    [data-testid="collapsedControl"]:hover::after {
+        opacity: 1;
     }
     
     section[data-testid="stSidebar"] .stMarkdown {
