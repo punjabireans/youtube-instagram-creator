@@ -1049,7 +1049,6 @@ with tab1:
     """, unsafe_allow_html=True)
     
     with st.expander("💡 Pro Tips for Amazing Screenshots", expanded=False):
-    with st.expander("💡 Pro Tips for Amazing Screenshots", expanded=False):
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("""
