@@ -177,17 +177,18 @@ def check_password():
                     max-width: 380px !important;
                 }
                 
-                /* Style the button */
+                /* Style the button - FORCE proper centering */
                 .stButton {
                     display: flex !important;
                     justify-content: center !important;
                     margin-top: 1rem !important;
+                    width: 100% !important;
                 }
                 
                 .stButton > button {
-                    background: rgba(255, 255, 255, 0.95) !important;
+                    background: white !important;
                     color: #667eea !important;
-                    border: none !important;
+                    border: 2px solid rgba(200, 200, 220, 0.3) !important;
                     border-radius: 14px !important;
                     padding: 14px 40px !important;
                     font-size: 1rem !important;
@@ -197,11 +198,11 @@ def check_password():
                     width: 320px !important;
                     max-width: 320px !important;
                     letter-spacing: 0.5px !important;
-                    margin: 0 auto !important;
                 }
                 
                 .stButton > button:hover {
                     background: white !important;
+                    border-color: #667eea !important;
                     transform: translateY(-2px) !important;
                     box-shadow: 0 6px 20px rgba(0,0,0,0.2) !important;
                 }
@@ -452,17 +453,18 @@ def check_password():
                     max-width: 380px !important;
                 }
                 
-                /* Style the button */
+                /* Style the button - FORCE proper centering */
                 .stButton {
                     display: flex !important;
                     justify-content: center !important;
                     margin-top: 1rem !important;
+                    width: 100% !important;
                 }
                 
                 .stButton > button {
-                    background: rgba(255, 255, 255, 0.95) !important;
+                    background: white !important;
                     color: #667eea !important;
-                    border: none !important;
+                    border: 2px solid rgba(200, 200, 220, 0.3) !important;
                     border-radius: 14px !important;
                     padding: 14px 40px !important;
                     font-size: 1rem !important;
@@ -472,11 +474,11 @@ def check_password():
                     width: 320px !important;
                     max-width: 320px !important;
                     letter-spacing: 0.5px !important;
-                    margin: 0 auto !important;
                 }
                 
                 .stButton > button:hover {
                     background: white !important;
+                    border-color: #667eea !important;
                     transform: translateY(-2px) !important;
                     box-shadow: 0 6px 20px rgba(0,0,0,0.2) !important;
                 }
@@ -2983,6 +2985,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
