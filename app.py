@@ -155,18 +155,18 @@ def check_password():
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
                     width: 100% !important;
-                    max-width: 320px !important;
+                    max-width: 280px !important;
                     margin: 0 auto !important;
                     display: block !important;
                 }
                 
                 .stTextInput {
-                    max-width: 320px !important;
+                    max-width: 280px !important;
                     margin: 0 auto !important;
                 }
                 
                 .stTextInput > div {
-                    max-width: 320px !important;
+                    max-width: 280px !important;
                     display: flex !important;
                     justify-content: center !important;
                     margin: 0 auto !important;
@@ -174,7 +174,7 @@ def check_password():
                 
                 .stTextInput > div > div {
                     width: 100% !important;
-                    max-width: 320px !important;
+                    max-width: 280px !important;
                 }
                 
                 /* Style the button - PERFECTLY CENTERED */
@@ -434,18 +434,18 @@ def check_password():
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 6px rgba(255,0,0,0.2) !important;
                     width: 100% !important;
-                    max-width: 320px !important;
+                    max-width: 280px !important;
                     margin: 0 auto !important;
                     display: block !important;
                 }
                 
                 .stTextInput {
-                    max-width: 320px !important;
+                    max-width: 280px !important;
                     margin: 0 auto !important;
                 }
                 
                 .stTextInput > div {
-                    max-width: 320px !important;
+                    max-width: 280px !important;
                     display: flex !important;
                     justify-content: center !important;
                     margin: 0 auto !important;
@@ -453,7 +453,7 @@ def check_password():
                 
                 .stTextInput > div > div {
                     width: 100% !important;
-                    max-width: 320px !important;
+                    max-width: 280px !important;
                 }
                 
                 /* Style the button - PERFECTLY CENTERED */
@@ -2989,6 +2989,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
