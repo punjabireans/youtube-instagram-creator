@@ -1768,37 +1768,34 @@ with tab3:
                 🚀 Post Content to All Platforms
             </h3>
             <p style='margin: 0; font-size: 1rem; color: #ffffff; opacity: 1;'>
-                Click below to post your content to all selected platforms at once
+                Click below to copy master content to all enabled platforms at once
             </p>
         </div>
     """, unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("📋 Post to All Selected Platforms", use_container_width=True, type="primary", key="push_to_all_btn"):
-            # Check if any platforms are actually configured
-            has_configured_platforms = (
-                (enable_instagram and st.session_state.ig_account_id) or
-                (enable_linkedin and st.session_state.li_account_id) or
-                (enable_facebook and st.session_state.fb_account_id) or
-                (enable_twitter and st.session_state.tw_account_id)
-            )
+        if st.button("📋 Copy Master to All Platforms", use_container_width=True, type="primary", key="push_to_all_btn"):
+            # Copy master content to all enabled platforms (regardless of account ID)
+            copied_count = 0
+            if enable_instagram:
+                st.session_state.ig_content_value = st.session_state.master_content
+                copied_count += 1
+            if enable_linkedin:
+                st.session_state.li_content_value = st.session_state.master_content
+                copied_count += 1
+            if enable_facebook:
+                st.session_state.fb_content_value = st.session_state.master_content
+                copied_count += 1
+            if enable_twitter:
+                st.session_state.tw_content_value = st.session_state.master_content
+                copied_count += 1
             
-            if has_configured_platforms:
-                # Copy master content to all enabled platforms
-                if enable_instagram and st.session_state.ig_account_id:
-                    st.session_state.ig_content_value = st.session_state.master_content
-                if enable_linkedin and st.session_state.li_account_id:
-                    st.session_state.li_content_value = st.session_state.master_content
-                if enable_facebook and st.session_state.fb_account_id:
-                    st.session_state.fb_content_value = st.session_state.master_content
-                if enable_twitter and st.session_state.tw_account_id:
-                    st.session_state.tw_content_value = st.session_state.master_content
-                
-                st.success("✅ Master content copied to all configured platforms!")
+            if copied_count > 0:
+                st.success(f"✅ Master content copied to {copied_count} platform(s)!")
                 st.rerun()
             else:
-                st.error("❌ Please select platforms and enter their Account IDs first!")
+                st.warning("⚠️ Please select at least one platform first!")
     
     st.markdown("<br>", unsafe_allow_html=True)
     
@@ -1865,8 +1862,7 @@ with tab3:
                     value=st.session_state.ig_content_value,
                     height=100,
                     key="ig_content_area",
-                    placeholder="Your Instagram caption with hashtags...",
-                    on_change=lambda: setattr(st.session_state, 'ig_content_value', st.session_state.ig_content_area)
+                    placeholder="Your Instagram caption with hashtags..."
                 )
             
             with col2:
@@ -1943,8 +1939,7 @@ with tab3:
                     value=st.session_state.li_content_value,
                     height=100,
                     key="li_content_area",
-                    placeholder="Your professional LinkedIn post...",
-                    on_change=lambda: setattr(st.session_state, 'li_content_value', st.session_state.li_content_area)
+                    placeholder="Your professional LinkedIn post..."
                 )
             
             with col2:
@@ -2021,8 +2016,7 @@ with tab3:
                     value=st.session_state.fb_content_value,
                     height=100,
                     key="fb_content_area",
-                    placeholder="Your Facebook post...",
-                    on_change=lambda: setattr(st.session_state, 'fb_content_value', st.session_state.fb_content_area)
+                    placeholder="Your Facebook post..."
                 )
             
             with col2:
@@ -2100,8 +2094,7 @@ with tab3:
                     height=100,
                     key="tw_content_area",
                     placeholder="Your tweet (max 280 characters)...",
-                    max_chars=280,
-                    on_change=lambda: setattr(st.session_state, 'tw_content_value', st.session_state.tw_content_area)
+                    max_chars=280
                 )
                 
                 char_count = len(tw_content)
@@ -2452,6 +2445,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
