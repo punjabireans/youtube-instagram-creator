@@ -41,6 +41,19 @@ def check_password():
                     padding: 0 !important; 
                     max-width: 100% !important;
                     margin: 0 !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    justify-content: center !important;
+                    min-height: 100vh !important;
+                }
+                
+                /* Force all child elements to center */
+                .main .block-container > div {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    justify-content: center !important;
+                    align-items: center !important;
+                    flex: 1 !important;
                 }
                 
                 /* CRITICAL: Override Streamlit's default background */
@@ -180,7 +193,7 @@ def check_password():
             </style>
         """, unsafe_allow_html=True)
         
-        # Full screen container with stars - FIXED: Proper vertical centering
+        # Full screen container with stars - REMOVED extra spacing
         st.markdown("""
             <div class="login-container">
                 <div class="stars">
@@ -206,10 +219,7 @@ def check_password():
             </div>
         """, unsafe_allow_html=True)
         
-        # Add vertical spacing to center content
-        st.markdown("<div style='height: 25vh;'></div>", unsafe_allow_html=True)
-        
-        # Centered login card wrapper - FIXED: Better centering
+        # Centered login card wrapper
         col1, col2, col3 = st.columns([1, 1, 1])
         
         with col2:
@@ -255,6 +265,19 @@ def check_password():
                     padding: 0 !important; 
                     max-width: 100% !important;
                     margin: 0 !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    justify-content: center !important;
+                    min-height: 100vh !important;
+                }
+                
+                /* Force all child elements to center */
+                .main .block-container > div {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    justify-content: center !important;
+                    align-items: center !important;
+                    flex: 1 !important;
                 }
                 
                 /* CRITICAL: Override Streamlit's default background */
@@ -411,7 +434,7 @@ def check_password():
             </style>
         """, unsafe_allow_html=True)
         
-        # Full screen container with stars - FIXED
+        # Full screen container with stars - REMOVED extra spacing
         st.markdown("""
             <div class="login-container">
                 <div class="stars">
@@ -437,10 +460,7 @@ def check_password():
             </div>
         """, unsafe_allow_html=True)
         
-        # Add vertical spacing to center content
-        st.markdown("<div style='height: 25vh;'></div>", unsafe_allow_html=True)
-        
-        # Centered login card wrapper - FIXED: Better centering
+        # Centered login card wrapper
         col1, col2, col3 = st.columns([1, 1, 1])
         
         with col2:
@@ -476,80 +496,6 @@ def check_password():
     else:
         # Password correct
         return True
-# ============================================================================
-# LOCALSTORAGE UTILITIES
-# ============================================================================
-
-def load_account_ids_from_localstorage():
-    """Load account IDs from browser localStorage using JavaScript"""
-    js_code = """
-    <script>
-        // Get account IDs from localStorage
-        const igId = localStorage.getItem('ig_account_id') || '';
-        const liId = localStorage.getItem('li_account_id') || '';
-        const fbId = localStorage.getItem('fb_account_id') || '';
-        const twId = localStorage.getItem('tw_account_id') || '';
-        
-        // Send to Streamlit
-        window.parent.postMessage({
-            type: 'streamlit:setComponentValue',
-            data: {
-                ig_account_id: igId,
-                li_account_id: liId,
-                fb_account_id: fbId,
-                tw_account_id: twId
-            }
-        }, '*');
-    </script>
-    """
-    st.components.v1.html(js_code, height=0)
-
-def save_to_localstorage(key, value):
-    """Save a value to browser localStorage"""
-    js_code = f"""
-    <script>
-        localStorage.setItem('{key}', '{value}');
-    </script>
-    """
-    st.components.v1.html(js_code, height=0)
-
-def clear_localstorage():
-    """Clear all saved data from localStorage"""
-    js_code = """
-    <script>
-        localStorage.removeItem('api_key');
-        localStorage.removeItem('ig_account_id');
-        localStorage.removeItem('li_account_id');
-        localStorage.removeItem('fb_account_id');
-        localStorage.removeItem('tw_account_id');
-        window.parent.postMessage({type: 'streamlit:componentReady'}, '*');
-    </script>
-    """
-    st.components.v1.html(js_code, height=0)
-
-# ============================================================================
-# FONT UTILITIES
-# ============================================================================
-
-def get_font(size, bold=False):
-    """Get Work Sans SemiBold font or fallback to default"""
-    try:
-        font_paths = [
-            "WorkSans-SemiBold.ttf" if not bold else "WorkSans-Bold.ttf",
-            "/System/Library/Fonts/Helvetica.ttc",
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-            "arial.ttf"
-        ]
-        
-        for font_path in font_paths:
-            try:
-                return ImageFont.truetype(font_path, size)
-            except:
-                continue
-                
-        return ImageFont.load_default()
-    except:
-        return ImageFont.load_default()
 
 # ============================================================================
 # YOUTUBE TO INSTAGRAM POST FUNCTIONS
@@ -2953,6 +2899,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
