@@ -1115,22 +1115,20 @@ st.markdown("""
 st.markdown('<h1 class="main-header">🚀 Content Posting Automations</h1>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">Streamline your content creation and multi-platform posting workflow</p>', unsafe_allow_html=True)
 
-# Add floating sidebar toggle button with JavaScript
-st.markdown("""
+# Add floating sidebar toggle button using st.components
+st.components.v1.html("""
 <button class="floating-sidebar-toggle" onclick="
     const sidebar = window.parent.document.querySelector('[data-testid=stSidebar]');
     const collapseBtn = window.parent.document.querySelector('[data-testid=collapsedControl]');
     const expandBtn = window.parent.document.querySelector('section[data-testid=stSidebar] button[kind=header]');
     
     if (sidebar && sidebar.getAttribute('aria-expanded') === 'true') {
-        // Sidebar is open, close it
         if (expandBtn) expandBtn.click();
     } else {
-        // Sidebar is closed, open it
         if (collapseBtn) collapseBtn.click();
     }
 ">☰</button>
-""", unsafe_allow_html=True)
+""", height=0)
 
 # Hidden component to load data from localStorage
 load_storage_js = """
