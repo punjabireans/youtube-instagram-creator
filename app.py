@@ -143,7 +143,7 @@ def check_password():
                     text-shadow: 0 1px 3px rgba(0,0,0,0.2);
                 }
                 
-                /* Style the password input - SET CONTAINER WIDTH */
+                /* Style the password input - SIMPLE */
                 .stTextInput > div > div > input {
                     background: rgba(255, 255, 255, 0.9) !important;
                     backdrop-filter: blur(10px);
@@ -157,28 +157,19 @@ def check_password():
                 }
                 
                 .stTextInput {
-                    margin: 0 auto !important;
-                    width: 340px !important;
+                    margin: 0 !important;
                 }
                 
                 .stTextInput > div {
-                    display: flex !important;
-                    justify-content: center !important;
-                    margin: 0 auto !important;
-                    width: 340px !important;
+                    display: block !important;
+                    margin: 0 !important;
                 }
                 
-                .stTextInput > div > div {
-                    width: 340px !important;
-                }
-                
-                /* Style the button - MATCH PASSWORD FIELD EXACTLY */
+                /* Style the button - MATCH PASSWORD NATURALLY */
                 .stButton {
                     display: block !important;
                     margin-top: 1rem !important;
-                    width: 270px !important;
-                    margin-left: auto !important;
-                    margin-right: auto !important;
+                    width: 100% !important;
                 }
                 
                 .stButton > button {
@@ -191,7 +182,7 @@ def check_password():
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                    width: 270px !important;
+                    width: 100% !important;
                     letter-spacing: 0.5px !important;
                 }
                 
@@ -270,7 +261,7 @@ def check_password():
                 label_visibility="collapsed"
             )
             
-            # Login button
+            # Login button - INSIDE col2
             if st.button("🔓 Login", use_container_width=False, type="primary"):
                 if password_input:
                     if hashlib.sha256(password_input.encode()).hexdigest() == hashlib.sha256("RenaPostTool81".encode()).hexdigest():
@@ -416,7 +407,7 @@ def check_password():
                     text-shadow: 0 1px 3px rgba(0,0,0,0.2);
                 }
                 
-                /* Style the password input with error state - SET CONTAINER WIDTH */
+                /* Style the password input with error state - SIMPLE */
                 .stTextInput > div > div > input {
                     background: rgba(255, 255, 255, 0.9) !important;
                     backdrop-filter: blur(10px);
@@ -430,28 +421,19 @@ def check_password():
                 }
                 
                 .stTextInput {
-                    margin: 0 auto !important;
-                    width: 340px !important;
+                    margin: 0 !important;
                 }
                 
                 .stTextInput > div {
-                    display: flex !important;
-                    justify-content: center !important;
-                    margin: 0 auto !important;
-                    width: 340px !important;
+                    display: block !important;
+                    margin: 0 !important;
                 }
                 
-                .stTextInput > div > div {
-                    width: 340px !important;
-                }
-                
-                /* Style the button - MATCH PASSWORD FIELD EXACTLY */
+                /* Style the button - MATCH PASSWORD NATURALLY */
                 .stButton {
                     display: block !important;
                     margin-top: 1rem !important;
-                    width: 270px !important;
-                    margin-left: auto !important;
-                    margin-right: auto !important;
+                    width: 100% !important;
                 }
                 
                 .stButton > button {
@@ -464,7 +446,7 @@ def check_password():
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                    width: 270px !important;
+                    width: 100% !important;
                     letter-spacing: 0.5px !important;
                 }
                 
@@ -2946,6 +2928,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
