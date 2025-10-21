@@ -166,12 +166,13 @@ def check_password():
                     margin: 0 auto !important;
                 }
                 
-                /* Style the button - MATCH PASSWORD CONTAINER WIDTH */
+                /* Style the button - MANUALLY CENTERED */
                 .stButton {
                     display: flex !important;
                     justify-content: center !important;
                     margin-top: 1rem !important;
                     width: 100% !important;
+                    padding: 0 !important;
                 }
                 
                 .stButton > button {
@@ -184,9 +185,11 @@ def check_password():
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                    width: 100% !important;
-                    max-width: 100% !important;
+                    width: auto !important;
+                    min-width: 200px !important;
                     letter-spacing: 0.5px !important;
+                    margin: 0 auto !important;
+                    display: block !important;
                 }
                 
                 .stButton > button:hover {
@@ -433,12 +436,13 @@ def check_password():
                     margin: 0 auto !important;
                 }
                 
-                /* Style the button - MATCH PASSWORD CONTAINER WIDTH */
+                /* Style the button - MANUALLY CENTERED */
                 .stButton {
                     display: flex !important;
                     justify-content: center !important;
                     margin-top: 1rem !important;
                     width: 100% !important;
+                    padding: 0 !important;
                 }
                 
                 .stButton > button {
@@ -451,9 +455,11 @@ def check_password():
                     font-weight: 600 !important;
                     transition: all 0.3s ease !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                    width: 100% !important;
-                    max-width: 100% !important;
+                    width: auto !important;
+                    min-width: 200px !important;
                     letter-spacing: 0.5px !important;
+                    margin: 0 auto !important;
+                    display: block !important;
                 }
                 
                 .stButton > button:hover {
@@ -2934,6 +2940,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
