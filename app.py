@@ -618,6 +618,37 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
+    /* Sidebar Toggle Button - Make it more visible */
+    button[kind="header"] {
+        background: white !important;
+        color: #667eea !important;
+        border: 2px solid #667eea !important;
+        border-radius: 8px !important;
+        padding: 8px 12px !important;
+        font-weight: 600 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+    }
+    
+    button[kind="header"]:hover {
+        background: #667eea !important;
+        color: white !important;
+        transform: scale(1.05);
+    }
+    
+    /* Sidebar collapse/expand button */
+    [data-testid="collapsedControl"] {
+        background: white !important;
+        color: #667eea !important;
+        border: 2px solid #667eea !important;
+        border-radius: 8px !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+    }
+    
+    [data-testid="collapsedControl"]:hover {
+        background: #667eea !important;
+        color: white !important;
+    }
+    
     /* Main Container */
     .main {
         background: #f5f7fa;
@@ -678,6 +709,16 @@ st.markdown("""
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
         color: white !important;
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        font-weight: 700 !important;
+    }
+    
+    /* Make sure tab text is always visible */
+    .stTabs [data-baseweb="tab"] > div {
+        color: inherit !important;
+    }
+    
+    .stTabs [aria-selected="true"] > div {
+        color: white !important;
     }
     
     .stTabs [data-baseweb="tab-panel"] {
@@ -1505,10 +1546,12 @@ with tab3:
     
     # Master content editor with modern styling
     st.markdown("""
-        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
-                    padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
-            <h3 style='margin-top: 0;'>📝 Master Content Editor</h3>
-            <p style='color: #666; margin: 0;'>Create your content once, then customize for each platform</p>
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); 
+                    padding: 2rem; border-radius: 16px; margin: 1.5rem 0; border: 2px solid #667eea;'>
+            <h3 style='margin-top: 0; color: #667eea;'>📝 Master Content Editor</h3>
+            <p style='color: #4a5568; margin: 0.5rem 0 0 0; font-size: 0.95rem;'>
+                ✍️ Create your content once, then push to all selected platforms below
+            </p>
         </div>
     """, unsafe_allow_html=True)
     
@@ -1539,12 +1582,24 @@ with tab3:
         master_schedule_iso = master_datetime_pdt.isoformat()
         
         st.session_state.master_schedule = master_schedule_iso
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        if st.button("📋 Push to All Platforms", use_container_width=True, type="secondary"):
+    
+    # Post to All Platforms Section
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                    padding: 2rem; border-radius: 16px; text-align: center; color: white; margin: 1rem 0;'>
+            <h3 style='margin: 0 0 0.5rem 0; color: white;'>🚀 Post Content to All Platforms</h3>
+            <p style='margin: 0; font-size: 0.9rem; opacity: 0.95;'>
+                Click below to post your content to all selected platforms at once
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("📋 Post to All Selected Platforms", use_container_width=True, type="primary", key="push_to_all_btn"):
             st.session_state.push_to_all = True
-            st.success("✅ Content pushed!")
+            st.success("✅ Content will be posted to all platforms below!")
     
     st.markdown("<br>", unsafe_allow_html=True)
     
