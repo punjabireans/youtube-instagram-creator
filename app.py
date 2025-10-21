@@ -1768,34 +1768,137 @@ with tab3:
                 🚀 Post Content to All Platforms
             </h3>
             <p style='margin: 0; font-size: 1rem; color: #ffffff; opacity: 1;'>
-                Click below to copy master content to all enabled platforms at once
+                Click below to post your master content to all configured platforms at once
             </p>
         </div>
     """, unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("📋 Copy Master to All Platforms", use_container_width=True, type="primary", key="push_to_all_btn"):
-            # Copy master content to all enabled platforms (regardless of account ID)
-            copied_count = 0
-            if enable_instagram:
-                st.session_state.ig_content_value = st.session_state.master_content
-                copied_count += 1
-            if enable_linkedin:
-                st.session_state.li_content_value = st.session_state.master_content
-                copied_count += 1
-            if enable_facebook:
-                st.session_state.fb_content_value = st.session_state.master_content
-                copied_count += 1
-            if enable_twitter:
-                st.session_state.tw_content_value = st.session_state.master_content
-                copied_count += 1
-            
-            if copied_count > 0:
-                st.success(f"✅ Master content copied to {copied_count} platform(s)!")
-                st.rerun()
+        if st.button("📋 Post to All Selected Platforms", use_container_width=True, type="primary", key="push_to_all_btn"):
+            if not st.session_state.api_key:
+                st.error("❌ Please enter your API key in the sidebar!")
             else:
-                st.warning("⚠️ Please select at least one platform first!")
+                # Build list of platforms to post to
+                platforms_to_post = []
+                
+                if enable_instagram and st.session_state.ig_account_id:
+                    # Upload images first
+                    media_items = []
+                    if carousel_images:
+                        with st.spinner("📤 Uploading images for Instagram..."):
+                            for img in carousel_images:
+                                url = upload_image_to_getlate(img, st.session_state.api_key)
+                                if url:
+                                    media_items.append({"url": url})
+                    
+                    platforms_to_post.append({
+                        "platform": "Instagram",
+                        "accountId": st.session_state.ig_account_id,
+                        "content": st.session_state.master_content,
+                        "schedule": st.session_state.master_schedule,
+                        "mediaItems": media_items
+                    })
+                
+                if enable_linkedin and st.session_state.li_account_id:
+                    # Upload images first
+                    media_items = []
+                    if carousel_images:
+                        with st.spinner("📤 Uploading images for LinkedIn..."):
+                            for img in carousel_images:
+                                url = upload_image_to_getlate(img, st.session_state.api_key)
+                                if url:
+                                    media_items.append({"url": url})
+                    
+                    platforms_to_post.append({
+                        "platform": "LinkedIn",
+                        "accountId": st.session_state.li_account_id,
+                        "content": st.session_state.master_content,
+                        "schedule": st.session_state.master_schedule,
+                        "mediaItems": media_items
+                    })
+                
+                if enable_facebook and st.session_state.fb_account_id:
+                    # Upload images first
+                    media_items = []
+                    if carousel_images:
+                        with st.spinner("📤 Uploading images for Facebook..."):
+                            for img in carousel_images:
+                                url = upload_image_to_getlate(img, st.session_state.api_key)
+                                if url:
+                                    media_items.append({"url": url})
+                    
+                    platforms_to_post.append({
+                        "platform": "Facebook",
+                        "accountId": st.session_state.fb_account_id,
+                        "content": st.session_state.master_content,
+                        "schedule": st.session_state.master_schedule,
+                        "mediaItems": media_items
+                    })
+                
+                if enable_twitter and st.session_state.tw_account_id:
+                    # Upload images first
+                    media_items = []
+                    if carousel_images:
+                        with st.spinner("📤 Uploading images for Twitter..."):
+                            for img in carousel_images:
+                                url = upload_image_to_getlate(img, st.session_state.api_key)
+                                if url:
+                                    media_items.append({"url": url})
+                    
+                    platforms_to_post.append({
+                        "platform": "Twitter",
+                        "accountId": st.session_state.tw_account_id,
+                        "content": st.session_state.master_content,
+                        "schedule": st.session_state.master_schedule,
+                        "mediaItems": media_items
+                    })
+                
+                if not platforms_to_post:
+                    st.error("❌ No platforms configured! Please enable platforms and enter Account IDs.")
+                else:
+                    # Post to all platforms
+                    with st.spinner(f"📤 Posting to {len(platforms_to_post)} platform(s)..."):
+                        success_count = 0
+                        error_count = 0
+                        
+                        progress_bar = st.progress(0)
+                        status_text = st.empty()
+                        
+                        for idx, platform_data in enumerate(platforms_to_post):
+                            status_text.text(f"Posting to {platform_data['platform']}...")
+                            
+                            payload = build_post_payload(
+                                content=platform_data['content'],
+                                scheduled_time=platform_data['schedule'],
+                                timezone="America/Los_Angeles",
+                                platforms_config=[{
+                                    "accountId": platform_data['accountId'],
+                                    "mediaItems": platform_data['mediaItems']
+                                }]
+                            )
+                            
+                            response = send_post_to_api(st.session_state.api_key, payload)
+                            
+                            if response and response.status_code in [200, 201]:
+                                success_count += 1
+                            else:
+                                error_count += 1
+                                error_msg = response.json() if response else "Connection error"
+                                st.error(f"❌ {platform_data['platform']}: Failed - {error_msg}")
+                            
+                            progress_bar.progress((idx + 1) / len(platforms_to_post))
+                        
+                        status_text.empty()
+                        progress_bar.empty()
+                        
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        
+                        if error_count == 0:
+                            st.balloons()
+                            st.success(f"🎉 Successfully posted to all {success_count} platform(s)!")
+                        else:
+                            st.warning(f"⚠️ Posted to {success_count} platform(s), {error_count} failed")
     
     st.markdown("<br>", unsafe_allow_html=True)
     
@@ -1856,19 +1959,30 @@ with tab3:
                 # FIXED: Initialize in session state if not exists
                 if 'ig_content_value' not in st.session_state:
                     st.session_state.ig_content_value = ""
+                if 'ig_refresh_counter' not in st.session_state:
+                    st.session_state.ig_refresh_counter = 0
                 
                 ig_content = st.text_area(
                     "💬 Caption",
                     value=st.session_state.ig_content_value,
                     height=100,
-                    key="ig_content_area",
+                    key=f"ig_content_area_{st.session_state.ig_refresh_counter}",
                     placeholder="Your Instagram caption with hashtags..."
                 )
+                # Update session state with current value
+                if ig_content != st.session_state.ig_content_value:
+                    st.session_state.ig_content_value = ig_content
             
             with col2:
-                # FIXED: Simple button that copies master content
-                if st.button("📋 Use Master", key="ig_use_master_btn", use_container_width=True):
+                # FIXED: Button clears and resets the text area by changing its key
+                use_master_ig = st.button("📋 Use Master", key="ig_use_master_btn", use_container_width=True)
+                
+                if use_master_ig:
                     st.session_state.ig_content_value = st.session_state.master_content
+                    # Force widget refresh by incrementing a counter
+                    if 'ig_refresh_counter' not in st.session_state:
+                        st.session_state.ig_refresh_counter = 0
+                    st.session_state.ig_refresh_counter += 1
                     st.rerun()
                 
                 st.markdown("**📅 Schedule**")
@@ -1933,19 +2047,30 @@ with tab3:
                 # FIXED: Initialize in session state
                 if 'li_content_value' not in st.session_state:
                     st.session_state.li_content_value = ""
+                if 'li_refresh_counter' not in st.session_state:
+                    st.session_state.li_refresh_counter = 0
                 
                 li_content = st.text_area(
                     "💬 Post Content",
                     value=st.session_state.li_content_value,
                     height=100,
-                    key="li_content_area",
+                    key=f"li_content_area_{st.session_state.li_refresh_counter}",
                     placeholder="Your professional LinkedIn post..."
                 )
+                # Update session state with current value
+                if li_content != st.session_state.li_content_value:
+                    st.session_state.li_content_value = li_content
             
             with col2:
-                # FIXED: Simple button that copies master content
-                if st.button("📋 Use Master", key="li_use_master_btn", use_container_width=True):
+                # FIXED: Button clears and resets the text area by changing its key
+                use_master_li = st.button("📋 Use Master", key="li_use_master_btn", use_container_width=True)
+                
+                if use_master_li:
                     st.session_state.li_content_value = st.session_state.master_content
+                    # Force widget refresh by incrementing a counter
+                    if 'li_refresh_counter' not in st.session_state:
+                        st.session_state.li_refresh_counter = 0
+                    st.session_state.li_refresh_counter += 1
                     st.rerun()
                 
                 st.markdown("**📅 Schedule**")
@@ -2010,19 +2135,30 @@ with tab3:
                 # FIXED: Initialize in session state
                 if 'fb_content_value' not in st.session_state:
                     st.session_state.fb_content_value = ""
+                if 'fb_refresh_counter' not in st.session_state:
+                    st.session_state.fb_refresh_counter = 0
                 
                 fb_content = st.text_area(
                     "💬 Post Content",
                     value=st.session_state.fb_content_value,
                     height=100,
-                    key="fb_content_area",
+                    key=f"fb_content_area_{st.session_state.fb_refresh_counter}",
                     placeholder="Your Facebook post..."
                 )
+                # Update session state with current value
+                if fb_content != st.session_state.fb_content_value:
+                    st.session_state.fb_content_value = fb_content
             
             with col2:
-                # FIXED: Simple button that copies master content
-                if st.button("📋 Use Master", key="fb_use_master_btn", use_container_width=True):
+                # FIXED: Button clears and resets the text area by changing its key
+                use_master_fb = st.button("📋 Use Master", key="fb_use_master_btn", use_container_width=True)
+                
+                if use_master_fb:
                     st.session_state.fb_content_value = st.session_state.master_content
+                    # Force widget refresh by incrementing a counter
+                    if 'fb_refresh_counter' not in st.session_state:
+                        st.session_state.fb_refresh_counter = 0
+                    st.session_state.fb_refresh_counter += 1
                     st.rerun()
                 
                 st.markdown("**📅 Schedule**")
@@ -2087,15 +2223,20 @@ with tab3:
                 # FIXED: Initialize in session state
                 if 'tw_content_value' not in st.session_state:
                     st.session_state.tw_content_value = ""
+                if 'tw_refresh_counter' not in st.session_state:
+                    st.session_state.tw_refresh_counter = 0
                 
                 tw_content = st.text_area(
                     "💬 Tweet Content",
                     value=st.session_state.tw_content_value,
                     height=100,
-                    key="tw_content_area",
+                    key=f"tw_content_area_{st.session_state.tw_refresh_counter}",
                     placeholder="Your tweet (max 280 characters)...",
                     max_chars=280
                 )
+                # Update session state with current value
+                if tw_content != st.session_state.tw_content_value:
+                    st.session_state.tw_content_value = tw_content
                 
                 char_count = len(tw_content)
                 if char_count > 280:
@@ -2106,9 +2247,15 @@ with tab3:
                     st.info(f"✍️ {char_count}/280 characters used")
             
             with col2:
-                # FIXED: Simple button that copies master content
-                if st.button("📋 Use Master", key="tw_use_master_btn", use_container_width=True):
+                # FIXED: Button clears and resets the text area by changing its key
+                use_master_tw = st.button("📋 Use Master", key="tw_use_master_btn", use_container_width=True)
+                
+                if use_master_tw:
                     st.session_state.tw_content_value = st.session_state.master_content
+                    # Force widget refresh by incrementing a counter
+                    if 'tw_refresh_counter' not in st.session_state:
+                        st.session_state.tw_refresh_counter = 0
+                    st.session_state.tw_refresh_counter += 1
                     st.rerun()
                 
                 st.markdown("**📅 Schedule**")
@@ -2445,6 +2592,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
