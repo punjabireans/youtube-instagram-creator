@@ -693,8 +693,8 @@ st.markdown("""
         padding: 0 28px;
         background: transparent;
         border-radius: 12px;
-        color: #4a5568;
-        font-size: 15px;
+        color: #2d3748;
+        font-size: 16px;
         font-weight: 600;
         border: none;
         transition: all 0.3s ease;
@@ -707,18 +707,23 @@ st.markdown("""
     
     .stTabs [aria-selected="true"] {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        color: white !important;
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         font-weight: 700 !important;
     }
     
-    /* Make sure tab text is always visible */
-    .stTabs [data-baseweb="tab"] > div {
-        color: inherit !important;
+    /* Force tab text colors - CRITICAL FIX */
+    .stTabs [data-baseweb="tab"] span {
+        color: #2d3748 !important;
     }
     
-    .stTabs [aria-selected="true"] > div {
-        color: white !important;
+    .stTabs [aria-selected="true"] span {
+        color: #ffffff !important;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .stTabs [data-baseweb="tab"] > div,
+    .stTabs [data-baseweb="tab"] > div > div {
+        color: inherit !important;
     }
     
     .stTabs [data-baseweb="tab-panel"] {
@@ -812,7 +817,7 @@ st.markdown("""
     
     .stButton > button[kind="primary"] {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        color: white !important;
     }
     
     .stButton > button[kind="primary"]:hover {
@@ -821,8 +826,15 @@ st.markdown("""
     
     .stButton > button[kind="secondary"] {
         background: white;
-        color: #667eea;
+        color: #667eea !important;
         border: 2px solid #667eea;
+    }
+    
+    /* Force button text to be visible */
+    .stButton > button span,
+    .stButton > button p,
+    .stButton > button div {
+        color: inherit !important;
     }
     
     /* File Uploader */
@@ -946,6 +958,48 @@ st.markdown("""
 
 st.markdown('<h1 class="main-header">🚀 Content Posting Automations</h1>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">Streamline your content creation and multi-platform posting workflow</p>', unsafe_allow_html=True)
+
+# Add visible sidebar toggle at the top
+st.markdown("""
+<style>
+    /* Sidebar toggle button fixed at top left */
+    .sidebar-toggle {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 999999;
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .sidebar-toggle:hover {
+        background: #667eea;
+        color: white;
+        transform: scale(1.05);
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# JavaScript to toggle sidebar
+st.markdown("""
+<button class="sidebar-toggle" onclick="
+    const sidebar = window.parent.document.querySelector('[data-testid=stSidebar]');
+    if (sidebar) {
+        if (sidebar.style.marginLeft === '-21rem' || sidebar.style.marginLeft === '') {
+            sidebar.style.marginLeft = '0';
+        } else {
+            sidebar.style.marginLeft = '-21rem';
+        }
+    }
+">☰ Menu</button>
+""", unsafe_allow_html=True)
 
 # Hidden component to load data from localStorage
 load_storage_js = """
@@ -1587,9 +1641,12 @@ with tab3:
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("""
         <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                    padding: 2rem; border-radius: 16px; text-align: center; color: white; margin: 1rem 0;'>
-            <h3 style='margin: 0 0 0.5rem 0; color: white;'>🚀 Post Content to All Platforms</h3>
-            <p style='margin: 0; font-size: 0.9rem; opacity: 0.95;'>
+                    padding: 2.5rem; border-radius: 16px; text-align: center; margin: 1.5rem 0;
+                    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);'>
+            <h3 style='margin: 0 0 0.5rem 0; color: #ffffff; font-size: 1.5rem; font-weight: 700;'>
+                🚀 Post Content to All Platforms
+            </h3>
+            <p style='margin: 0; font-size: 1rem; color: #ffffff; opacity: 1;'>
                 Click below to post your content to all selected platforms at once
             </p>
         </div>
