@@ -678,34 +678,42 @@ st.markdown("""
     .main {
         background: #f5f7fa;
         padding: 0 !important;
-        transition: margin-left 0.3s ease;
+        transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     
     .block-container {
         padding: 2rem 1rem !important;
         max-width: 1400px !important;
         background: #f5f7fa;
-        margin: 0 auto !important;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     
-    /* When sidebar is collapsed, center the main content */
-    section[data-testid="stSidebar"][aria-expanded="false"] ~ .main .block-container,
-    body:not(:has(section[data-testid="stSidebar"][aria-expanded="true"])) .main .block-container {
+    /* When sidebar is open - content has left margin */
+    section[data-testid="stSidebar"][aria-expanded="true"] ~ .main .block-container {
+        margin-left: 2rem !important;
+        margin-right: 2rem !important;
+    }
+    
+    /* When sidebar is closed - center the content */
+    section[data-testid="stSidebar"][aria-expanded="false"] ~ .main .block-container {
         margin-left: auto !important;
         margin-right: auto !important;
-        padding-left: 3rem !important;
-        padding-right: 3rem !important;
+        padding-left: 4rem !important;
+        padding-right: 4rem !important;
     }
     
-    /* Adjust main content margin when sidebar is visible */
-    .main {
+    /* Adjust main container positioning */
+    section[data-testid="stSidebar"][aria-expanded="false"] ~ .main {
         margin-left: 0 !important;
     }
     
-    /* Smooth transition for content reflow */
+    section[data-testid="stSidebar"][aria-expanded="true"] ~ .main {
+        margin-left: 0 !important;
+    }
+    
+    /* Smooth transition for all elements */
     .main, .block-container, section[data-testid="stSidebar"] {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     
     /* Header Styling */
@@ -794,12 +802,24 @@ st.markdown("""
     section[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
         border-right: none;
-        min-width: 21rem !important;
-        max-width: 21rem !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     
     section[data-testid="stSidebar"] > div {
         background: transparent;
+    }
+    
+    /* Allow sidebar to collapse properly - REMOVE fixed width */
+    section[data-testid="stSidebar"][aria-expanded="true"] {
+        min-width: 21rem !important;
+        max-width: 21rem !important;
+    }
+    
+    /* When collapsed, let it hide completely */
+    section[data-testid="stSidebar"][aria-expanded="false"] {
+        min-width: 0 !important;
+        max-width: 0 !important;
+        margin-left: -21rem !important;
     }
     
     /* Style the sidebar collapse/expand button - Make it VISIBLE and working */
