@@ -1696,14 +1696,17 @@ with tab3:
         with col2:
             st.metric("📷 Total Images", len(carousel_images))
         
-        # Image preview
-        cols = st.columns(min(5, len(carousel_images)))
-        for i, img_file in enumerate(carousel_images[:5]):
-            with cols[i]:
-                img = Image.open(img_file)
-                st.image(img, use_container_width=True, caption=f"#{i+1}")
-        if len(carousel_images) > 5:
-            st.info(f"➕ ... and {len(carousel_images) - 5} more images")
+        # Compact image preview grid - show thumbnails
+        with st.expander(f"👁️ Preview Uploaded Images ({len(carousel_images)} images)", expanded=False):
+            cols = st.columns(5)
+            for i, img_file in enumerate(carousel_images):
+                with cols[i % 5]:
+                    img = Image.open(img_file)
+                    st.image(img, use_container_width=True, caption=f"#{i+1}")
+                    if i >= 9 and i < len(carousel_images) - 1:  # Show first 10, then indicate more
+                        if i == 9:
+                            st.info(f"... +{len(carousel_images) - 10} more")
+                        break
     
     st.markdown("<br>", unsafe_allow_html=True)
     
@@ -1824,18 +1827,24 @@ with tab3:
                 if ig_account_id:
                     st.caption("✅ Account ID saved permanently")
                 
+                # Use session state for content value
+                if 'ig_content_value' not in st.session_state:
+                    st.session_state.ig_content_value = ""
+                
                 ig_content = st.text_area(
                     "💬 Caption",
-                    value=st.session_state.master_content if st.session_state.get('push_to_all') else "",
+                    value=st.session_state.get('ig_content_value', ''),
                     height=100,
                     key="ig_content",
                     placeholder="Your Instagram caption with hashtags..."
                 )
+                # Update session state when text changes
+                st.session_state.ig_content_value = ig_content
             
             with col2:
                 if st.button("📋 Use Master", key="ig_use_master", use_container_width=True):
-                    st.session_state.ig_content = st.session_state.master_content
-                    st.rerun()
+                    st.session_state.ig_content_value = st.session_state.master_content
+                    st.success("✅ Content copied from master!")
                 
                 st.markdown("**📅 Schedule**")
                 use_master_schedule = st.checkbox("Use master schedule", value=True, key="ig_master_sched")
@@ -1897,18 +1906,24 @@ with tab3:
                 if li_account_id:
                     st.caption("✅ Account ID saved permanently")
                 
+                # Use session state for content value
+                if 'li_content_value' not in st.session_state:
+                    st.session_state.li_content_value = ""
+                
                 li_content = st.text_area(
                     "💬 Post Content",
-                    value=st.session_state.master_content if st.session_state.get('push_to_all') else "",
+                    value=st.session_state.get('li_content_value', ''),
                     height=100,
                     key="li_content",
                     placeholder="Your professional LinkedIn post..."
                 )
+                # Update session state when text changes
+                st.session_state.li_content_value = li_content
             
             with col2:
                 if st.button("📋 Use Master", key="li_use_master", use_container_width=True):
-                    st.session_state.li_content = st.session_state.master_content
-                    st.rerun()
+                    st.session_state.li_content_value = st.session_state.master_content
+                    st.success("✅ Content copied from master!")
                 
                 st.markdown("**📅 Schedule**")
                 use_master_schedule_li = st.checkbox("Use master schedule", value=True, key="li_master_sched")
@@ -1970,18 +1985,24 @@ with tab3:
                 if fb_account_id:
                     st.caption("✅ Account ID saved permanently")
                 
+                # Use session state for content value
+                if 'fb_content_value' not in st.session_state:
+                    st.session_state.fb_content_value = ""
+                
                 fb_content = st.text_area(
                     "💬 Post Content",
-                    value=st.session_state.master_content if st.session_state.get('push_to_all') else "",
+                    value=st.session_state.get('fb_content_value', ''),
                     height=100,
                     key="fb_content",
                     placeholder="Your Facebook post..."
                 )
+                # Update session state when text changes
+                st.session_state.fb_content_value = fb_content
             
             with col2:
                 if st.button("📋 Use Master", key="fb_use_master", use_container_width=True):
-                    st.session_state.fb_content = st.session_state.master_content
-                    st.rerun()
+                    st.session_state.fb_content_value = st.session_state.master_content
+                    st.success("✅ Content copied from master!")
                 
                 st.markdown("**📅 Schedule**")
                 use_master_schedule_fb = st.checkbox("Use master schedule", value=True, key="fb_master_sched")
@@ -2043,14 +2064,20 @@ with tab3:
                 if tw_account_id:
                     st.caption("✅ Account ID saved permanently")
                 
+                # Use session state for content value
+                if 'tw_content_value' not in st.session_state:
+                    st.session_state.tw_content_value = ""
+                
                 tw_content = st.text_area(
                     "💬 Tweet Content",
-                    value=st.session_state.master_content if st.session_state.get('push_to_all') else "",
+                    value=st.session_state.get('tw_content_value', ''),
                     height=100,
                     key="tw_content",
                     placeholder="Your tweet (max 280 characters)...",
                     max_chars=280
                 )
+                # Update session state when text changes
+                st.session_state.tw_content_value = tw_content
                 
                 char_count = len(tw_content)
                 if char_count > 280:
@@ -2062,8 +2089,8 @@ with tab3:
             
             with col2:
                 if st.button("📋 Use Master", key="tw_use_master", use_container_width=True):
-                    st.session_state.tw_content = st.session_state.master_content
-                    st.rerun()
+                    st.session_state.tw_content_value = st.session_state.master_content
+                    st.success("✅ Content copied from master!")
                 
                 st.markdown("**📅 Schedule**")
                 use_master_schedule_tw = st.checkbox("Use master schedule", value=True, key="tw_master_sched")
