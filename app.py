@@ -960,45 +960,33 @@ st.markdown('<h1 class="main-header">🚀 Content Posting Automations</h1>', uns
 st.markdown('<p class="sub-header">Streamline your content creation and multi-platform posting workflow</p>', unsafe_allow_html=True)
 
 # Add visible sidebar toggle at the top
+col1, col2, col3 = st.columns([0.5, 8, 0.5])
+with col1:
+    if st.button("☰", key="sidebar_toggle", help="Toggle Sidebar"):
+        st.rerun()
+
+# Add custom styling for the toggle button
 st.markdown("""
 <style>
-    /* Sidebar toggle button fixed at top left */
-    .sidebar-toggle {
-        position: fixed;
-        top: 1rem;
-        left: 1rem;
-        z-index: 999999;
-        background: white;
-        color: #667eea;
-        border: 2px solid #667eea;
-        border-radius: 8px;
-        padding: 10px 16px;
-        font-weight: 600;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        cursor: pointer;
-        transition: all 0.3s ease;
+    /* Style the sidebar toggle button */
+    div[data-testid="column"]:first-child button[kind="secondary"] {
+        background: white !important;
+        color: #667eea !important;
+        border: 2px solid #667eea !important;
+        border-radius: 8px !important;
+        padding: 8px 16px !important;
+        font-size: 1.5rem !important;
+        font-weight: 600 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+        width: 100% !important;
     }
     
-    .sidebar-toggle:hover {
-        background: #667eea;
-        color: white;
+    div[data-testid="column"]:first-child button[kind="secondary"]:hover {
+        background: #667eea !important;
+        color: white !important;
         transform: scale(1.05);
     }
 </style>
-""", unsafe_allow_html=True)
-
-# JavaScript to toggle sidebar
-st.markdown("""
-<button class="sidebar-toggle" onclick="
-    const sidebar = window.parent.document.querySelector('[data-testid=stSidebar]');
-    if (sidebar) {
-        if (sidebar.style.marginLeft === '-21rem' || sidebar.style.marginLeft === '') {
-            sidebar.style.marginLeft = '0';
-        } else {
-            sidebar.style.marginLeft = '-21rem';
-        }
-    }
-">☰ Menu</button>
 """, unsafe_allow_html=True)
 
 # Hidden component to load data from localStorage
