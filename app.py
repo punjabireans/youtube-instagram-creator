@@ -1384,7 +1384,7 @@ with tab1:
     """, unsafe_allow_html=True)
     
     youtube_url = st.text_input(
-        "🔗 Paste YouTube URL here then press enter",
+        "🔗 Paste YouTube URL here",
         placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ or https://youtu.be/dQw4w9WgXcQ",
         help="Paste any YouTube video link"
     )
@@ -1483,7 +1483,7 @@ with tab1:
         
         # Image preview in a nice grid with pairing info
         st.markdown("### 🖼️ Your Screenshots (Preview)")
-        st.info("ℹ️ Images are paired in order: **Images 1 & 2** make Post 1, **Images 3 & 4** make Post 2, etc.")
+        st.info("ℹ️ Images are paired in order: **Images 1 & 2** make Post 1, **Images 3 & 4** make Post 2, etc. Text will be automatically split between the two images in each post.")
         
         cols = st.columns(4)
         for i, uploaded_file in enumerate(uploaded_files):
@@ -1500,7 +1500,7 @@ with tab1:
             <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
                         padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
                 <h3 style='margin-top: 0;'>✍️ Add Captions to Your Posts</h3>
-                <p style='color: #666; margin: 0.5rem 0 0 0;'>Each post gets its own caption that will be split across both images</p>
+                <p style='color: #666; margin: 0.5rem 0 0 0;'>Each caption will be automatically split and overlaid on the bottom of both images in the post</p>
             </div>
         """, unsafe_allow_html=True)
         
@@ -1533,9 +1533,9 @@ with tab1:
                 f"Caption for Post {post_idx + 1}",
                 value=caption_value,
                 height=100,
-                placeholder=f"Write the caption for Post {post_idx + 1} here...",
+                placeholder=f"Write the caption for Post {post_idx + 1} here... (will be split and overlaid on both images)",
                 key=caption_key,
-                help=f"This caption will be split across {images_info}",
+                help=f"This caption will be automatically split between {images_info} and overlaid at the bottom of each image",
                 label_visibility="collapsed"
             )
             
@@ -1557,9 +1557,9 @@ with tab1:
         with col1:
             include_originals = st.checkbox("📦 Include originals in ZIP", value=True)
         with col2:
-            guest_name = st.text_input("👤 Guest name (optional)", placeholder="Dr. Jane Smith")
+            guest_name = st.text_input("👤 Guest name (optional)", placeholder="Dr. Jane Smith", help="If provided, a promotional post will be added at the end")
         with col3:
-            logo_file = st.file_uploader("🎭 Podcast logo (optional)", type=['png', 'jpg', 'jpeg'])
+            logo_file = st.file_uploader("🎭 Podcast logo (optional)", type=['png', 'jpg', 'jpeg'], help="Logo for the promotional post")
         
         st.markdown("<br>", unsafe_allow_html=True)
         
@@ -1567,10 +1567,11 @@ with tab1:
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             if st.button("🎨 ✨ Generate Instagram Posts", type="primary", use_container_width=True):
-                with st.spinner("✨ Creating your beautiful Instagram posts..."):
+                with st.spinner("✨ Creating your beautiful Instagram posts with text overlays..."):
+                    # Call the function with the correct parameters
                     instagram_posts = create_posts_from_uploads(
                         uploaded_files, 
-                        post_captions, 
+                        post_captions,  # List of captions, one per post
                         guest_name, 
                         logo_file
                     )
@@ -1588,9 +1589,13 @@ with tab1:
                     for i, post_img in enumerate(instagram_posts):
                         with cols[i % 3]:
                             st.image(post_img, caption=f"Post {i+1}", use_container_width=True)
+                            # Show caption if it's not the promo post
                             if i < len(post_captions) and post_captions[i]:
-                                with st.expander(f"View Caption for Post {i+1}"):
+                                with st.expander(f"📝 Caption for Post {i+1}"):
                                     st.write(post_captions[i])
+                            elif i == len(instagram_posts) - 1 and guest_name:
+                                with st.expander(f"📢 Promotional Post"):
+                                    st.write(f"Listen to the full conversation with {guest_name}")
                     
                     # Download section
                     st.markdown("<br>", unsafe_allow_html=True)
@@ -1641,9 +1646,12 @@ with tab1:
                     st.markdown("<br>", unsafe_allow_html=True)
                     
                     # Info box
+                    promo_text = f"+ 1 promotional post for {guest_name}" if guest_name else ""
                     st.info(f"""
                     **📦 Your download includes:**
-                    - ✅ {len(instagram_posts)} Instagram-ready posts (1080x1080px)
+                    - ✅ {num_posts} Instagram-ready posts (1080x1080px) {promo_text}
+                    - ✅ Text overlays automatically positioned at bottom of images
+                    - ✅ Captions split intelligently across image pairs
                     - ✅ Optimized for Instagram carousel format
                     {"- ✅ Original screenshots included" if include_originals else ""}
                     
@@ -3340,6 +3348,7 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
+
 
 
 
