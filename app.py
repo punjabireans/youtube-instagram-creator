@@ -334,8 +334,6 @@ def get_font(size, bold=False):
         return ImageFont.load_default()
 
 def create_posts_from_uploads(uploaded_files, post_texts, guest_name="", logo_file=None):
-    # ... rest of your existing code
-def create_posts_from_uploads(uploaded_files, post_texts, guest_name="", logo_file=None):
     """Create Instagram posts from uploaded images plus promotional post"""
     
     instagram_posts = []
@@ -3288,6 +3286,7 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
+
 
 
 
