@@ -1387,10 +1387,6 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # TAB 1: YOUTUBE TO INSTAGRAM
 # ============================================================================
 
-# ============================================================================
-# TAB 1: YOUTUBE TO INSTAGRAM
-# ============================================================================
-
 with tab1:
     # Hero section
     st.markdown("""
@@ -1517,7 +1513,7 @@ with tab1:
         
         st.markdown("<br>", unsafe_allow_html=True)
         
-      # Text input section with individual captions per image
+        # Text input section with individual captions per image
         st.markdown("""
             <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
                         padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
@@ -1566,21 +1562,39 @@ with tab1:
             
             st.markdown("<br>", unsafe_allow_html=True)
         
-        # Create button with modern styling
+        # Customization options
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                        padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
+                <h3 style='margin-top: 0;'>🎨 Customization Options</h3>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            include_originals = st.checkbox("📦 Include originals in ZIP", value=True)
+        with col2:
+            guest_name = st.text_input("👤 Guest name (optional)", placeholder="Dr. Jane Smith", help="If provided, a promotional post will be added at the end")
+        with col3:
+            logo_file = st.file_uploader("🎭 Podcast logo (optional)", type=['png', 'jpg', 'jpeg'], help="Logo for the promotional post")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Create and Download buttons
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-           if st.button("🎨 ✨ Generate Instagram Posts", type="primary", use_container_width=True):
+            if st.button("🎨 ✨ Generate Instagram Posts", type="primary", use_container_width=True):
                 with st.spinner("✨ Creating your beautiful Instagram posts..."):
                     instagram_posts = create_posts_from_uploads(
                         uploaded_files, 
-                        image_captions,  # Changed from post_captions to image_captions
+                        image_captions,
                         guest_name, 
                         logo_file
                     )
                     
                     # Store in session state
                     st.session_state.generated_ig_posts = instagram_posts
-                    st.session_state.post_texts_for_ig = post_texts
+                    st.session_state.post_captions = image_captions
                     
                     st.success(f"🎉 Successfully created {len(instagram_posts)} Instagram posts!")
                     
@@ -1591,8 +1605,22 @@ with tab1:
                     for i, post_img in enumerate(instagram_posts):
                         with cols[i % 3]:
                             st.image(post_img, caption=f"Post {i+1}", use_container_width=True)
+                            # Show caption if it's not the promo post
+                            if i < len(image_captions):
+                                # Show captions for the two images in this post
+                                img_start = i * 2
+                                img_end = min(img_start + 2, len(image_captions))
+                                if img_start < len(image_captions):
+                                    with st.expander(f"📝 Captions for Post {i+1}"):
+                                        if img_start < len(image_captions) and image_captions[img_start]:
+                                            st.write(f"**Top Image:** {image_captions[img_start]}")
+                                        if img_start + 1 < len(image_captions) and image_captions[img_start + 1]:
+                                            st.write(f"**Bottom Image:** {image_captions[img_start + 1]}")
+                            elif i == len(instagram_posts) - 1 and guest_name:
+                                with st.expander(f"📢 Promotional Post"):
+                                    st.write(f"Listen to the full conversation with {guest_name}")
                     
-                    # Download section with modern card
+                    # Download section
                     st.markdown("<br>", unsafe_allow_html=True)
                     st.markdown("""
                         <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); 
@@ -1601,6 +1629,29 @@ with tab1:
                         </div>
                     """, unsafe_allow_html=True)
                     
+                    # Individual downloads
+                    st.markdown("### 📄 Download Individual Posts")
+                    cols = st.columns(min(len(instagram_posts), 3))
+                    for i, post_img in enumerate(instagram_posts):
+                        with cols[i % 3]:
+                            # Convert PIL Image to bytes for download
+                            img_bytes = BytesIO()
+                            post_img.save(img_bytes, format='JPEG', quality=95)
+                            img_bytes.seek(0)
+                            
+                            st.download_button(
+                                label=f"⬇️ Post {i+1}",
+                                data=img_bytes,
+                                file_name=f"instagram_post_{i+1}.jpg",
+                                mime="image/jpeg",
+                                use_container_width=True,
+                                key=f"download_post_{i}"
+                            )
+                    
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    
+                    # Download all as ZIP
+                    st.markdown("### 📦 Download All Posts")
                     col1, col2, col3 = st.columns([1, 2, 1])
                     with col2:
                         original_imgs = uploaded_files if include_originals else None
@@ -1615,9 +1666,15 @@ with tab1:
                             type="primary"
                         )
                     
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    
+                    # Info box
+                    promo_text = f"+ 1 promotional post for {guest_name}" if guest_name else ""
                     st.info(f"""
                     **📦 Your download includes:**
-                    - ✅ {len(instagram_posts)} Instagram-ready posts (1080x1080px)
+                    - ✅ {num_posts} Instagram-ready posts (1080x1080px) {promo_text}
+                    - ✅ Text overlays automatically positioned at bottom of images
+                    - ✅ Individual captions on each image
                     - ✅ Optimized for Instagram carousel format
                     {"- ✅ Original screenshots included" if include_originals else ""}
                     
@@ -1637,6 +1694,7 @@ with tab1:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Watch the video and take screenshots, or upload existing screenshots</p>
             </div>
         """, unsafe_allow_html=True)
+
 # ============================================================================
 # TAB 2: CTA PODCAST CONTENT CREATION
 # ============================================================================
@@ -3314,6 +3372,7 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
+
 
 
 
