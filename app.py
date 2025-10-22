@@ -333,8 +333,8 @@ def get_font(size, bold=False):
     except:
         return ImageFont.load_default()
 
-def create_posts_from_uploads(uploaded_files, post_texts, guest_name="", logo_file=None):
-    """Create Instagram posts from uploaded images plus promotional post"""
+def create_posts_from_uploads(uploaded_files, image_captions, guest_name="", logo_file=None):
+    """Create Instagram posts from uploaded images with individual captions per image"""
     
     instagram_posts = []
     
@@ -345,11 +345,19 @@ def create_posts_from_uploads(uploaded_files, post_texts, guest_name="", logo_fi
             img = img.convert('RGB')
         images.append(img)
     
+    # Process images in pairs
     for i in range(0, len(images), 2):
         post_images = images[i:i+2]
-        post_text = post_texts[i//2] if i//2 < len(post_texts) else ""
         
-        instagram_post = create_single_instagram_post(post_images, post_text)
+        # Get captions for each image in the pair
+        if len(post_images) == 2:
+            top_caption = image_captions[i] if i < len(image_captions) else ""
+            bottom_caption = image_captions[i+1] if (i+1) < len(image_captions) else ""
+            captions = [top_caption, bottom_caption]
+        else:
+            captions = [image_captions[i] if i < len(image_captions) else ""]
+        
+        instagram_post = create_single_instagram_post_individual(post_images, captions)
         instagram_posts.append(instagram_post)
     
     # Add promotional post at the end
@@ -359,8 +367,8 @@ def create_posts_from_uploads(uploaded_files, post_texts, guest_name="", logo_fi
     
     return instagram_posts
 
-def create_single_instagram_post(images, post_text):
-    """Create a single Instagram post from 1 or 2 images"""
+def create_single_instagram_post(images, captions):
+    """Create a single Instagram post from 1 or 2 images with individual captions"""
     
     POST_SIZE = 1080
     
@@ -375,12 +383,11 @@ def create_single_instagram_post(images, post_text):
         top_img = resize_image_to_exact(top_img, POST_SIZE, img_height)
         bottom_img = resize_image_to_exact(bottom_img, POST_SIZE, img_height)
         
-        text_parts = split_text_for_post(post_text)
-        
-        if len(text_parts) >= 1 and text_parts[0].strip():
-            top_img = add_text_overlay(top_img, text_parts[0])
-        if len(text_parts) >= 2 and text_parts[1].strip():
-            bottom_img = add_text_overlay(bottom_img, text_parts[1])
+        # Use individual captions instead of splitting
+        if len(captions) >= 1 and captions[0].strip():
+            top_img = add_text_overlay(top_img, captions[0])
+        if len(captions) >= 2 and captions[1].strip():
+            bottom_img = add_text_overlay(bottom_img, captions[1])
         
         post.paste(top_img, (0, 0))
         post.paste(bottom_img, (0, POST_SIZE // 2))
@@ -389,8 +396,8 @@ def create_single_instagram_post(images, post_text):
         img = images[0]
         img = resize_image_to_exact(img, POST_SIZE, POST_SIZE)
         
-        if post_text.strip():
-            img = add_text_overlay(img, post_text)
+        if len(captions) >= 1 and captions[0].strip():
+            img = add_text_overlay(img, captions[0])
         
         post.paste(img, (0, 0))
     
@@ -1510,42 +1517,63 @@ with tab1:
         
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # Text input section with modern styling
+      # Text input section with individual captions per image
         st.markdown("""
             <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
                         padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
-                <h3 style='margin-top: 0;'>✍️ Add Captions to Your Posts</h3>
+                <h3 style='margin-top: 0;'>✍️ Add Captions to Your Images</h3>
+                <p style='color: #666; margin: 0.5rem 0 0 0;'>Each image gets its own caption overlay at the bottom</p>
             </div>
         """, unsafe_allow_html=True)
-        num_posts = math.ceil(len(uploaded_files) / 2)
         
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            post_texts_input = st.text_area(
-                f"📝 Enter captions for your {num_posts} posts", 
-                placeholder="Caption for post 1 (will split across 2 images)\nCaption for post 2\nCaption for post 3...",
-                height=150,
-                help="One line per post. Text automatically splits between images."
+        # Initialize session state for image captions
+        if 'tab1_image_captions' not in st.session_state:
+            st.session_state.tab1_image_captions = {}
+        
+        # Create individual caption textboxes for each image
+        image_captions = []
+        for img_idx in range(len(uploaded_files)):
+            # Calculate which post this image belongs to
+            post_number = (img_idx // 2) + 1
+            image_position = "Top" if img_idx % 2 == 0 else "Bottom"
+            
+            # Calculate pair info
+            if img_idx % 2 == 0 and img_idx + 1 < len(uploaded_files):
+                pair_info = f"(Pairs with Image #{img_idx + 2})"
+            elif img_idx % 2 == 1:
+                pair_info = f"(Pairs with Image #{img_idx})"
+            else:
+                pair_info = "(Single image)"
+            
+            st.markdown(f"**Image #{img_idx + 1}** - Post {post_number} ({image_position}) {pair_info}")
+            
+            caption_key = f"img_caption_{img_idx}"
+            caption_value = st.session_state.tab1_image_captions.get(caption_key, "")
+            
+            caption = st.text_area(
+                f"Caption for Image #{img_idx + 1}",
+                value=caption_value,
+                height=80,
+                placeholder=f"Write caption for Image #{img_idx + 1}...",
+                key=caption_key,
+                help=f"This caption will be overlaid on Image #{img_idx + 1} ({image_position} of Post {post_number})",
+                label_visibility="collapsed"
             )
-        
-        with col2:
-            st.markdown("**🎨 Customization Options**")
-            include_originals = st.checkbox("📦 Include originals in ZIP", value=True)
-            guest_name = st.text_input("👤 Guest name (optional)", placeholder="Dr. Jane Smith")
-            logo_file = st.file_uploader("🎭 Podcast logo (optional)", type=['png', 'jpg', 'jpeg'])
-        
-        st.markdown("<br>", unsafe_allow_html=True)
+            
+            # Update session state
+            st.session_state.tab1_image_captions[caption_key] = caption
+            image_captions.append(caption)
+            
+            st.markdown("<br>", unsafe_allow_html=True)
         
         # Create button with modern styling
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            if st.button("🎨 ✨ Generate Instagram Posts", type="primary", use_container_width=True):
-                post_texts = [line.strip() for line in post_texts_input.split('\n') if line.strip()]
-                
+           if st.button("🎨 ✨ Generate Instagram Posts", type="primary", use_container_width=True):
                 with st.spinner("✨ Creating your beautiful Instagram posts..."):
                     instagram_posts = create_posts_from_uploads(
                         uploaded_files, 
-                        post_texts, 
+                        image_captions,  # Changed from post_captions to image_captions
                         guest_name, 
                         logo_file
                     )
@@ -3286,6 +3314,7 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
+
 
 
 
