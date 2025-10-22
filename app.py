@@ -1384,7 +1384,7 @@ with tab1:
     """, unsafe_allow_html=True)
     
     youtube_url = st.text_input(
-        "🔗 Paste YouTube URL here",
+        "🔗 Paste YouTube URL here then press enter",
         placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ or https://youtu.be/dQw4w9WgXcQ",
         help="Paste any YouTube video link"
     )
@@ -3340,6 +3340,7 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
+
 
 
 
