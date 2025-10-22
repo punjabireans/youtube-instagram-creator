@@ -1443,29 +1443,29 @@ with tab1:
         </div>
     """, unsafe_allow_html=True)
     
-    with st.expander("💡 Additional Screenshot Tips", expanded=False):
+    with st.expander("💡 Pro Tips for Amazing Screenshots", expanded=False):
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("""
-            **📸 Best Practices:**
-            - 🖥️ Use fullscreen mode for better quality
-            - ⏸️ Pause at clear, high-quality frames
-            - 🎯 Capture 2 screenshots per post
-            - 💾 Save as PNG or JPG format
+            **📸 Taking Screenshots:**
+            - 🖥️ Go fullscreen for quality
+            - ⏸️ Pause at key moments
+            - 🎯 Use 2 screenshots per post
+            - 💾 Save as PNG or JPG
             """)
         with col2:
             st.markdown("""
-            **📱 Alternative Methods:**
-            - **Browser Extension:** Awesome Screenshot, Nimbus
-            - **Screen Recording:** Record → Extract frames later
-            - **Mobile:** `Power + Vol Down` (Android/iOS)
+            **⌨️ Keyboard Shortcuts:**
+            - **Windows:** `Win + Shift + S`
+            - **Mac:** `Cmd + Shift + 4`
+            - **Mobile:** `Power + Vol Down`
             """)
     
     uploaded_files = st.file_uploader(
         "📁 Drop your screenshots here or click to browse", 
         accept_multiple_files=True, 
         type=['png', 'jpg', 'jpeg'],
-        help="Upload in the order you want them to appear (images are paired: 1&2, 3&4, 5&6...)"
+        help="Upload in the order you want them to appear"
     )
     
     if uploaded_files:
@@ -1481,104 +1481,59 @@ with tab1:
         
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # Image preview in a nice grid with pairing info
-        st.markdown("### 🖼️ Your Screenshots (Preview)")
-        st.info("ℹ️ Images are paired in order: **Images 1 & 2** make Post 1, **Images 3 & 4** make Post 2, etc. Text will be automatically split between the two images in each post.")
-        
+        # Image preview in a nice grid
+        st.markdown("### 🖼️ Your Screenshots")
         cols = st.columns(4)
         for i, uploaded_file in enumerate(uploaded_files):
             with cols[i % 4]:
                 img = Image.open(uploaded_file)
-                post_number = (i // 2) + 1
-                image_position = "Left" if i % 2 == 0 else "Right"
-                st.image(img, caption=f"#{i+1} - Post {post_number} ({image_position})", use_container_width=True)
+                st.image(img, caption=f"Screenshot {i+1}", use_container_width=True)
         
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # Text input section with individual captions per post
+        # Text input section with modern styling
         st.markdown("""
             <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
                         padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
                 <h3 style='margin-top: 0;'>✍️ Add Captions to Your Posts</h3>
-                <p style='color: #666; margin: 0.5rem 0 0 0;'>Each caption will be automatically split and overlaid on the bottom of both images in the post</p>
             </div>
         """, unsafe_allow_html=True)
-        
         num_posts = math.ceil(len(uploaded_files) / 2)
         
-        # Initialize session state for captions if not exists
-        if 'tab1_captions' not in st.session_state:
-            st.session_state.tab1_captions = {}
-        
-        # Create individual caption textboxes for each post
-        post_captions = []
-        for post_idx in range(num_posts):
-            # Calculate which images are in this post
-            img_start = post_idx * 2
-            img_end = min(img_start + 2, len(uploaded_files))
-            image_numbers = list(range(img_start + 1, img_end + 1))
-            
-            # Create label with image info
-            if len(image_numbers) == 2:
-                images_info = f"Images #{image_numbers[0]} & #{image_numbers[1]}"
-            else:
-                images_info = f"Image #{image_numbers[0]} only"
-            
-            st.markdown(f"**Post {post_idx + 1}** - {images_info}")
-            
-            caption_key = f"caption_post_{post_idx}"
-            caption_value = st.session_state.tab1_captions.get(caption_key, "")
-            
-            caption = st.text_area(
-                f"Caption for Post {post_idx + 1}",
-                value=caption_value,
-                height=100,
-                placeholder=f"Write the caption for Post {post_idx + 1} here... (will be split and overlaid on both images)",
-                key=caption_key,
-                help=f"This caption will be automatically split between {images_info} and overlaid at the bottom of each image",
-                label_visibility="collapsed"
-            )
-            
-            # Update session state
-            st.session_state.tab1_captions[caption_key] = caption
-            post_captions.append(caption)
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-        
-        # Customization options
-        st.markdown("""
-            <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
-                        padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
-                <h3 style='margin-top: 0;'>🎨 Customization Options</h3>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns([2, 1])
         with col1:
-            include_originals = st.checkbox("📦 Include originals in ZIP", value=True)
+            post_texts_input = st.text_area(
+                f"📝 Enter captions for your {num_posts} posts", 
+                placeholder="Caption for post 1 (will split across 2 images)\nCaption for post 2\nCaption for post 3...",
+                height=150,
+                help="One line per post. Text automatically splits between images."
+            )
+        
         with col2:
-            guest_name = st.text_input("👤 Guest name (optional)", placeholder="Dr. Jane Smith", help="If provided, a promotional post will be added at the end")
-        with col3:
-            logo_file = st.file_uploader("🎭 Podcast logo (optional)", type=['png', 'jpg', 'jpeg'], help="Logo for the promotional post")
+            st.markdown("**🎨 Customization Options**")
+            include_originals = st.checkbox("📦 Include originals in ZIP", value=True)
+            guest_name = st.text_input("👤 Guest name (optional)", placeholder="Dr. Jane Smith")
+            logo_file = st.file_uploader("🎭 Podcast logo (optional)", type=['png', 'jpg', 'jpeg'])
         
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # Create and Download buttons
+        # Create button with modern styling
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             if st.button("🎨 ✨ Generate Instagram Posts", type="primary", use_container_width=True):
-                with st.spinner("✨ Creating your beautiful Instagram posts with text overlays..."):
-                    # Call the function with the correct parameters
+                post_texts = [line.strip() for line in post_texts_input.split('\n') if line.strip()]
+                
+                with st.spinner("✨ Creating your beautiful Instagram posts..."):
                     instagram_posts = create_posts_from_uploads(
                         uploaded_files, 
-                        post_captions,  # List of captions, one per post
+                        post_texts, 
                         guest_name, 
                         logo_file
                     )
                     
                     # Store in session state
                     st.session_state.generated_ig_posts = instagram_posts
-                    st.session_state.post_captions = post_captions
+                    st.session_state.post_texts_for_ig = post_texts
                     
                     st.success(f"🎉 Successfully created {len(instagram_posts)} Instagram posts!")
                     
@@ -1589,15 +1544,8 @@ with tab1:
                     for i, post_img in enumerate(instagram_posts):
                         with cols[i % 3]:
                             st.image(post_img, caption=f"Post {i+1}", use_container_width=True)
-                            # Show caption if it's not the promo post
-                            if i < len(post_captions) and post_captions[i]:
-                                with st.expander(f"📝 Caption for Post {i+1}"):
-                                    st.write(post_captions[i])
-                            elif i == len(instagram_posts) - 1 and guest_name:
-                                with st.expander(f"📢 Promotional Post"):
-                                    st.write(f"Listen to the full conversation with {guest_name}")
                     
-                    # Download section
+                    # Download section with modern card
                     st.markdown("<br>", unsafe_allow_html=True)
                     st.markdown("""
                         <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); 
@@ -1606,29 +1554,6 @@ with tab1:
                         </div>
                     """, unsafe_allow_html=True)
                     
-                    # Individual downloads
-                    st.markdown("### 📄 Download Individual Posts")
-                    cols = st.columns(min(len(instagram_posts), 3))
-                    for i, post_img in enumerate(instagram_posts):
-                        with cols[i % 3]:
-                            # Convert PIL Image to bytes for download
-                            img_bytes = BytesIO()
-                            post_img.save(img_bytes, format='JPEG', quality=95)
-                            img_bytes.seek(0)
-                            
-                            st.download_button(
-                                label=f"⬇️ Post {i+1}",
-                                data=img_bytes,
-                                file_name=f"instagram_post_{i+1}.jpg",
-                                mime="image/jpeg",
-                                use_container_width=True,
-                                key=f"download_post_{i}"
-                            )
-                    
-                    st.markdown("<br>", unsafe_allow_html=True)
-                    
-                    # Download all as ZIP
-                    st.markdown("### 📦 Download All Posts")
                     col1, col2, col3 = st.columns([1, 2, 1])
                     with col2:
                         original_imgs = uploaded_files if include_originals else None
@@ -1643,15 +1568,9 @@ with tab1:
                             type="primary"
                         )
                     
-                    st.markdown("<br>", unsafe_allow_html=True)
-                    
-                    # Info box
-                    promo_text = f"+ 1 promotional post for {guest_name}" if guest_name else ""
                     st.info(f"""
                     **📦 Your download includes:**
-                    - ✅ {num_posts} Instagram-ready posts (1080x1080px) {promo_text}
-                    - ✅ Text overlays automatically positioned at bottom of images
-                    - ✅ Captions split intelligently across image pairs
+                    - ✅ {len(instagram_posts)} Instagram-ready posts (1080x1080px)
                     - ✅ Optimized for Instagram carousel format
                     {"- ✅ Original screenshots included" if include_originals else ""}
                     
@@ -3348,6 +3267,7 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
+
 
 
 
