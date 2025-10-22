@@ -357,7 +357,7 @@ def create_posts_from_uploads(uploaded_files, image_captions, guest_name="", log
         else:
             captions = [image_captions[i] if i < len(image_captions) else ""]
         
-        instagram_post = create_single_instagram_post_individual(post_images, captions)
+        instagram_post = create_single_instagram_post(post_images, captions)
         instagram_posts.append(instagram_post)
     
     # Add promotional post at the end
@@ -3314,6 +3314,7 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
+
 
 
 
