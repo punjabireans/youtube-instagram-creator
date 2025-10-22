@@ -1361,6 +1361,10 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # TAB 1: YOUTUBE TO INSTAGRAM
 # ============================================================================
 
+# ============================================================================
+# TAB 1: YOUTUBE TO INSTAGRAM
+# ============================================================================
+
 with tab1:
     # Hero section
     st.markdown("""
@@ -1370,6 +1374,67 @@ with tab1:
         </div>
     """, unsafe_allow_html=True)
     
+    # YouTube Video Embed Section
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(255, 0, 0, 0.1) 0%, rgba(255, 0, 0, 0.05) 100%); 
+                    padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
+            <h3 style='margin-top: 0;'>🎥 Watch & Screenshot YouTube Video</h3>
+            <p style='color: #666; margin: 0.5rem 0 0 0;'>Paste a YouTube link to watch and take screenshots directly</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    youtube_url = st.text_input(
+        "🔗 Paste YouTube URL here",
+        placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ or https://youtu.be/dQw4w9WgXcQ",
+        help="Paste any YouTube video link"
+    )
+    
+    if youtube_url:
+        # Extract video ID from URL
+        video_id = None
+        
+        if "youtube.com/watch?v=" in youtube_url:
+            video_id = youtube_url.split("watch?v=")[1].split("&")[0]
+        elif "youtu.be/" in youtube_url:
+            video_id = youtube_url.split("youtu.be/")[1].split("?")[0]
+        elif "youtube.com/embed/" in youtube_url:
+            video_id = youtube_url.split("embed/")[1].split("?")[0]
+        
+        if video_id:
+            st.markdown("""
+                <div style='background: black; padding: 1rem; border-radius: 12px; margin: 1rem 0;'>
+            """, unsafe_allow_html=True)
+            
+            # Embed YouTube video
+            st.video(f"https://www.youtube.com/watch?v={video_id}")
+            
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+            # Screenshot instructions
+            with st.expander("📸 How to Take Screenshots from the Video", expanded=True):
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown("""
+                    **⌨️ Keyboard Shortcuts:**
+                    - **Windows:** `Win + Shift + S` or `PrtScn`
+                    - **Mac:** `Cmd + Shift + 4`
+                    - **Chrome Extension:** Use Awesome Screenshot
+                    """)
+                with col2:
+                    st.markdown("""
+                    **💡 Pro Tips:**
+                    - ⏸️ Pause at key moments
+                    - 🖼️ Take screenshots of interesting frames
+                    - 📥 Upload them below to create posts
+                    - 🎯 Aim for 2 screenshots per post
+                    """)
+            
+            st.info("💡 **Tip:** Play the video above, pause at moments you want to capture, take screenshots using your keyboard shortcuts, then upload them below!")
+        else:
+            st.warning("⚠️ Invalid YouTube URL. Please enter a valid YouTube link.")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
     # Upload section with modern card
     st.markdown("""
         <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
@@ -1378,29 +1443,29 @@ with tab1:
         </div>
     """, unsafe_allow_html=True)
     
-    with st.expander("💡 Pro Tips for Amazing Screenshots", expanded=False):
+    with st.expander("💡 Additional Screenshot Tips", expanded=False):
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("""
-            **📸 Taking Screenshots:**
-            - 🖥️ Go fullscreen for quality
-            - ⏸️ Pause at key moments
-            - 🎯 Use 2 screenshots per post
-            - 💾 Save as PNG or JPG
+            **📸 Best Practices:**
+            - 🖥️ Use fullscreen mode for better quality
+            - ⏸️ Pause at clear, high-quality frames
+            - 🎯 Capture 2 screenshots per post
+            - 💾 Save as PNG or JPG format
             """)
         with col2:
             st.markdown("""
-            **⌨️ Keyboard Shortcuts:**
-            - **Windows:** `Win + Shift + S`
-            - **Mac:** `Cmd + Shift + 4`
-            - **Mobile:** `Power + Vol Down`
+            **📱 Alternative Methods:**
+            - **Browser Extension:** Awesome Screenshot, Nimbus
+            - **Screen Recording:** Record → Extract frames later
+            - **Mobile:** `Power + Vol Down` (Android/iOS)
             """)
     
     uploaded_files = st.file_uploader(
         "📁 Drop your screenshots here or click to browse", 
         accept_multiple_files=True, 
         type=['png', 'jpg', 'jpeg'],
-        help="Upload in the order you want them to appear"
+        help="Upload in the order you want them to appear (images are paired: 1&2, 3&4, 5&6...)"
     )
     
     if uploaded_files:
@@ -1416,59 +1481,103 @@ with tab1:
         
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # Image preview in a nice grid
-        st.markdown("### 🖼️ Your Screenshots")
+        # Image preview in a nice grid with pairing info
+        st.markdown("### 🖼️ Your Screenshots (Preview)")
+        st.info("ℹ️ Images are paired in order: **Images 1 & 2** make Post 1, **Images 3 & 4** make Post 2, etc.")
+        
         cols = st.columns(4)
         for i, uploaded_file in enumerate(uploaded_files):
             with cols[i % 4]:
                 img = Image.open(uploaded_file)
-                st.image(img, caption=f"Screenshot {i+1}", use_container_width=True)
+                post_number = (i // 2) + 1
+                image_position = "Left" if i % 2 == 0 else "Right"
+                st.image(img, caption=f"#{i+1} - Post {post_number} ({image_position})", use_container_width=True)
         
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # Text input section with modern styling
+        # Text input section with individual captions per post
         st.markdown("""
             <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
                         padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
                 <h3 style='margin-top: 0;'>✍️ Add Captions to Your Posts</h3>
+                <p style='color: #666; margin: 0.5rem 0 0 0;'>Each post gets its own caption that will be split across both images</p>
             </div>
         """, unsafe_allow_html=True)
+        
         num_posts = math.ceil(len(uploaded_files) / 2)
         
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            post_texts_input = st.text_area(
-                f"📝 Enter captions for your {num_posts} posts", 
-                placeholder="Caption for post 1 (will split across 2 images)\nCaption for post 2\nCaption for post 3...",
-                height=150,
-                help="One line per post. Text automatically splits between images."
-            )
+        # Initialize session state for captions if not exists
+        if 'tab1_captions' not in st.session_state:
+            st.session_state.tab1_captions = {}
         
-        with col2:
-            st.markdown("**🎨 Customization Options**")
+        # Create individual caption textboxes for each post
+        post_captions = []
+        for post_idx in range(num_posts):
+            # Calculate which images are in this post
+            img_start = post_idx * 2
+            img_end = min(img_start + 2, len(uploaded_files))
+            image_numbers = list(range(img_start + 1, img_end + 1))
+            
+            # Create label with image info
+            if len(image_numbers) == 2:
+                images_info = f"Images #{image_numbers[0]} & #{image_numbers[1]}"
+            else:
+                images_info = f"Image #{image_numbers[0]} only"
+            
+            st.markdown(f"**Post {post_idx + 1}** - {images_info}")
+            
+            caption_key = f"caption_post_{post_idx}"
+            caption_value = st.session_state.tab1_captions.get(caption_key, "")
+            
+            caption = st.text_area(
+                f"Caption for Post {post_idx + 1}",
+                value=caption_value,
+                height=100,
+                placeholder=f"Write the caption for Post {post_idx + 1} here...",
+                key=caption_key,
+                help=f"This caption will be split across {images_info}",
+                label_visibility="collapsed"
+            )
+            
+            # Update session state
+            st.session_state.tab1_captions[caption_key] = caption
+            post_captions.append(caption)
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Customization options
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                        padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
+                <h3 style='margin-top: 0;'>🎨 Customization Options</h3>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
             include_originals = st.checkbox("📦 Include originals in ZIP", value=True)
+        with col2:
             guest_name = st.text_input("👤 Guest name (optional)", placeholder="Dr. Jane Smith")
+        with col3:
             logo_file = st.file_uploader("🎭 Podcast logo (optional)", type=['png', 'jpg', 'jpeg'])
         
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # Create button with modern styling
+        # Create and Download buttons
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             if st.button("🎨 ✨ Generate Instagram Posts", type="primary", use_container_width=True):
-                post_texts = [line.strip() for line in post_texts_input.split('\n') if line.strip()]
-                
                 with st.spinner("✨ Creating your beautiful Instagram posts..."):
                     instagram_posts = create_posts_from_uploads(
                         uploaded_files, 
-                        post_texts, 
+                        post_captions, 
                         guest_name, 
                         logo_file
                     )
                     
-                    # Store in session state for posting later
+                    # Store in session state
                     st.session_state.generated_ig_posts = instagram_posts
-                    st.session_state.post_texts_for_ig = post_texts
+                    st.session_state.post_captions = post_captions
                     
                     st.success(f"🎉 Successfully created {len(instagram_posts)} Instagram posts!")
                     
@@ -1479,19 +1588,44 @@ with tab1:
                     for i, post_img in enumerate(instagram_posts):
                         with cols[i % 3]:
                             st.image(post_img, caption=f"Post {i+1}", use_container_width=True)
+                            if i < len(post_captions) and post_captions[i]:
+                                with st.expander(f"View Caption for Post {i+1}"):
+                                    st.write(post_captions[i])
                     
-                    # Download section with modern card
+                    # Download section
                     st.markdown("<br>", unsafe_allow_html=True)
                     st.markdown("""
                         <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); 
                                     padding: 2rem; border-radius: 16px; text-align: center;'>
-                            <h3 style='margin-top: 0;'>📥 Download or Post to Instagram</h3>
+                            <h3 style='margin-top: 0;'>📥 Download Your Posts</h3>
                         </div>
                     """, unsafe_allow_html=True)
                     
-                    col1, col2 = st.columns(2)
+                    # Individual downloads
+                    st.markdown("### 📄 Download Individual Posts")
+                    cols = st.columns(min(len(instagram_posts), 3))
+                    for i, post_img in enumerate(instagram_posts):
+                        with cols[i % 3]:
+                            # Convert PIL Image to bytes for download
+                            img_bytes = BytesIO()
+                            post_img.save(img_bytes, format='JPEG', quality=95)
+                            img_bytes.seek(0)
+                            
+                            st.download_button(
+                                label=f"⬇️ Post {i+1}",
+                                data=img_bytes,
+                                file_name=f"instagram_post_{i+1}.jpg",
+                                mime="image/jpeg",
+                                use_container_width=True,
+                                key=f"download_post_{i}"
+                            )
                     
-                    with col1:
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    
+                    # Download all as ZIP
+                    st.markdown("### 📦 Download All Posts")
+                    col1, col2, col3 = st.columns([1, 2, 1])
+                    with col2:
                         original_imgs = uploaded_files if include_originals else None
                         zip_data = create_zip_from_posts(instagram_posts, original_imgs)
                         
@@ -1500,172 +1634,35 @@ with tab1:
                             data=zip_data,
                             file_name=f"instagram_posts_{len(instagram_posts)}.zip",
                             mime="application/zip",
-                            use_container_width=True
+                            use_container_width=True,
+                            type="primary"
                         )
                     
-                    with col2:
-                        if st.button("📸 Post to Instagram", type="secondary", use_container_width=True):
-                            st.session_state.show_ig_posting = True
-                            st.rerun()
+                    st.markdown("<br>", unsafe_allow_html=True)
                     
+                    # Info box
                     st.info(f"""
                     **📦 Your download includes:**
                     - ✅ {len(instagram_posts)} Instagram-ready posts (1080x1080px)
-                    - {"✅ Original screenshots included" if include_originals else ""}
-                    - ✅ Ready to upload to Instagram instantly!
+                    - ✅ Optimized for Instagram carousel format
+                    {"- ✅ Original screenshots included" if include_originals else ""}
+                    
+                    **💡 Next steps:**
+                    1. Download your posts
+                    2. Open Instagram app
+                    3. Create new post → Select multiple images
+                    4. Upload in order and add your caption
+                    5. Share with your audience! 🚀
                     """)
-        
-        # Instagram Posting Section
-        if st.session_state.get('show_ig_posting') and st.session_state.get('generated_ig_posts'):
-            st.markdown("<br><br>", unsafe_allow_html=True)
-            st.markdown("""
-                <div style='background: linear-gradient(135deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); 
-                            padding: 0.1rem; border-radius: 16px; margin: 2rem 0;'>
-                    <div style='background: white; padding: 2rem; border-radius: 15px;'>
-                        <h3 style='margin-top: 0; color: #bc1888; text-align: center;'>📷 Post to Instagram</h3>
-                    </div>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            if not st.session_state.api_key:
-                st.warning("⚠️ Please enter your GetLate API Key in the sidebar to post to Instagram")
-            elif not st.session_state.ig_account_id:
-                st.warning("⚠️ Please enter your Instagram Account ID in the sidebar settings")
-                with st.expander("How to get your Instagram Account ID"):
-                    st.markdown("""
-                    1. Go to the **Create Carousel/Feed Post** tab
-                    2. Enable Instagram and enter your Account ID
-                    3. It will be saved for future use
-                    
-                    Or get it via API:
-                    ```
-                    curl -H "Authorization: Bearer YOUR_API_KEY" \
-                      "https://getlate.dev/api/v1/accounts?profileId=PROFILE_ID"
-                    ```
-                    """)
-            else:
-                col1, col2 = st.columns([2, 1])
-                
-                with col1:
-                    ig_caption_tab1 = st.text_area(
-                        "📝 Instagram Caption",
-                        value="",
-                        height=120,
-                        placeholder="Write your Instagram caption here...\n\nAdd hashtags and emojis! 🎉",
-                        key="ig_caption_tab1"
-                    )
-                
-                with col2:
-                    st.markdown("**📅 Schedule**")
-                    
-                    post_now_tab1 = st.checkbox("Post Immediately", value=True, key="post_now_tab1")
-                    
-                    if not post_now_tab1:
-                        default_date = datetime.now() + timedelta(hours=1)
-                        pdt = pytz.timezone('America/Los_Angeles')
-                        
-                        schedule_date_tab1 = st.date_input("Date", value=default_date, key="schedule_date_tab1")
-                        schedule_time_tab1 = st.time_input("Time (PDT)", value=default_date.time(), key="schedule_time_tab1")
-                        
-                        schedule_datetime = datetime.combine(schedule_date_tab1, schedule_time_tab1)
-                        schedule_datetime_pdt = pdt.localize(schedule_datetime)
-                        schedule_iso_tab1 = schedule_datetime_pdt.isoformat()
-                    else:
-                        schedule_iso_tab1 = None
-                    
-                    st.markdown("<br>", unsafe_allow_html=True)
-                    st.info(f"📊 {len(st.session_state.generated_ig_posts)} posts will be uploaded")
-                
-                st.markdown("<br>", unsafe_allow_html=True)
-                
-                # Post to Instagram button
-                col1, col2, col3 = st.columns([1, 2, 1])
-                with col2:
-                    if st.button("🚀 Post All to Instagram Now", type="primary", use_container_width=True, key="post_to_ig_btn"):
-                        with st.spinner("📤 Uploading images and posting to Instagram..."):
-                            success_count = 0
-                            error_count = 0
-                            
-                            progress_bar = st.progress(0)
-                            status_text = st.empty()
-                            
-                            # Upload each generated post to GetLate and schedule
-                            for idx, post_img in enumerate(st.session_state.generated_ig_posts):
-                                status_text.text(f"Uploading post {idx + 1} of {len(st.session_state.generated_ig_posts)}...")
-                                
-                                # Convert PIL Image to bytes
-                                img_bytes_io = BytesIO()
-                                post_img.save(img_bytes_io, format='JPEG', quality=95)
-                                img_bytes_io.seek(0)
-                                
-                                # Create a file-like object for upload
-                                img_bytes_io.name = f"instagram_post_{idx + 1}.jpg"
-                                
-                                # Upload to GetLate
-                                uploaded_url = upload_image_to_getlate(img_bytes_io, st.session_state.api_key)
-                                
-                                if uploaded_url:
-                                    # Create post payload
-                                    post_payload = {
-                                        "content": ig_caption_tab1 if ig_caption_tab1 else f"Post {idx + 1}",
-                                        "platforms": [
-                                            {
-                                                "platform": "instagram",
-                                                "accountId": st.session_state.ig_account_id,
-                                                "mediaItems": [{"url": uploaded_url}]
-                                            }
-                                        ],
-                                        "timezone": "America/Los_Angeles"
-                                    }
-                                    
-                                    if post_now_tab1:
-                                        post_payload["publishNow"] = True
-                                    else:
-                                        post_payload["scheduledFor"] = schedule_iso_tab1
-                                    
-                                    # Send to GetLate API
-                                    response = send_post_to_api(st.session_state.api_key, post_payload)
-                                    
-                                    if response and response.status_code in [200, 201]:
-                                        success_count += 1
-                                    else:
-                                        error_count += 1
-                                        st.error(f"❌ Post {idx + 1} failed to schedule")
-                                else:
-                                    error_count += 1
-                                    st.error(f"❌ Failed to upload post {idx + 1}")
-                                
-                                progress_bar.progress((idx + 1) / len(st.session_state.generated_ig_posts))
-                            
-                            status_text.empty()
-                            progress_bar.empty()
-                            
-                            st.markdown("<br>", unsafe_allow_html=True)
-                            
-                            if error_count == 0:
-                                st.balloons()
-                                st.markdown("""
-                                    <div style='background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); 
-                                                padding: 2rem; border-radius: 16px; text-align: center;'>
-                                        <h2 style='margin: 0; color: #155724;'>🎉 Success!</h2>
-                                        <p style='color: #155724; margin: 0.5rem 0 0 0;'>All {success_count} posts posted to Instagram successfully!</p>
-                                    </div>
-                                """, unsafe_allow_html=True)
-                            else:
-                                st.markdown(f"""
-                                    <div style='background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); 
-                                                padding: 2rem; border-radius: 16px; text-align: center;'>
-                                        <h3 style='margin: 0; color: #856404;'>⚠️ Partial Success</h3>
-                                        <p style='color: #856404; margin: 0.5rem 0 0 0;'>{success_count} successful, {error_count} failed</p>
-                                    </div>
-                                """, unsafe_allow_html=True)
-                
-                # Close button
-                st.markdown("<br>", unsafe_allow_html=True)
-                if st.button("❌ Close Instagram Posting", use_container_width=True):
-                    st.session_state.show_ig_posting = False
-                    st.rerun()
-
+    
+    else:
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); 
+                        padding: 3rem; border-radius: 16px; text-align: center; margin: 3rem 0;'>
+                <h3 style='margin: 0; color: #0c5460;'>👆 Paste a YouTube link above or upload screenshots to get started</h3>
+                <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Watch the video and take screenshots, or upload existing screenshots</p>
+            </div>
+        """, unsafe_allow_html=True)
 # ============================================================================
 # TAB 2: CTA PODCAST CONTENT CREATION
 # ============================================================================
@@ -3343,6 +3340,7 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
+
 
 
 
