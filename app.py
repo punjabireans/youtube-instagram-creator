@@ -313,7 +313,28 @@ def check_password():
 # ============================================================================
 # YOUTUBE TO INSTAGRAM POST FUNCTIONS
 # ============================================================================
+def get_font(size, bold=False):
+    """Get Work Sans SemiBold font or fallback to default"""
+    try:
+        font_paths = [
+            "WorkSans-SemiBold.ttf" if not bold else "WorkSans-Bold.ttf",
+            "/System/Library/Fonts/Helvetica.ttc",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+            "arial.ttf"
+        ]
+        
+        for font_path in font_paths:
+            try:
+                return ImageFont.truetype(font_path, size)
+            except:
+                continue
+                
+        return ImageFont.load_default()
+    except:
+        return ImageFont.load_default()
 
+def create_posts_from_uploads(uploaded_files, post_texts, guest_name="", logo_file=None):
+    # ... rest of your existing code
 def create_posts_from_uploads(uploaded_files, post_texts, guest_name="", logo_file=None):
     """Create Instagram posts from uploaded images plus promotional post"""
     
@@ -3267,6 +3288,7 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
+
 
 
 
