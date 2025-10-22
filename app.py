@@ -1686,91 +1686,6 @@ with tab2:
             <p style='color: #666; margin: 1rem 0 0 0; font-size: 1.1rem;'>This feature is currently under development</p>
         </div>
     """, unsafe_allow_html=True)
-    
-    # Placeholder content
-    st.markdown("""
-        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
-                    padding: 2rem; border-radius: 16px; margin: 2rem 0;'>
-            <h3 style='margin-top: 0;'>📋 Planned Features:</h3>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("""
-        ### 🎨 Content Creation
-        - 📝 Custom CTA templates
-        - 🖼️ Branded graphics generator
-        - ✂️ Podcast clip creator
-        - 📊 Episode highlights extractor
-        - 🎯 Audience engagement tools
-        """)
-        
-        st.markdown("""
-        ### 🎙️ Podcast Specific
-        - 🎵 Audio waveform visualizer
-        - 📢 Guest spotlight creator
-        - 🔊 Episode teaser generator
-        - 💬 Quote card maker
-        - 🎧 Listen now CTAs
-        """)
-    
-    with col2:
-        st.markdown("""
-        ### 📱 Social Media Ready
-        - 📸 Instagram story templates
-        - 🎬 Reel/Short form video CTAs
-        - 🖼️ Carousel post builder
-        - 📝 Caption suggestions
-        - #️⃣ Hashtag recommendations
-        """)
-        
-        st.markdown("""
-        ### 🚀 Automation
-        - ⏰ Scheduled content drops
-        - 🔄 Auto-post episode releases
-        - 📧 Email newsletter integration
-        - 📊 Analytics tracking
-        - 🎯 A/B testing CTAs
-        """)
-    
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    
-    # Interactive placeholder
-    st.markdown("""
-        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
-                    padding: 2rem; border-radius: 16px; margin: 2rem 0;'>
-            <h3 style='margin-top: 0; text-align: center;'>💡 Got Ideas?</h3>
-            <p style='text-align: center; color: #666;'>Help shape this feature! What podcast CTA tools would you find most valuable?</p>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    user_suggestions = st.text_area(
-        "Share your suggestions (optional)",
-        placeholder="What features would make your podcast content creation easier?",
-        height=100
-    )
-    
-    if st.button("📧 Send Suggestions", type="primary", use_container_width=True):
-        if user_suggestions:
-            st.success("✅ Thank you! Your suggestions have been noted.")
-            st.balloons()
-        else:
-            st.info("💡 Please enter your suggestions above")
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # Call to action
-    st.markdown("""
-        <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                    padding: 3rem; border-radius: 16px; text-align: center; color: white;'>
-            <h2 style='margin: 0 0 1rem 0; color: white;'>🎙️ Stay Tuned!</h2>
-            <p style='margin: 0 0 1.5rem 0; font-size: 1.1rem;'>We're working hard to bring you the best podcast CTA tools</p>
-            <p style='margin: 0; font-size: 0.9rem; opacity: 0.9;'>Expected release: Coming Soon</p>
-        </div>
-    """, unsafe_allow_html=True)
-
 # ============================================================================
 # TAB 3: CREATE CAROUSEL/FEED POST
 # ============================================================================
@@ -2681,6 +2596,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
