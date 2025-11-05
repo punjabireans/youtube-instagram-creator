@@ -19,13 +19,13 @@ def check_password():
         # First run, show password input with the new design
         st.markdown("""
             <style>
-                @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
                 /* --- Base Setup --- */
                 body {
                     font-family: 'Poppins', sans-serif;
                     margin: 0;
-                    overflow: hidden; /* Prevent scrollbars from showing */
+                    overflow: hidden; /* Prevent scrollbars */
                 }
 
                 /* CRITICAL: Hide ALL Streamlit default elements */
@@ -34,328 +34,258 @@ def check_password():
                 header {visibility: hidden !important;}
                 .stDeployButton {visibility: hidden !important;}
                 
-                /* Make app container fill screen */
+                /* Main App Container */
                 .stApp {
-                    background: none !important; /* Remove Streamlit's default background */
+                    background: none !important;
                     position: fixed;
                     top: 0;
                     left: 0;
                     width: 100vw;
                     height: 100vh;
-                    display: flex;
+                    display: flex; /* Use flex to center content */
                     justify-content: center;
                     align-items: center;
-                    overflow: hidden; /* Ensure background elements don't cause scroll */
-                    background-color: #30164F; /* Base background color */
+                    overflow: hidden;
                 }
 
-                /* --- Animated Background Elements --- */
-
-                /* Main Gradient Background */
+                /* --- Animated Background --- */
+                
+                /* 1. Dark Purple Gradient */
                 .stApp::before {
                     content: '';
                     position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: linear-gradient(180deg, #30164F 0%, #1F0F38 100%);
-                    z-index: 0;
+                    top: 0; left: 0;
+                    width: 100%; height: 100%;
+                    background: linear-gradient(180deg, #2E1351 0%, #1E0C34 100%);
+                    z-index: -3;
                 }
 
-                /* Starry Sky Overlay */
+                /* 2. Starry Sky */
                 .stApp::after {
                     content: '';
                     position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 200%; /* Larger to allow animation */
-                    height: 200%;
+                    top: 0; left: 0;
+                    width: 200%; height: 200%;
                     background-image: 
-                        radial-gradient(1px 1px at 15% 25%, rgba(255,255,255,0.8), transparent),
-                        radial-gradient(1px 1px at 85% 70%, rgba(255,255,255,0.8), transparent),
-                        radial-gradient(1px 1px at 40% 50%, rgba(255,255,255,0.6), transparent),
-                        radial-gradient(2px 2px at 70% 30%, rgba(255,255,255,0.9), transparent),
-                        radial-gradient(1px 1px at 30% 90%, rgba(255,255,255,0.7), transparent),
-                        radial-gradient(1px 1px at 5% 60%, rgba(255,255,255,0.5), transparent),
-                        radial-gradient(2px 2px at 95% 10%, rgba(255,255,255,0.9), transparent);
-                    background-size: 150px 150px; /* Density of stars */
-                    animation: starfield 60s linear infinite; /* Slow, continuous movement */
-                    z-index: 1;
-                    pointer-events: none; /* Allow clicks to pass through */
+                        radial-gradient(1px 1px at 10% 30%, #FFFFFF, transparent),
+                        radial-gradient(1px 1px at 80% 60%, #FFFFFF, transparent),
+                        radial-gradient(1px 1px at 45% 70%, #FFFFFF, transparent),
+                        radial-gradient(1px 1px at 70% 10%, #FFFFFF, transparent),
+                        radial-gradient(1px 1px at 20% 85%, #FFFFFF, transparent);
+                    background-size: 200px 200px;
+                    animation: starfield 60s linear infinite;
+                    z-index: -2;
+                    pointer-events: none;
                 }
-
+                
                 @keyframes starfield {
-                    from { background-position: 0 0; }
-                    to { background-position: -150px 150px; } /* Diagonal movement */
+                    from { transform: translate(0, 0); }
+                    to { transform: translate(-200px, 200px); }
                 }
-                
-                /* Pine Tree Silhouettes - Layer 1 (Darker, closer, faster) */
-                .mountain-layer-1 {
+
+                /* 3. Mountain Silhouette */
+                .mountain-silhouette {
                     position: absolute;
-                    bottom: 0;
-                    left: 0;
-                    width: 200%; /* Wider for parallax */
-                    height: 55%;
-                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 300'%3E%3Cpath fill='%2318092B' d='M-20,300 L50,150 L120,300 Z M80,300 L150,100 L220,300 Z M180,300 L250,180 L320,300 Z M300,300 L370,120 L440,300 Z M420,300 L490,170 L560,300 Z M540,300 L610,130 L680,300 Z M660,300 L730,190 L800,300 Z M780,300 L850,110 L920,300 Z M900,300 L970,160 L1040,300 Z' /%3E%3C/svg%3E");
-                    background-repeat: repeat-x;
-                    background-size: 50% auto;
-                    z-index: 3;
-                    opacity: 0.9;
-                    animation: parallax-mountains-1 40s linear infinite;
-                }
-
-                /* Pine Tree Silhouettes - Layer 2 (Lighter, further, slower) */
-                .mountain-layer-2 {
-                    position: absolute;
-                    bottom: 0;
-                    left: 0;
-                    width: 200%; /* Wider for parallax */
-                    height: 45%; /* Shorter for perspective */
-                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 300'%3E%3Cpath fill='%2323113F' d='M-20,300 L50,150 L120,300 Z M80,300 L150,100 L220,300 Z M180,300 L250,180 L320,300 Z M300,300 L370,120 L440,300 Z M420,300 L490,170 L560,300 Z M540,300 L610,130 L680,300 Z M660,300 L730,190 L800,300 Z M780,300 L850,110 L920,300 Z M900,300 L970,160 L1040,300 Z' /%3E%3C/svg%3E");
-                    background-repeat: repeat-x;
-                    background-size: 50% auto;
-                    z-index: 2;
-                    opacity: 0.7;
-                    animation: parallax-mountains-2 80s linear infinite;
-                }
-
-                @keyframes parallax-mountains-1 {
-                    from { transform: translateX(0); }
-                    to { transform: translateX(-50%); }
-                }
-                @keyframes parallax-mountains-2 {
-                    from { transform: translateX(0); }
-                    to { transform: translateX(-50%); }
-                }
-
-                /* --- Login Card --- */
-                /* Ensure all stVerticalBlock within the login card don't have extra padding */
-                [data-testid="stVerticalBlock"] > div {
-                    gap: 0px !important; /* Adjust default Streamlit block spacing */
-                }
-
-                .login-card-container {
-                    position: relative; /* For z-index to overlay background */
-                    z-index: 10;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
+                    bottom: 0; left: 0;
                     width: 100%;
-                    height: 100%;
+                    height: 25%; /* Adjust height as needed */
+                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 200'%3E%3Cpath fill='%23120624' d='M0,200 L0,150 C100,100 150,120 200,140 S300,180 350,160 S450,100 500,110 S600,150 650,130 S750,180 800,170 S900,120 950,130 L1000,140 L1000,200 Z' /%3E%3C/svg%3E");
+                    background-repeat: repeat-x;
+                    background-size: 100% 100%;
+                    z-index: -1;
+                    pointer-events: none;
                 }
 
-                .login-card {
-                    background: rgba(255, 255, 255, 0.1);
-                    backdrop-filter: blur(15px);
-                    -webkit-backdrop-filter: blur(15px);
-                    border: 1px solid rgba(255, 255, 255, 0.2);
-                    border-radius: 20px;
-                    width: 400px;
+                /* --- Login Form Container --- */
+                
+                /* This is the container for all the login elements */
+                .login-container {
+                    width: 450px;
                     max-width: 90%;
-                    padding: 2.5rem 3rem;
-                    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-                    text-align: center;
+                    padding: 2rem;
+                    /* This container is now logically centered by st.columns */
                 }
-                
-                .login-card h2 {
-                    color: white;
+
+                /* The "Login" H2 Title */
+                .login-container h2 {
+                    color: #FFFFFF;
                     font-weight: 600;
-                    font-size: 2.5rem;
+                    font-size: 2.2rem;
+                    text-align: left;
                     margin-bottom: 2rem;
-                    letter-spacing: 0.5px;
-                }
-
-                /* --- Inputs & Form --- */
-                [data-testid="stForm"] {
-                    gap: 1.5rem; /* Space between inputs and button */
-                }
-
-                [data-testid="stTextInput"] > div {
-                    background: rgba(255, 255, 255, 0.15);
-                    border-radius: 10px;
-                    border: 1px solid rgba(255, 255, 255, 0.2);
-                    transition: all 0.3s ease;
-                    position: relative; /* For icon positioning */
                 }
                 
-                [data-testid="stTextInput"] > div:hover {
-                    background: rgba(255, 255, 255, 0.2);
-                    border: 1px solid rgba(255, 255, 255, 0.4);
+                /* Make all vertical blocks inside form gapless */
+                [data-testid="stForm"] [data-testid="stVerticalBlock"] {
+                    gap: 0;
                 }
 
+                /* --- Password Input --- */
+                
+                /* FIX: Hide the "Password" label */
+                [data-testid="stTextInput"] > label {
+                    display: none !important;
+                }
+                
+                /* Style the input field container */
+                [data-testid="stTextInput"] > div {
+                    border-radius: 8px !important;
+                    background-color: #FFFFFF !important;
+                    border: 1px solid #D0D0D0 !important;
+                }
+                
                 [data-testid="stTextInput"] input {
                     background: transparent !important;
-                    color: white !important;
-                    font-weight: 400;
+                    color: #1E0C34 !important; /* Dark text for contrast */
+                    font-weight: 500;
                     font-size: 1rem;
-                    padding: 1rem 1.25rem 1rem 3.5rem !important; /* Adjust padding for icon */
+                    padding: 1.25rem 1rem !important;
                     border: none !important;
                     box-shadow: none !important;
-                    width: calc(100% - 3.5rem) !important; /* Account for icon padding */
                 }
                 
                 [data-testid="stTextInput"] input::placeholder {
-                    color: rgba(255, 255, 255, 0.7) !important;
+                    color: #808080 !important; /* Gray placeholder text */
                 }
 
-                /* Password icon */
-                [data-testid="stTextInput"] > div::before {
-                    content: '🔒'; /* Lock icon */
-                    position: absolute;
-                    left: 1.25rem;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    color: rgba(255, 255, 255, 0.7);
-                    font-size: 1.2rem;
-                    pointer-events: none; /* Allow clicks on input field */
-                }
-                
-                /* --- Options (Checkbox & Link) --- */
+                /* --- Options Row (Remember/Forgot) --- */
                 .login-options {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    margin-top: -1rem; /* Pull up closer to password */
-                    margin-bottom: -1rem; /* Pull button closer */
+                    margin-top: 1rem;
+                    margin-bottom: 1.5rem;
                 }
 
-                /* Styling Streamlit checkbox */
+                /* Style the "Remember me" checkbox */
                 [data-testid="stCheckbox"] > label {
-                    flex-direction: row-reverse; /* Put checkbox on left, label on right */
+                    flex-direction: row-reverse; /* Box on left, text on right */
                     justify-content: flex-end;
-                    gap: 8px; /* Space between box and text */
+                    gap: 8px;
                 }
-                [data-testid="stCheckbox"] .st-bd { /* The checkbox span */
+                [data-testid="stCheckbox"] .st-bd { /* The box */
                     width: 18px;
                     height: 18px;
-                    border: 2px solid rgba(255, 255, 255, 0.7);
+                    border: 2px solid #FFFFFF;
                     border-radius: 4px;
                     background-color: transparent;
-                    transition: all 0.2s ease;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
                 }
                 [data-testid="stCheckbox"] .st-bd:has(input:checked) {
-                    background-color: #F8D142; /* Yellow check */
-                    border-color: #F8D142;
+                    background-color: #E95757; /* Use button color */
+                    border-color: #E95757;
                 }
                 [data-testid="stCheckbox"] .st-bd:has(input:checked)::after {
-                    content: '✔'; /* Checkmark */
-                    color: #2D0F46; /* Dark purple checkmark */
+                    content: '✔';
+                    color: #FFFFFF;
                     font-size: 12px;
-                    line-height: 1; /* Adjust vertical alignment */
                 }
-                [data-testid="stCheckbox"] label span { /* Text of the checkbox */
-                    color: rgba(255, 255, 255, 0.8) !important;
+                [data-testid="stCheckbox"] label span { /* The text */
+                    color: #F0F0F0 !important;
                     font-size: 0.9rem;
-                    font-weight: 300;
+                    font-weight: 400;
                 }
                 
-                .forgot-link {
-                    font-size: 0.9rem;
-                    font-weight: 300;
-                }
-                
+                /* "Forgot password?" link */
                 .forgot-link a {
-                    color: #F8D142 !important; /* Yellow link from design */
+                    color: #F0F0F0 !important;
+                    font-size: 0.9rem;
+                    font-weight: 400;
                     text-decoration: none;
                 }
-                
                 .forgot-link a:hover {
-                    color: white !important;
+                    text-decoration: underline;
                 }
 
-                /* --- Button --- */
+                /* --- Login Button --- */
                 [data-testid="stButton"] button {
-                    background: white !important;
-                    color: #30164F !important; /* Dark purple text */
+                    background: #E95757 !important; /* Coral/Red color from screenshot */
+                    color: #FFFFFF !important;
                     font-weight: 600 !important;
                     font-size: 1rem !important;
-                    border-radius: 10px !important;
+                    border-radius: 8px !important;
                     border: none !important;
-                    padding: 0.8rem 1rem !important;
+                    padding: 0.9rem 1rem !important;
                     transition: all 0.3s ease !important;
                 }
                 
                 [data-testid="stButton"] button:hover {
-                    background: #F8D142 !important; /* Yellow hover */
-                    color: #1F0F38 !important;
+                    filter: brightness(1.1);
                     transform: translateY(-2px);
-                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
                 }
 
                 /* --- Register Link --- */
                 .register-link {
-                    color: rgba(255, 255, 255, 0.8);
-                    font-weight: 300;
+                    color: #F0F0F0;
+                    font-weight: 400;
                     font-size: 0.9rem;
+                    text-align: left;
                     margin-top: 2rem;
                 }
                 .register-link a {
-                    color: #F8D142 !important;
-                    font-weight: 500;
+                    color: #FFFFFF !important; /* Brighter link */
+                    font-weight: 600;
                     text-decoration: none;
                 }
                 .register-link a:hover {
-                    color: white !important;
+                    text-decoration: underline;
                 }
 
             </style>
         """, unsafe_allow_html=True)
 
-        # Render the background layers
-        st.markdown("<div class='mountain-layer-1'></div>", unsafe_allow_html=True)
-        st.markdown("<div class='mountain-layer-2'></div>", unsafe_allow_html=True)
+        # Render the background
+        st.markdown("<div class='mountain-silhouette'></div>", unsafe_allow_html=True)
 
+        # --- Python Layout ---
+        # Use st.columns to create a centered container
+        _col1, col2, _col3 = st.columns([1, 1.5, 1])
 
-        # Login Card Container
-        st.markdown("<div class='login-card-container'>", unsafe_allow_html=True)
-        st.markdown("<div class='login-card'>", unsafe_allow_html=True)
-        st.markdown("<h2>Login</h2>", unsafe_allow_html=True)
+        with col2:
+            st.markdown("<div class='login-container'>", unsafe_allow_html=True)
+            st.markdown("<h2>Login</h2>", unsafe_allow_html=True)
 
-        with st.form("login_form"):
-            # This is the password field your logic uses
-            password_input = st.text_input(
-                "Password",
-                type="password",
-                placeholder="Password",
-                label_visibility="collapsed",
-                key="password_input_field"  # IMPORTANT: Use a new key to avoid conflicts and ensure interactivity
+            with st.form("login_form"):
+                
+                # This is the password field your logic uses
+                password_input = st.text_input(
+                    "Password",
+                    type="password",
+                    placeholder="Password",
+                    label_visibility="collapsed",
+                    key="password"  # IMPORTANT: Keep key="password" to match your original logic
+                )
+
+                # Options row
+                st.markdown("<div class='login-options'>", unsafe_allow_html=True)
+                col_a, col_b = st.columns([1, 1])
+                with col_a:
+                    st.checkbox("Remember me", key="remember_me", label_visibility="visible")
+                with col_b:
+                    st.markdown("<div class='forgot-link' style='text-align: right;'><a href='#'>Forgot password?</a></div>", unsafe_allow_html=True)
+                st.markdown("</div>", unsafe_allow_html=True)
+                
+                # Submit Button
+                submitted = st.form_submit_button("Login", use_container_width=True, type="primary")
+
+                if submitted:
+                    # This is your original password check logic
+                    if hashlib.sha256(st.session_state["password"].encode()).hexdigest() == hashlib.sha256("RenaPostTool81".encode()).hexdigest():
+                        st.session_state["password_correct"] = True
+                        del st.session_state["password"]  # Don't store password
+                        st.rerun()
+                    else:
+                        st.session_state["password_correct"] = False
+                        st.error("Incorrect password. Please try again.")
+
+            st.markdown(
+                """
+                <div class='register-link'>
+                    Don't have an account? <a href='#'>Register</a>
+                </div>
+                """,
+                unsafe_allow_html=True
             )
-
-            # Options row
-            col1, col2 = st.columns([1, 1])
-            with col1:
-                st.checkbox("Remember me", key="remember_me_checkbox", label_visibility="visible") # Make visible to apply custom styling
-            with col2:
-                st.markdown("<div class='forgot-link' style='text-align: right;'><a href='#'>Forgot password?</a></div>", unsafe_allow_html=True)
-
-            # Submit Button
-            submitted = st.form_submit_button("Login", use_container_width=True, type="primary")
-
-            if submitted:
-                # This is your original password check logic
-                if hashlib.sha256(st.session_state["password_input_field"].encode()).hexdigest() == hashlib.sha256("RenaPostTool81".encode()).hexdigest():
-                    st.session_state["password_correct"] = True
-                    del st.session_state["password_input_field"]  # Don't store password in session state after check
-                    # You might also want to save st.session_state["remember_me_checkbox"] if you want "remember me" functionality
-                    st.rerun()
-                else:
-                    st.session_state["password_correct"] = False
-                    st.error("Incorrect password. Please try again.")
-
-        st.markdown(
-            """
-            <div class='register-link'>
-                Don't have an account? <a href='#'>Register</a>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        st.markdown("</div>", unsafe_allow_html=True) # Close login-card
-        st.markdown("</div>", unsafe_allow_html=True) # Close login-card-container
+            st.markdown("</div>", unsafe_allow_html=True) # Close login-container
 
         return False
 
@@ -368,7 +298,6 @@ def check_password():
     else:
         # Password correct
         return True
-
 # ============================================================================
 # YOUTUBE TO INSTAGRAM POST FUNCTIONS
 # ============================================================================
@@ -3431,6 +3360,7 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
+
 
 
 
