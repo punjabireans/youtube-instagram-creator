@@ -9,7 +9,6 @@ import json
 from datetime import datetime, timedelta
 import pytz
 import hashlib
-
 # ============================================================================
 # PASSWORD PROTECTION
 # ============================================================================
@@ -25,6 +24,8 @@ def check_password():
                 /* --- Base Setup --- */
                 body {
                     font-family: 'Poppins', sans-serif;
+                    margin: 0;
+                    overflow: hidden; /* Prevent scrollbars from showing */
                 }
 
                 /* CRITICAL: Hide ALL Streamlit default elements */
@@ -34,26 +35,23 @@ def check_password():
                 .stDeployButton {visibility: hidden !important;}
                 
                 /* Make app container fill screen */
-                [data-testid="stAppViewContainer"] {
-                    background: none !important;
-                }
-
-                /* --- Animated Background --- */
                 .stApp {
-                    background: linear-gradient(180deg, #30164F 0%, #1F0F38 100%);
+                    background: none !important; /* Remove Streamlit's default background */
                     position: fixed;
                     top: 0;
                     left: 0;
                     width: 100vw;
                     height: 100vh;
-                    overflow: hidden;
                     display: flex;
                     justify-content: center;
                     align-items: center;
-                    z-index: -1;
+                    overflow: hidden; /* Ensure background elements don't cause scroll */
+                    background-color: #30164F; /* Base background color */
                 }
 
-                /* Starry Sky Overlay */
+                /* --- Animated Background Elements --- */
+
+                /* Main Gradient Background */
                 .stApp::before {
                     content: '';
                     position: absolute;
@@ -61,42 +59,92 @@ def check_password():
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background-image: 
-                        radial-gradient(1px 1px at 20% 30%, white, transparent),
-                        radial-gradient(1px 1px at 80% 40%, white, transparent),
-                        radial-gradient(1px 1px at 50% 70%, white, transparent),
-                        radial-gradient(2px 2px at 30% 80%, white, transparent),
-                        radial-gradient(2px 2px at 90% 10%, white, transparent);
-                    background-size: 300px 300px;
-                    animation: twinkle 15s linear infinite;
-                    z-index: 1;
+                    background: linear-gradient(180deg, #30164F 0%, #1F0F38 100%);
+                    z-index: 0;
                 }
 
-                @keyframes twinkle {
-                    0% { background-position: 0 0; }
-                    100% { background-position: -300px 300px; }
-                }
-                
-                /* Pine Tree Silhouettes */
+                /* Starry Sky Overlay */
                 .stApp::after {
                     content: '';
                     position: absolute;
-                    bottom: -50px; /* Start slightly below */
+                    top: 0;
                     left: 0;
-                    width: 100%;
-                    height: 50%;
-                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 300'%3E%3Cpath fill='%23120624' d='M-20,300 L50,150 L120,300 Z M80,300 L150,100 L220,300 Z M180,300 L250,180 L320,300 Z M300,300 L370,120 L440,300 Z M420,300 L490,170 L560,300 Z M540,300 L610,130 L680,300 Z M660,300 L730,190 L800,300 Z M780,300 L850,110 L920,300 Z M900,300 L970,160 L1040,300 Z' /%3E%3C/svg%3E");
+                    width: 200%; /* Larger to allow animation */
+                    height: 200%;
+                    background-image: 
+                        radial-gradient(1px 1px at 15% 25%, rgba(255,255,255,0.8), transparent),
+                        radial-gradient(1px 1px at 85% 70%, rgba(255,255,255,0.8), transparent),
+                        radial-gradient(1px 1px at 40% 50%, rgba(255,255,255,0.6), transparent),
+                        radial-gradient(2px 2px at 70% 30%, rgba(255,255,255,0.9), transparent),
+                        radial-gradient(1px 1px at 30% 90%, rgba(255,255,255,0.7), transparent),
+                        radial-gradient(1px 1px at 5% 60%, rgba(255,255,255,0.5), transparent),
+                        radial-gradient(2px 2px at 95% 10%, rgba(255,255,255,0.9), transparent);
+                    background-size: 150px 150px; /* Density of stars */
+                    animation: starfield 60s linear infinite; /* Slow, continuous movement */
+                    z-index: 1;
+                    pointer-events: none; /* Allow clicks to pass through */
+                }
+
+                @keyframes starfield {
+                    from { background-position: 0 0; }
+                    to { background-position: -150px 150px; } /* Diagonal movement */
+                }
+                
+                /* Pine Tree Silhouettes - Layer 1 (Darker, closer, faster) */
+                .mountain-layer-1 {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 200%; /* Wider for parallax */
+                    height: 55%;
+                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 300'%3E%3Cpath fill='%2318092B' d='M-20,300 L50,150 L120,300 Z M80,300 L150,100 L220,300 Z M180,300 L250,180 L320,300 Z M300,300 L370,120 L440,300 Z M420,300 L490,170 L560,300 Z M540,300 L610,130 L680,300 Z M660,300 L730,190 L800,300 Z M780,300 L850,110 L920,300 Z M900,300 L970,160 L1040,300 Z' /%3E%3C/svg%3E");
+                    background-repeat: repeat-x;
+                    background-size: 50% auto;
+                    z-index: 3;
+                    opacity: 0.9;
+                    animation: parallax-mountains-1 40s linear infinite;
+                }
+
+                /* Pine Tree Silhouettes - Layer 2 (Lighter, further, slower) */
+                .mountain-layer-2 {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 200%; /* Wider for parallax */
+                    height: 45%; /* Shorter for perspective */
+                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 300'%3E%3Cpath fill='%2323113F' d='M-20,300 L50,150 L120,300 Z M80,300 L150,100 L220,300 Z M180,300 L250,180 L320,300 Z M300,300 L370,120 L440,300 Z M420,300 L490,170 L560,300 Z M540,300 L610,130 L680,300 Z M660,300 L730,190 L800,300 Z M780,300 L850,110 L920,300 Z M900,300 L970,160 L1040,300 Z' /%3E%3C/svg%3E");
                     background-repeat: repeat-x;
                     background-size: 50% auto;
                     z-index: 2;
                     opacity: 0.7;
+                    animation: parallax-mountains-2 80s linear infinite;
                 }
-                
+
+                @keyframes parallax-mountains-1 {
+                    from { transform: translateX(0); }
+                    to { transform: translateX(-50%); }
+                }
+                @keyframes parallax-mountains-2 {
+                    from { transform: translateX(0); }
+                    to { transform: translateX(-50%); }
+                }
+
                 /* --- Login Card --- */
-                [data-testid="stVerticalBlock"] {
-                    gap: 0;
+                /* Ensure all stVerticalBlock within the login card don't have extra padding */
+                [data-testid="stVerticalBlock"] > div {
+                    gap: 0px !important; /* Adjust default Streamlit block spacing */
                 }
-                
+
+                .login-card-container {
+                    position: relative; /* For z-index to overlay background */
+                    z-index: 10;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 100%;
+                    height: 100%;
+                }
+
                 .login-card {
                     background: rgba(255, 255, 255, 0.1);
                     backdrop-filter: blur(15px);
@@ -107,7 +155,6 @@ def check_password():
                     max-width: 90%;
                     padding: 2.5rem 3rem;
                     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-                    z-index: 10;
                     text-align: center;
                 }
                 
@@ -129,6 +176,7 @@ def check_password():
                     border-radius: 10px;
                     border: 1px solid rgba(255, 255, 255, 0.2);
                     transition: all 0.3s ease;
+                    position: relative; /* For icon positioning */
                 }
                 
                 [data-testid="stTextInput"] > div:hover {
@@ -141,13 +189,26 @@ def check_password():
                     color: white !important;
                     font-weight: 400;
                     font-size: 1rem;
-                    padding: 1rem 1.25rem;
+                    padding: 1rem 1.25rem 1rem 3.5rem !important; /* Adjust padding for icon */
                     border: none !important;
                     box-shadow: none !important;
+                    width: calc(100% - 3.5rem) !important; /* Account for icon padding */
                 }
                 
                 [data-testid="stTextInput"] input::placeholder {
                     color: rgba(255, 255, 255, 0.7) !important;
+                }
+
+                /* Password icon */
+                [data-testid="stTextInput"] > div::before {
+                    content: '🔒'; /* Lock icon */
+                    position: absolute;
+                    left: 1.25rem;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: rgba(255, 255, 255, 0.7);
+                    font-size: 1.2rem;
+                    pointer-events: none; /* Allow clicks on input field */
                 }
                 
                 /* --- Options (Checkbox & Link) --- */
@@ -159,7 +220,34 @@ def check_password():
                     margin-bottom: -1rem; /* Pull button closer */
                 }
 
-                [data-testid="stCheckbox"] label {
+                /* Styling Streamlit checkbox */
+                [data-testid="stCheckbox"] > label {
+                    flex-direction: row-reverse; /* Put checkbox on left, label on right */
+                    justify-content: flex-end;
+                    gap: 8px; /* Space between box and text */
+                }
+                [data-testid="stCheckbox"] .st-bd { /* The checkbox span */
+                    width: 18px;
+                    height: 18px;
+                    border: 2px solid rgba(255, 255, 255, 0.7);
+                    border-radius: 4px;
+                    background-color: transparent;
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                [data-testid="stCheckbox"] .st-bd:has(input:checked) {
+                    background-color: #F8D142; /* Yellow check */
+                    border-color: #F8D142;
+                }
+                [data-testid="stCheckbox"] .st-bd:has(input:checked)::after {
+                    content: '✔'; /* Checkmark */
+                    color: #2D0F46; /* Dark purple checkmark */
+                    font-size: 12px;
+                    line-height: 1; /* Adjust vertical alignment */
+                }
+                [data-testid="stCheckbox"] label span { /* Text of the checkbox */
                     color: rgba(255, 255, 255, 0.8) !important;
                     font-size: 0.9rem;
                     font-weight: 300;
@@ -217,71 +305,64 @@ def check_password():
             </style>
         """, unsafe_allow_html=True)
 
-        # 2. NEW LAYOUT BLOCK
-        # Center the card
-        _col1, col2, _col3 = st.columns([1, 1.5, 1])
-        with col2:
-            st.markdown("<div class='login-card'>", unsafe_allow_html=True)
-            st.markdown("<h2>Login</h2>", unsafe_allow_html=True)
+        # Render the background layers
+        st.markdown("<div class='mountain-layer-1'></div>", unsafe_allow_html=True)
+        st.markdown("<div class='mountain-layer-2'></div>", unsafe_allow_html=True)
 
-            with st.form("login_form"):
-                # The design has a username, so we add it.
-                username_input = st.text_input(
-                    "Username",
-                    placeholder="Username",
-                    label_visibility="collapsed",
-                    key="login_username"
-                )
 
-                # This is the password field your logic uses
-                password_input = st.text_input(
-                    "Password",
-                    type="password",
-                    placeholder="Password",
-                    label_visibility="collapsed",
-                    key="password"  # IMPORTANT: Keep key="password" to match your original logic
-                )
+        # Login Card Container
+        st.markdown("<div class='login-card-container'>", unsafe_allow_html=True)
+        st.markdown("<div class='login-card'>", unsafe_allow_html=True)
+        st.markdown("<h2>Login</h2>", unsafe_allow_html=True)
 
-                # Options row
-                col1, col2 = st.columns([1, 1])
-                with col1:
-                    st.checkbox("Remember me", key="remember_me")
-                with col2:
-                    st.markdown("<div class='forgot-link'><a href='#'>Forgot password?</a></div>", unsafe_allow_html=True)
-
-                # Submit Button
-                submitted = st.form_submit_button("Login", use_container_width=True, type="primary")
-
-                if submitted:
-                    # This is your original password check logic
-                    if hashlib.sha256(st.session_state["password"].encode()).hexdigest() == hashlib.sha256("RenaPostTool81".encode()).hexdigest():
-                        st.session_state["password_correct"] = True
-                        del st.session_state["password"]  # Don't store password
-                        if "login_username" in st.session_state:
-                            del st.session_state["login_username"] # Clear username too
-                        st.rerun()
-                    else:
-                        st.session_state["password_correct"] = False
-                        st.error("Incorrect password. Please try again.")
-
-            st.markdown(
-                """
-                <div class='register-link'>
-                    Don't have an account? <a href='#'>Register</a>
-                </div>
-                """,
-                unsafe_allow_html=True
+        with st.form("login_form"):
+            # This is the password field your logic uses
+            password_input = st.text_input(
+                "Password",
+                type="password",
+                placeholder="Password",
+                label_visibility="collapsed",
+                key="password_input_field"  # IMPORTANT: Use a new key to avoid conflicts and ensure interactivity
             )
-            st.markdown("</div>", unsafe_allow_html=True)
+
+            # Options row
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                st.checkbox("Remember me", key="remember_me_checkbox", label_visibility="visible") # Make visible to apply custom styling
+            with col2:
+                st.markdown("<div class='forgot-link' style='text-align: right;'><a href='#'>Forgot password?</a></div>", unsafe_allow_html=True)
+
+            # Submit Button
+            submitted = st.form_submit_button("Login", use_container_width=True, type="primary")
+
+            if submitted:
+                # This is your original password check logic
+                if hashlib.sha256(st.session_state["password_input_field"].encode()).hexdigest() == hashlib.sha256("RenaPostTool81".encode()).hexdigest():
+                    st.session_state["password_correct"] = True
+                    del st.session_state["password_input_field"]  # Don't store password in session state after check
+                    # You might also want to save st.session_state["remember_me_checkbox"] if you want "remember me" functionality
+                    st.rerun()
+                else:
+                    st.session_state["password_correct"] = False
+                    st.error("Incorrect password. Please try again.")
+
+        st.markdown(
+            """
+            <div class='register-link'>
+                Don't have an account? <a href='#'>Register</a>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        st.markdown("</div>", unsafe_allow_html=True) # Close login-card
+        st.markdown("</div>", unsafe_allow_html=True) # Close login-card-container
 
         return False
 
     elif not st.session_state["password_correct"]:
-        # Password incorrect, show the login form again with an error
-        # This state is now handled inside the form submit button
-        # We can simplify this part
+        # If password was incorrect, clear the flag and rerun to show login again
         st.session_state.pop("password_correct", None)
-        st.rerun() # Force a rerun to show the login page again
+        st.rerun()
         return False
 
     else:
@@ -3350,6 +3431,7 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
+
 
 
 
