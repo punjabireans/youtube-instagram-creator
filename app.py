@@ -1655,9 +1655,66 @@ with tab3:
                 transcript_content = transcript_file_tab3.read().decode('utf-8')
                 st.text_area("Preview", value=transcript_content[:300] + "..." if len(transcript_content) > 300 else transcript_content, height=100, disabled=True, label_visibility="collapsed")
         
-        # Generate Caption button
-        if st.button("✨ Generate Caption", key="generate_caption_tab3", help="Generate caption from transcript (Coming Soon)"):
-            st.info("🚧 Caption generation feature coming soon!")
+        # Generate Caption button with webhook functionality
+        if st.button("✨ Generate Caption", key="generate_caption_tab3", help="Generate caption from images and transcript"):
+            if not carousel_images:
+                st.warning("⚠️ Please upload images first!")
+            else:
+                with st.spinner("🔄 Sending data to generate caption..."):
+                    try:
+                        # Prepare files for webhook
+                        files = []
+                        
+                        # Add images
+                        for idx, img_file in enumerate(carousel_images):
+                            img_file.seek(0)
+                            files.append(('images', (img_file.name, img_file.getvalue(), img_file.type)))
+                        
+                        # Add transcript if available
+                        if transcript_file_tab3:
+                            transcript_file_tab3.seek(0)
+                            files.append(('transcript', (transcript_file_tab3.name, transcript_file_tab3.getvalue(), 'text/plain')))
+                        
+                        # Send to webhook
+                        webhook_url = "https://hook.us2.make.com/mz87lk80py2p2dr5dtn924mdjuox2bg7"
+                        response = requests.post(webhook_url, files=files, timeout=30)
+                        
+                        if response.status_code == 200:
+                            try:
+                                # Try to parse JSON response
+                                result = response.json()
+                                
+                                # Check if response has caption field
+                                if isinstance(result, dict) and 'caption' in result:
+                                    st.session_state.master_content = result['caption']
+                                    st.success("✅ Caption generated successfully!")
+                                    st.rerun()
+                                else:
+                                    # If response is just text, use it directly
+                                    response_text = response.text.strip()
+                                    if response_text:
+                                        st.session_state.master_content = response_text
+                                        st.success("✅ Caption generated successfully!")
+                                        st.rerun()
+                                    else:
+                                        st.info("📬 Request sent! Waiting for caption...")
+                            except ValueError:
+                                # If not JSON, treat as plain text
+                                response_text = response.text.strip()
+                                if response_text:
+                                    st.session_state.master_content = response_text
+                                    st.success("✅ Caption generated successfully!")
+                                    st.rerun()
+                                else:
+                                    st.info("📬 Request sent! Waiting for caption...")
+                        else:
+                            st.error(f"❌ Failed to send request: {response.status_code}")
+                            st.error(f"Response: {response.text}")
+                    
+                    except requests.exceptions.Timeout:
+                        st.error("❌ Request timed out. Please try again.")
+                    except Exception as e:
+                        st.error(f"❌ Error: {str(e)}")
     
     with col2:
         st.markdown("**📅 Master Schedule (PDT)**")
@@ -2196,14 +2253,95 @@ with tab4:
                 transcript_content_tab4 = transcript_file_tab4.read().decode('utf-8')
                 st.text_area("Preview", value=transcript_content_tab4[:300] + "..." if len(transcript_content_tab4) > 300 else transcript_content_tab4, height=100, disabled=True, label_visibility="collapsed")
         
-        # Generate Caption and Tags buttons
+        # Generate Caption and Tags buttons with webhook functionality
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
-            if st.button("✨ Generate Caption", key="generate_caption_tab4", help="Generate caption from transcript (Coming Soon)"):
-                st.info("🚧 Caption generation feature coming soon!")
+            if st.button("✨ Generate Caption", key="generate_caption_tab4", help="Generate caption from transcript"):
+                if not transcript_file_tab4:
+                    st.warning("⚠️ Please upload a transcript first!")
+                else:
+                    with st.spinner("🔄 Sending transcript to generate caption..."):
+                        try:
+                            # Prepare files for webhook
+                            files = []
+                            
+                            # Add transcript (required)
+                            transcript_file_tab4.seek(0)
+                            files.append(('transcript', (transcript_file_tab4.name, transcript_file_tab4.getvalue(), 'text/plain')))
+                            
+                            # Send to webhook
+                            webhook_url = "https://hook.us2.make.com/mz87lk80py2p2dr5dtn924mdjuox2bg7"
+                            response = requests.post(webhook_url, files=files, timeout=30)
+                            
+                            if response.status_code == 200:
+                                try:
+                                    # Try to parse JSON response
+                                    result = response.json()
+                                    
+                                    # Check if response has caption field
+                                    if isinstance(result, dict) and 'caption' in result:
+                                        st.session_state.video_master_content = result['caption']
+                                        st.success("✅ Caption generated successfully!")
+                                        st.rerun()
+                                    else:
+                                        # If response is just text, use it directly
+                                        response_text = response.text.strip()
+                                        if response_text:
+                                            st.session_state.video_master_content = response_text
+                                            st.success("✅ Caption generated successfully!")
+                                            st.rerun()
+                                        else:
+                                            st.info("📬 Request sent! Waiting for caption...")
+                                except ValueError:
+                                    # If not JSON, treat as plain text
+                                    response_text = response.text.strip()
+                                    if response_text:
+                                        st.session_state.video_master_content = response_text
+                                        st.success("✅ Caption generated successfully!")
+                                        st.rerun()
+                                    else:
+                                        st.info("📬 Request sent! Waiting for caption...")
+                            else:
+                                st.error(f"❌ Failed to send request: {response.status_code}")
+                                st.error(f"Response: {response.text}")
+                        
+                        except requests.exceptions.Timeout:
+                            st.error("❌ Request timed out. Please try again.")
+                        except Exception as e:
+                            st.error(f"❌ Error: {str(e)}")
+        
         with col_btn2:
-            if st.button("🏷️ Generate Tags", key="generate_tags_tab4", help="Generate tags from transcript (Coming Soon)"):
-                st.info("🚧 Tag generation feature coming soon!")
+            if st.button("🏷️ Generate Tags", key="generate_tags_tab4", help="Generate tags from transcript"):
+                if not transcript_file_tab4:
+                    st.warning("⚠️ Please upload a transcript first!")
+                else:
+                    with st.spinner("🔄 Sending transcript to generate tags..."):
+                        try:
+                            # Prepare files for webhook
+                            files = []
+                            
+                            # Add transcript (required)
+                            transcript_file_tab4.seek(0)
+                            files.append(('transcript', (transcript_file_tab4.name, transcript_file_tab4.getvalue(), 'text/plain')))
+                            
+                            # Add request type indicator
+                            files.append(('request_type', ('request_type.txt', b'tags', 'text/plain')))
+                            
+                            # Send to webhook
+                            webhook_url = "https://hook.us2.make.com/mz87lk80py2p2dr5dtn924mdjuox2bg7"
+                            response = requests.post(webhook_url, files=files, timeout=30)
+                            
+                            if response.status_code == 200:
+                                st.success("✅ Tags generation request sent successfully!")
+                                st.info("📬 Tags will be available shortly. Check your Make.com scenario output.")
+                            else:
+                                st.error(f"❌ Failed to send request: {response.status_code}")
+                                st.error(f"Response: {response.text}")
+                        
+                        except requests.exceptions.Timeout:
+                            st.error("❌ Request timed out. Please try again.")
+                        except Exception as e:
+                            st.error(f"❌ Error: {str(e)}")
         
         # Master tags/hashtags
         video_master_tags = st.text_input(
