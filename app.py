@@ -9,6 +9,25 @@ import json
 from datetime import datetime, timedelta
 import pytz
 import hashlib
+
+# ============================================================================
+# CONFIGURATION - INPUT YOUR API KEY AND ACCOUNT IDs HERE
+# ============================================================================
+# TODO: Replace these dummy values with your actual credentials
+FIXED_API_KEY = "123456"  # Replace with your actual GetLate API key
+
+# Tab 3 (Multi-Platform Post Creator) Account IDs
+INSTAGRAM_ACCOUNT_ID = "123456"  # Replace with your Instagram account ID
+LINKEDIN_ACCOUNT_ID = "123456"   # Replace with your LinkedIn account ID
+FACEBOOK_ACCOUNT_ID = "123456"   # Replace with your Facebook account ID
+TWITTER_ACCOUNT_ID = "123456"    # Replace with your Twitter account ID
+
+# Tab 4 (Short Form Video Creator) Account IDs
+YOUTUBE_ACCOUNT_ID = "123456"           # Replace with your YouTube account ID
+INSTAGRAM_VIDEO_ACCOUNT_ID = "123456"  # Replace with your Instagram account ID for videos
+TIKTOK_ACCOUNT_ID = "123456"           # Replace with your TikTok account ID
+FACEBOOK_VIDEO_ACCOUNT_ID = "123456"   # Replace with your Facebook account ID for videos
+
 # ============================================================================
 # PASSWORD PROTECTION - ENHANCED VERSION
 # ============================================================================
@@ -742,12 +761,12 @@ st.set_page_config(
     page_title="Content Posting Automations", 
     page_icon="🚀", 
     layout="wide",
-    initial_sidebar_state="expanded"  # Force sidebar to be open by default
+    initial_sidebar_state="expanded"
 )
 
 # Check password first
 if not check_password():
-    st.stop()  # Stop execution if password is incorrect
+    st.stop()
 
 # Custom CSS for modern, beautiful styling
 st.markdown("""
@@ -820,7 +839,7 @@ st.markdown("""
         border-color: white !important;
     }
     
-    /* Main Container - Fixed layout with sidebar always visible */
+    /* Main Container */
     .main {
         background: #f5f7fa;
         padding: 0 !important;
@@ -884,7 +903,7 @@ st.markdown("""
         font-weight: 700 !important;
     }
     
-    /* Force tab text colors - CRITICAL FIX */
+    /* Force tab text colors */
     .stTabs [data-baseweb="tab"] span,
     .stTabs [data-baseweb="tab"] p,
     .stTabs [data-baseweb="tab"] div {
@@ -903,7 +922,6 @@ st.markdown("""
         color: inherit !important;
     }
     
-    /* Additional override for any nested elements */
     .stTabs [aria-selected="true"] * {
         color: #ffffff !important;
     }
@@ -916,7 +934,7 @@ st.markdown("""
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
     
-    /* Sidebar Styling - FIXED, NO TOGGLE */
+    /* Sidebar Styling */
     section[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
         border-right: none;
@@ -928,117 +946,6 @@ st.markdown("""
     
     section[data-testid="stSidebar"] > div {
         background: transparent;
-    }
-    
-    /* HIDE all toggle buttons - sidebar cannot be collapsed */
-    section[data-testid="stSidebar"] button[kind="header"],
-    [data-testid="collapsedControl"] {
-        display: none !important;
-    }
-    
-    /* Prevent sidebar from collapsing */
-    section[data-testid="stSidebar"][aria-expanded="false"] {
-        min-width: 21rem !important;
-        max-width: 21rem !important;
-        margin-left: 0 !important;
-    }
-    
-    /* Style the sidebar collapse/expand button - Make it VISIBLE and working */
-    section[data-testid="stSidebar"] button[kind="header"] {
-        background: rgba(255,255,255,0.2) !important;
-        color: white !important;
-        border: 2px solid rgba(255,255,255,0.5) !important;
-        border-radius: 8px !important;
-        padding: 8px 12px !important;
-        font-weight: 600 !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
-        transition: all 0.3s ease !important;
-        position: relative !important;
-    }
-    
-    section[data-testid="stSidebar"] button[kind="header"]:hover {
-        background: rgba(255,255,255,0.3) !important;
-        border-color: white !important;
-        transform: scale(1.05);
-    }
-    
-    /* Add tooltip text to sidebar button */
-    section[data-testid="stSidebar"] button[kind="header"]::after {
-        content: "Hide Sidebar";
-        position: absolute;
-        left: 100%;
-        top: 50%;
-        transform: translateY(-50%);
-        margin-left: 10px;
-        background: #2d3748;
-        color: white;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        white-space: nowrap;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        z-index: 999;
-    }
-    
-    section[data-testid="stSidebar"] button[kind="header"]:hover::after {
-        opacity: 1;
-    }
-    
-    /* Sidebar collapse/expand button when sidebar is CLOSED */
-    [data-testid="collapsedControl"] {
-        background: white !important;
-        color: #667eea !important;
-        border: 3px solid #667eea !important;
-        border-radius: 0 8px 8px 0 !important;
-        box-shadow: 2px 2px 12px rgba(0,0,0,0.2) !important;
-        width: 40px !important;
-        height: 60px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        transition: all 0.3s ease !important;
-        position: relative !important;
-    }
-    
-    [data-testid="collapsedControl"]:hover {
-        background: #667eea !important;
-        color: white !important;
-        border-color: #764ba2 !important;
-        box-shadow: 2px 2px 16px rgba(102, 126, 234, 0.4) !important;
-        transform: scale(1.05);
-    }
-    
-    [data-testid="collapsedControl"] svg {
-        width: 24px !important;
-        height: 24px !important;
-    }
-    
-    /* Add tooltip text to collapsed control */
-    [data-testid="collapsedControl"]::after {
-        content: "Open Sidebar";
-        position: absolute;
-        left: 100%;
-        top: 50%;
-        transform: translateY(-50%);
-        margin-left: 10px;
-        background: #2d3748;
-        color: white;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        white-space: nowrap;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        z-index: 999;
-    }
-    
-    [data-testid="collapsedControl"]:hover::after {
-        opacity: 1;
     }
     
     section[data-testid="stSidebar"] .stMarkdown {
@@ -1127,7 +1034,6 @@ st.markdown("""
         border: 2px solid #667eea;
     }
     
-    /* Force button text to be visible */
     .stButton > button span,
     .stButton > button p,
     .stButton > button div {
@@ -1256,41 +1162,11 @@ st.markdown("""
 st.markdown('<h1 class="main-header">🚀 Content Posting Automations</h1>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">Streamline your content creation and multi-platform posting workflow</p>', unsafe_allow_html=True)
 
-# Hidden component to load data from localStorage
-load_storage_js = """
-<script>
-    const apiKey = localStorage.getItem('api_key') || '';
-    const igId = localStorage.getItem('ig_account_id') || '';
-    const liId = localStorage.getItem('li_account_id') || '';
-    const fbId = localStorage.getItem('fb_account_id') || '';
-    const twId = localStorage.getItem('tw_account_id') || '';
-    
-    // Store in hidden inputs to pass to Streamlit
-    if (apiKey) document.cookie = `api_key=${apiKey}; path=/`;
-    if (igId) document.cookie = `ig_account_id=${igId}; path=/`;
-    if (liId) document.cookie = `li_account_id=${liId}; path=/`;
-    if (fbId) document.cookie = `fb_account_id=${fbId}; path=/`;
-    if (twId) document.cookie = `tw_account_id=${twId}; path=/`;
-</script>
-"""
-st.components.v1.html(load_storage_js, height=0)
-
 # Initialize session state
-if 'api_key' not in st.session_state:
-    st.session_state.api_key = ""
 if 'master_content' not in st.session_state:
     st.session_state.master_content = ""
 if 'master_schedule' not in st.session_state:
     st.session_state.master_schedule = None
-# Save account IDs (will be loaded from localStorage)
-if 'ig_account_id' not in st.session_state:
-    st.session_state.ig_account_id = ""
-if 'li_account_id' not in st.session_state:
-    st.session_state.li_account_id = ""
-if 'fb_account_id' not in st.session_state:
-    st.session_state.fb_account_id = ""
-if 'tw_account_id' not in st.session_state:
-    st.session_state.tw_account_id = ""
 # Tab 1 Instagram posting
 if 'generated_ig_posts' not in st.session_state:
     st.session_state.generated_ig_posts = None
@@ -1299,34 +1175,21 @@ if 'show_ig_posting' not in st.session_state:
 if 'post_texts_for_ig' not in st.session_state:
     st.session_state.post_texts_for_ig = []
 
-# Load from localStorage on first load
-if 'loaded_from_storage' not in st.session_state:
-    st.session_state.loaded_from_storage = True
-
-# API Key in sidebar
+# API Key display in sidebar (read-only)
 with st.sidebar:
     st.markdown("### ⚙️ Settings")
     st.markdown("---")
     
-    api_key = st.text_input(
-        "🔑 GetLate API Key", 
-        type="password", 
-        value=st.session_state.api_key,
-        help="Enter your GetLate API key for posting",
-        placeholder="Enter your API key...",
-        key="api_key_input"
+    # Display API key as read-only
+    st.markdown("**🔑 GetLate API Key**")
+    st.text_input(
+        "API Key", 
+        value=FIXED_API_KEY,
+        disabled=True,
+        label_visibility="collapsed",
+        key="display_api_key"
     )
-    
-    # Save to both session state and localStorage
-    if api_key != st.session_state.api_key:
-        st.session_state.api_key = api_key
-        if api_key:
-            save_to_localstorage('api_key', api_key)
-    
-    if api_key:
-        st.success("✅ Connected & Saved Permanently")
-    else:
-        st.warning("⚠️ API key required")
+    st.success("✅ API Key Configured")
     
     st.markdown("---")
     st.markdown("### 📚 Resources")
@@ -1336,41 +1199,7 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("### 📊 Quick Stats")
-    if st.session_state.api_key:
-        st.info("🟢 API Connected")
-    else:
-        st.error("🔴 No API Key")
-    
-    # Show saved account IDs
-    saved_accounts = []
-    if st.session_state.ig_account_id:
-        saved_accounts.append("📷 Instagram")
-    if st.session_state.li_account_id:
-        saved_accounts.append("💼 LinkedIn")
-    if st.session_state.fb_account_id:
-        saved_accounts.append("👥 Facebook")
-    if st.session_state.tw_account_id:
-        saved_accounts.append("🐦 Twitter")
-    
-    if saved_accounts:
-        st.success(f"💾 {len(saved_accounts)} accounts saved")
-        with st.expander("View Saved Accounts"):
-            for account in saved_accounts:
-                st.write(account)
-            
-            st.markdown("---")
-            st.warning("⚠️ Clearing will remove API key and all account IDs")
-            if st.button("🗑️ Clear All Saved Data", use_container_width=True):
-                st.session_state.api_key = ""
-                st.session_state.ig_account_id = ""
-                st.session_state.li_account_id = ""
-                st.session_state.fb_account_id = ""
-                st.session_state.tw_account_id = ""
-                clear_localstorage()
-                st.success("✅ All data cleared!")
-                st.rerun()
-    else:
-        st.info("No accounts saved yet")
+    st.info("🟢 API Connected")
     
     st.markdown("---")
     st.markdown("<small>Made with ❤️ for content creators</small>", unsafe_allow_html=True)
@@ -1715,11 +1544,9 @@ with tab2:
             <p style='color: #666; margin: 1rem 0 0 0; font-size: 1.1rem;'>This feature is currently under development</p>
         </div>
     """, unsafe_allow_html=True)
+
 # ============================================================================
 # TAB 3: CREATE CAROUSEL/FEED POST
-# ============================================================================
-# ============================================================================
-# TAB 3: CREATE CAROUSEL/FEED POST - COMPLETE CODE WITH FIXES
 # ============================================================================
 
 with tab3:
@@ -1731,15 +1558,55 @@ with tab3:
         </div>
     """, unsafe_allow_html=True)
     
-    # Check API key
-    if not st.session_state.api_key:
-        st.markdown("""
-            <div style='background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); 
-                        padding: 2rem; border-radius: 16px; text-align: center; margin: 2rem 0;'>
-                <h3 style='margin: 0; color: #856404;'>⚠️ API Key Required</h3>
-                <p style='color: #856404; margin: 0.5rem 0 0 0;'>Please enter your GetLate API Key in the sidebar to use this feature</p>
-            </div>
-        """, unsafe_allow_html=True)
+    # Display configured account IDs in a nice info box
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                    padding: 1.5rem; border-radius: 16px; margin: 1.5rem 0;'>
+            <h3 style='margin-top: 0;'>📋 Configured Account IDs</h3>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.markdown("**📷 Instagram**")
+        st.text_input("IG ID", value=INSTAGRAM_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab3_ig_display")
+    with col2:
+        st.markdown("**💼 LinkedIn**")
+        st.text_input("LI ID", value=LINKEDIN_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab3_li_display")
+    with col3:
+        st.markdown("**👥 Facebook**")
+        st.text_input("FB ID", value=FACEBOOK_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab3_fb_display")
+    with col4:
+        st.markdown("**🐦 Twitter**")
+        st.text_input("TW ID", value=TWITTER_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab3_tw_display")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Transcript upload section
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                    padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
+            <h3 style='margin-top: 0;'>📄 Upload Transcript (Optional)</h3>
+            <p style='color: #666; margin: 0.5rem 0 0 0;'>Upload a transcript file to help generate captions</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    transcript_file_tab3 = st.file_uploader(
+        "📁 Drop your transcript file here",
+        accept_multiple_files=False,
+        type=['txt'],
+        key="transcript_tab3",
+        help="Upload a .txt transcript file"
+    )
+    
+    if transcript_file_tab3:
+        st.success(f"✅ Transcript uploaded: {transcript_file_tab3.name}")
+        # Read and display preview
+        transcript_content = transcript_file_tab3.read().decode('utf-8')
+        with st.expander("👁️ Preview Transcript"):
+            st.text_area("Transcript Content", value=transcript_content[:500] + "..." if len(transcript_content) > 500 else transcript_content, height=150, disabled=True, label_visibility="collapsed")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
     
     # Image upload section with modern card
     st.markdown("""
@@ -1747,7 +1614,8 @@ with tab3:
                     padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
             <h3 style='margin-top: 0;'>📤 Upload Your Media</h3>
         </div>
-    """, unsafe_allow_html=True)    
+    """, unsafe_allow_html=True)
+    
     carousel_images = st.file_uploader(
         "📁 Drop your images here or click to browse",
         accept_multiple_files=True,
@@ -1763,9 +1631,8 @@ with tab3:
         with col2:
             st.metric("📷 Total Images", len(carousel_images))
         
-        # FIXED: Compact image preview in collapsible grid
+        # Compact image preview in collapsible grid
         with st.expander(f"👁️ Preview Uploaded Images ({len(carousel_images)} images)", expanded=False):
-            # Show in grid of 4 columns
             num_cols = 4
             cols = st.columns(num_cols)
             for i, img_file in enumerate(carousel_images):
@@ -1797,11 +1664,14 @@ with tab3:
             key="master_content_input"
         )
         st.session_state.master_content = master_content
+        
+        # Generate Caption button
+        if st.button("✨ Generate Caption", key="generate_caption_tab3", help="Generate caption from transcript (Coming Soon)"):
+            st.info("🚧 Caption generation feature coming soon!")
     
     with col2:
         st.markdown("**📅 Master Schedule (PDT)**")
         
-        # FIXED: Use unique keys and store in session state properly
         default_date = datetime.now() + timedelta(hours=1)
         
         master_date = st.date_input(
@@ -1841,129 +1711,126 @@ with tab3:
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         if st.button("📋 Post to All Selected Platforms", use_container_width=True, type="primary", key="push_to_all_btn"):
-            if not st.session_state.api_key:
-                st.error("❌ Please enter your API key in the sidebar!")
+            # Build list of platforms to post to
+            platforms_to_post = []
+            
+            if enable_instagram:
+                # Upload images first
+                media_items = []
+                if carousel_images:
+                    with st.spinner("📤 Uploading images for Instagram..."):
+                        for img in carousel_images:
+                            url = upload_image_to_getlate(img, FIXED_API_KEY)
+                            if url:
+                                media_items.append({"url": url})
+                
+                platforms_to_post.append({
+                    "platform": "Instagram",
+                    "accountId": INSTAGRAM_ACCOUNT_ID,
+                    "content": st.session_state.master_content,
+                    "schedule": st.session_state.master_schedule,
+                    "mediaItems": media_items
+                })
+            
+            if enable_linkedin:
+                # Upload images first
+                media_items = []
+                if carousel_images:
+                    with st.spinner("📤 Uploading images for LinkedIn..."):
+                        for img in carousel_images:
+                            url = upload_image_to_getlate(img, FIXED_API_KEY)
+                            if url:
+                                media_items.append({"url": url})
+                
+                platforms_to_post.append({
+                    "platform": "LinkedIn",
+                    "accountId": LINKEDIN_ACCOUNT_ID,
+                    "content": st.session_state.master_content,
+                    "schedule": st.session_state.master_schedule,
+                    "mediaItems": media_items
+                })
+            
+            if enable_facebook:
+                # Upload images first
+                media_items = []
+                if carousel_images:
+                    with st.spinner("📤 Uploading images for Facebook..."):
+                        for img in carousel_images:
+                            url = upload_image_to_getlate(img, FIXED_API_KEY)
+                            if url:
+                                media_items.append({"url": url})
+                
+                platforms_to_post.append({
+                    "platform": "Facebook",
+                    "accountId": FACEBOOK_ACCOUNT_ID,
+                    "content": st.session_state.master_content,
+                    "schedule": st.session_state.master_schedule,
+                    "mediaItems": media_items
+                })
+            
+            if enable_twitter:
+                # Upload images first
+                media_items = []
+                if carousel_images:
+                    with st.spinner("📤 Uploading images for Twitter..."):
+                        for img in carousel_images:
+                            url = upload_image_to_getlate(img, FIXED_API_KEY)
+                            if url:
+                                media_items.append({"url": url})
+                
+                platforms_to_post.append({
+                    "platform": "Twitter",
+                    "accountId": TWITTER_ACCOUNT_ID,
+                    "content": st.session_state.master_content,
+                    "schedule": st.session_state.master_schedule,
+                    "mediaItems": media_items
+                })
+            
+            if not platforms_to_post:
+                st.error("❌ No platforms configured! Please enable platforms below.")
             else:
-                # Build list of platforms to post to
-                platforms_to_post = []
-                
-                if enable_instagram and st.session_state.get('ig_account_id'):
-                    # Upload images first
-                    media_items = []
-                    if carousel_images:
-                        with st.spinner("📤 Uploading images for Instagram..."):
-                            for img in carousel_images:
-                                url = upload_image_to_getlate(img, st.session_state.api_key)
-                                if url:
-                                    media_items.append({"url": url})
+                # Post to all platforms
+                with st.spinner(f"📤 Posting to {len(platforms_to_post)} platform(s)..."):
+                    success_count = 0
+                    error_count = 0
                     
-                    platforms_to_post.append({
-                        "platform": "Instagram",
-                        "accountId": st.session_state.ig_account_id,
-                        "content": st.session_state.master_content,
-                        "schedule": st.session_state.master_schedule,
-                        "mediaItems": media_items
-                    })
-                
-                if enable_linkedin and st.session_state.get('li_account_id'):
-                    # Upload images first
-                    media_items = []
-                    if carousel_images:
-                        with st.spinner("📤 Uploading images for LinkedIn..."):
-                            for img in carousel_images:
-                                url = upload_image_to_getlate(img, st.session_state.api_key)
-                                if url:
-                                    media_items.append({"url": url})
+                    progress_bar = st.progress(0)
+                    status_text = st.empty()
                     
-                    platforms_to_post.append({
-                        "platform": "LinkedIn",
-                        "accountId": st.session_state.li_account_id,
-                        "content": st.session_state.master_content,
-                        "schedule": st.session_state.master_schedule,
-                        "mediaItems": media_items
-                    })
-                
-                if enable_facebook and st.session_state.get('fb_account_id'):
-                    # Upload images first
-                    media_items = []
-                    if carousel_images:
-                        with st.spinner("📤 Uploading images for Facebook..."):
-                            for img in carousel_images:
-                                url = upload_image_to_getlate(img, st.session_state.api_key)
-                                if url:
-                                    media_items.append({"url": url})
-                    
-                    platforms_to_post.append({
-                        "platform": "Facebook",
-                        "accountId": st.session_state.fb_account_id,
-                        "content": st.session_state.master_content,
-                        "schedule": st.session_state.master_schedule,
-                        "mediaItems": media_items
-                    })
-                
-                if enable_twitter and st.session_state.get('tw_account_id'):
-                    # Upload images first
-                    media_items = []
-                    if carousel_images:
-                        with st.spinner("📤 Uploading images for Twitter..."):
-                            for img in carousel_images:
-                                url = upload_image_to_getlate(img, st.session_state.api_key)
-                                if url:
-                                    media_items.append({"url": url})
-                    
-                    platforms_to_post.append({
-                        "platform": "Twitter",
-                        "accountId": st.session_state.tw_account_id,
-                        "content": st.session_state.master_content,
-                        "schedule": st.session_state.master_schedule,
-                        "mediaItems": media_items
-                    })
-                
-                if not platforms_to_post:
-                    st.error("❌ No platforms configured! Please enable platforms and enter Account IDs.")
-                else:
-                    # Post to all platforms
-                    with st.spinner(f"📤 Posting to {len(platforms_to_post)} platform(s)..."):
-                        success_count = 0
-                        error_count = 0
+                    for idx, platform_data in enumerate(platforms_to_post):
+                        status_text.text(f"Posting to {platform_data['platform']}...")
                         
-                        progress_bar = st.progress(0)
-                        status_text = st.empty()
+                        payload = build_post_payload(
+                            content=platform_data['content'],
+                            scheduled_time=platform_data['schedule'],
+                            timezone="America/Los_Angeles",
+                            platforms_config=[{
+                                "accountId": platform_data['accountId'],
+                                "mediaItems": platform_data['mediaItems']
+                            }]
+                        )
                         
-                        for idx, platform_data in enumerate(platforms_to_post):
-                            status_text.text(f"Posting to {platform_data['platform']}...")
-                            
-                            payload = build_post_payload(
-                                content=platform_data['content'],
-                                scheduled_time=platform_data['schedule'],
-                                timezone="America/Los_Angeles",
-                                platforms_config=[{
-                                    "accountId": platform_data['accountId'],
-                                    "mediaItems": platform_data['mediaItems']
-                                }]
-                            )
-                            
-                            response = send_post_to_api(st.session_state.api_key, payload)
-                            
-                            if response and response.status_code in [200, 201]:
-                                success_count += 1
-                            else:
-                                error_count += 1
-                                error_msg = response.json() if response else "Connection error"
-                                st.error(f"❌ {platform_data['platform']}: Failed - {error_msg}")
-                            
-                            progress_bar.progress((idx + 1) / len(platforms_to_post))
+                        response = send_post_to_api(FIXED_API_KEY, payload)
                         
-                        status_text.empty()
-                        progress_bar.empty()
-                        
-                        st.markdown("<br>", unsafe_allow_html=True)
-                        
-                        if error_count == 0:
-                            st.balloons()
-                            st.success(f"🎉 Successfully posted to all {success_count} platform(s)!")
+                        if response and response.status_code in [200, 201]:
+                            success_count += 1
                         else:
-                            st.warning(f"⚠️ Posted to {success_count} platform(s), {error_count} failed")
+                            error_count += 1
+                            error_msg = response.json() if response else "Connection error"
+                            st.error(f"❌ {platform_data['platform']}: Failed - {error_msg}")
+                        
+                        progress_bar.progress((idx + 1) / len(platforms_to_post))
+                    
+                    status_text.empty()
+                    progress_bar.empty()
+                    
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    
+                    if error_count == 0:
+                        st.balloons()
+                        st.success(f"🎉 Successfully posted to all {success_count} platform(s)!")
+                    else:
+                        st.warning(f"⚠️ Posted to {success_count} platform(s), {error_count} failed")
     
     st.markdown("<br>", unsafe_allow_html=True)
     
@@ -1989,492 +1856,7 @@ with tab3:
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Platform-specific configurations
-    platforms_config = []
-    
-    # Instagram Configuration - FIXED
-    if enable_instagram:
-        st.markdown("""
-            <div style='background: linear-gradient(135deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); 
-                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
-                <div style='background: white; padding: 2rem; border-radius: 15px;'>
-                    <h3 style='margin-top: 0; color: #bc1888;'>📷 Instagram Configuration</h3>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        with st.container():
-            col1, col2 = st.columns([2, 1])
-            
-            with col1:
-                # FIXED: Use session state directly through key parameter
-                ig_account_id = st.text_input(
-                    "🆔 Instagram Account ID",
-                    key="ig_account_id",
-                    placeholder="Enter your Instagram account ID"
-                )
-                
-                if ig_account_id:
-                    st.caption("✅ Account ID saved")
-                
-                # Initialize content value in session state
-                if 'ig_content_value' not in st.session_state:
-                    st.session_state.ig_content_value = ""
-                if 'ig_refresh_counter' not in st.session_state:
-                    st.session_state.ig_refresh_counter = 0
-                
-                ig_content = st.text_area(
-                    "💬 Caption",
-                    value=st.session_state.ig_content_value,
-                    height=100,
-                    key=f"ig_content_area_{st.session_state.ig_refresh_counter}",
-                    placeholder="Your Instagram caption with hashtags..."
-                )
-                if ig_content != st.session_state.ig_content_value:
-                    st.session_state.ig_content_value = ig_content
-            
-            with col2:
-                use_master_ig = st.button("📋 Use Master", key="ig_use_master_btn", use_container_width=True)
-                
-                if use_master_ig:
-                    st.session_state.ig_content_value = st.session_state.master_content
-                    if 'ig_refresh_counter' not in st.session_state:
-                        st.session_state.ig_refresh_counter = 0
-                    st.session_state.ig_refresh_counter += 1
-                    st.rerun()
-                
-                st.markdown("**📅 Schedule**")
-                use_master_schedule = st.checkbox("Use master schedule", value=True, key="ig_master_sched")
-                
-                if not use_master_schedule:
-                    ig_date = st.date_input("Date", value=default_date, key="ig_schedule_date")
-                    ig_time = st.time_input("Time (PDT)", value=default_date.time(), key="ig_schedule_time")
-                    ig_datetime = datetime.combine(ig_date, ig_time)
-                    ig_datetime_pdt = pdt.localize(ig_datetime)
-                    ig_schedule = ig_datetime_pdt.isoformat()
-                else:
-                    ig_schedule = st.session_state.master_schedule
-            
-            if ig_account_id:
-                media_items = []
-                if carousel_images:
-                    with st.spinner("📤 Uploading images to GetLate..."):
-                        for img in carousel_images:
-                            url = upload_image_to_getlate(img, st.session_state.api_key)
-                            if url:
-                                media_items.append({"url": url})
-                
-                platforms_config.append({
-                    "platform": "Instagram",
-                    "accountId": ig_account_id,
-                    "content": st.session_state.ig_content_value,
-                    "schedule": ig_schedule,
-                    "mediaItems": media_items
-                })
-    
-    # LinkedIn Configuration - FIXED
-    if enable_linkedin:
-        st.markdown("""
-            <div style='background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%); 
-                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
-                <div style='background: white; padding: 2rem; border-radius: 15px;'>
-                    <h3 style='margin-top: 0; color: #0077b5;'>💼 LinkedIn Configuration</h3>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        with st.container():
-            col1, col2 = st.columns([2, 1])
-            
-            with col1:
-                # FIXED: Use session state directly through key parameter
-                li_account_id = st.text_input(
-                    "🆔 LinkedIn Account ID",
-                    key="li_account_id",
-                    placeholder="Enter your LinkedIn account ID"
-                )
-                
-                if li_account_id:
-                    st.caption("✅ Account ID saved")
-                
-                # Initialize content value in session state
-                if 'li_content_value' not in st.session_state:
-                    st.session_state.li_content_value = ""
-                if 'li_refresh_counter' not in st.session_state:
-                    st.session_state.li_refresh_counter = 0
-                
-                li_content = st.text_area(
-                    "💬 Post Content",
-                    value=st.session_state.li_content_value,
-                    height=100,
-                    key=f"li_content_area_{st.session_state.li_refresh_counter}",
-                    placeholder="Your professional LinkedIn post..."
-                )
-                if li_content != st.session_state.li_content_value:
-                    st.session_state.li_content_value = li_content
-            
-            with col2:
-                use_master_li = st.button("📋 Use Master", key="li_use_master_btn", use_container_width=True)
-                
-                if use_master_li:
-                    st.session_state.li_content_value = st.session_state.master_content
-                    if 'li_refresh_counter' not in st.session_state:
-                        st.session_state.li_refresh_counter = 0
-                    st.session_state.li_refresh_counter += 1
-                    st.rerun()
-                
-                st.markdown("**📅 Schedule**")
-                use_master_schedule_li = st.checkbox("Use master schedule", value=True, key="li_master_sched")
-                
-                if not use_master_schedule_li:
-                    li_date = st.date_input("Date", value=default_date, key="li_schedule_date")
-                    li_time = st.time_input("Time (PDT)", value=default_date.time(), key="li_schedule_time")
-                    li_datetime = datetime.combine(li_date, li_time)
-                    li_datetime_pdt = pdt.localize(li_datetime)
-                    li_schedule = li_datetime_pdt.isoformat()
-                else:
-                    li_schedule = st.session_state.master_schedule
-            
-            if li_account_id:
-                media_items = []
-                if carousel_images:
-                    with st.spinner("📤 Uploading images to GetLate..."):
-                        for img in carousel_images:
-                            url = upload_image_to_getlate(img, st.session_state.api_key)
-                            if url:
-                                media_items.append({"url": url})
-                
-                platforms_config.append({
-                    "platform": "LinkedIn",
-                    "accountId": li_account_id,
-                    "content": st.session_state.li_content_value,
-                    "schedule": li_schedule,
-                    "mediaItems": media_items
-                })
-    
-    # Facebook Configuration - FIXED
-    if enable_facebook:
-        st.markdown("""
-            <div style='background: linear-gradient(135deg, #1877f2 0%, #0c63d4 100%); 
-                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
-                <div style='background: white; padding: 2rem; border-radius: 15px;'>
-                    <h3 style='margin-top: 0; color: #1877f2;'>👥 Facebook Configuration</h3>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        with st.container():
-            col1, col2 = st.columns([2, 1])
-            
-            with col1:
-                # FIXED: Use session state directly through key parameter
-                fb_account_id = st.text_input(
-                    "🆔 Facebook Account ID",
-                    key="fb_account_id",
-                    placeholder="Enter your Facebook account ID"
-                )
-                
-                if fb_account_id:
-                    st.caption("✅ Account ID saved")
-                
-                # Initialize content value in session state
-                if 'fb_content_value' not in st.session_state:
-                    st.session_state.fb_content_value = ""
-                if 'fb_refresh_counter' not in st.session_state:
-                    st.session_state.fb_refresh_counter = 0
-                
-                fb_content = st.text_area(
-                    "💬 Post Content",
-                    value=st.session_state.fb_content_value,
-                    height=100,
-                    key=f"fb_content_area_{st.session_state.fb_refresh_counter}",
-                    placeholder="Your Facebook post..."
-                )
-                if fb_content != st.session_state.fb_content_value:
-                    st.session_state.fb_content_value = fb_content
-            
-            with col2:
-                use_master_fb = st.button("📋 Use Master", key="fb_use_master_btn", use_container_width=True)
-                
-                if use_master_fb:
-                    st.session_state.fb_content_value = st.session_state.master_content
-                    if 'fb_refresh_counter' not in st.session_state:
-                        st.session_state.fb_refresh_counter = 0
-                    st.session_state.fb_refresh_counter += 1
-                    st.rerun()
-                
-                st.markdown("**📅 Schedule**")
-                use_master_schedule_fb = st.checkbox("Use master schedule", value=True, key="fb_master_sched")
-                
-                if not use_master_schedule_fb:
-                    fb_date = st.date_input("Date", value=default_date, key="fb_schedule_date")
-                    fb_time = st.time_input("Time (PDT)", value=default_date.time(), key="fb_schedule_time")
-                    fb_datetime = datetime.combine(fb_date, fb_time)
-                    fb_datetime_pdt = pdt.localize(fb_datetime)
-                    fb_schedule = fb_datetime_pdt.isoformat()
-                else:
-                    fb_schedule = st.session_state.master_schedule
-            
-            if fb_account_id:
-                media_items = []
-                if carousel_images:
-                    with st.spinner("📤 Uploading images to GetLate..."):
-                        for img in carousel_images:
-                            url = upload_image_to_getlate(img, st.session_state.api_key)
-                            if url:
-                                media_items.append({"url": url})
-                
-                platforms_config.append({
-                    "platform": "Facebook",
-                    "accountId": fb_account_id,
-                    "content": st.session_state.fb_content_value,
-                    "schedule": fb_schedule,
-                    "mediaItems": media_items
-                })
-    
-    # Twitter Configuration - FIXED
-    if enable_twitter:
-        st.markdown("""
-            <div style='background: linear-gradient(135deg, #1DA1F2 0%, #0c85d0 100%); 
-                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
-                <div style='background: white; padding: 2rem; border-radius: 15px;'>
-                    <h3 style='margin-top: 0; color: #1DA1F2;'>🐦 Twitter Configuration</h3>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        with st.container():
-            col1, col2 = st.columns([2, 1])
-            
-            with col1:
-                # FIXED: Use session state directly through key parameter
-                tw_account_id = st.text_input(
-                    "🆔 Twitter Account ID",
-                    key="tw_account_id",
-                    placeholder="Enter your Twitter account ID"
-                )
-                
-                if tw_account_id:
-                    st.caption("✅ Account ID saved")
-                
-                # Initialize content value in session state
-                if 'tw_content_value' not in st.session_state:
-                    st.session_state.tw_content_value = ""
-                if 'tw_refresh_counter' not in st.session_state:
-                    st.session_state.tw_refresh_counter = 0
-                
-                tw_content = st.text_area(
-                    "💬 Tweet Content",
-                    value=st.session_state.tw_content_value,
-                    height=100,
-                    key=f"tw_content_area_{st.session_state.tw_refresh_counter}",
-                    placeholder="Your tweet (max 280 characters)...",
-                    max_chars=280
-                )
-                if tw_content != st.session_state.tw_content_value:
-                    st.session_state.tw_content_value = tw_content
-                
-                char_count = len(tw_content)
-                if char_count > 280:
-                    st.error(f"⚠️ Tweet is {char_count - 280} characters over the limit!")
-                elif char_count > 250:
-                    st.warning(f"⚡ {280 - char_count} characters remaining")
-                else:
-                    st.info(f"✍️ {char_count}/280 characters used")
-            
-            with col2:
-                use_master_tw = st.button("📋 Use Master", key="tw_use_master_btn", use_container_width=True)
-                
-                if use_master_tw:
-                    st.session_state.tw_content_value = st.session_state.master_content
-                    if 'tw_refresh_counter' not in st.session_state:
-                        st.session_state.tw_refresh_counter = 0
-                    st.session_state.tw_refresh_counter += 1
-                    st.rerun()
-                
-                st.markdown("**📅 Schedule**")
-                use_master_schedule_tw = st.checkbox("Use master schedule", value=True, key="tw_master_sched")
-                
-                if not use_master_schedule_tw:
-                    tw_date = st.date_input("Date", value=default_date, key="tw_schedule_date")
-                    tw_time = st.time_input("Time (PDT)", value=default_date.time(), key="tw_schedule_time")
-                    tw_datetime = datetime.combine(tw_date, tw_time)
-                    tw_datetime_pdt = pdt.localize(tw_datetime)
-                    tw_schedule = tw_datetime_pdt.isoformat()
-                else:
-                    tw_schedule = st.session_state.master_schedule
-            
-            if tw_account_id:
-                media_items = []
-                if carousel_images:
-                    with st.spinner("📤 Uploading images to GetLate..."):
-                        for img in carousel_images:
-                            url = upload_image_to_getlate(img, st.session_state.api_key)
-                            if url:
-                                media_items.append({"url": url})
-                
-                platforms_config.append({
-                    "platform": "Twitter",
-                    "accountId": tw_account_id,
-                    "content": st.session_state.tw_content_value,
-                    "schedule": tw_schedule,
-                    "mediaItems": media_items
-                })
-    
-    # Preview and Submit Section
-    if platforms_config:
-        st.markdown("<br><br>", unsafe_allow_html=True)
-        
-        st.markdown("""
-            <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); 
-                        padding: 2rem; border-radius: 16px; margin: 2rem 0;'>
-                <h3 style='margin-top: 0;'>👀 Preview Your Posts</h3>
-                <p style='color: #666; margin: 0;'>Review your content before scheduling</p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # Show preview for each platform
-        for platform_data in platforms_config:
-            platform_colors = {
-                "Instagram": "linear-gradient(135deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%)",
-                "LinkedIn": "linear-gradient(135deg, #0077b5 0%, #00a0dc 100%)",
-                "Facebook": "linear-gradient(135deg, #1877f2 0%, #0c63d4 100%)",
-                "Twitter": "linear-gradient(135deg, #1DA1F2 0%, #0c85d0 100%)"
-            }
-            
-            platform_icons = {
-                "Instagram": "📷",
-                "LinkedIn": "💼",
-                "Facebook": "👥",
-                "Twitter": "🐦"
-            }
-            
-            st.markdown(f"""
-                <div style='background: {platform_colors.get(platform_data["platform"], "#667eea")}; 
-                            padding: 0.1rem; border-radius: 12px; margin: 1rem 0;'>
-                    <div style='background: white; padding: 1.5rem; border-radius: 11px;'>
-                        <h4 style='margin: 0; color: #333;'>{platform_icons.get(platform_data["platform"], "📱")} {platform_data["platform"]}</h4>
-                    </div>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            col1, col2 = st.columns([2, 1])
-            
-            with col1:
-                st.markdown("**📝 Content:**")
-                if platform_data['content']:
-                    st.info(platform_data['content'])
-                else:
-                    st.warning("_No content provided_")
-                
-                if platform_data['mediaItems']:
-                    st.success(f"📷 {len(platform_data['mediaItems'])} image(s) attached")
-            
-            with col2:
-                st.markdown("**🆔 Account ID:**")
-                st.code(platform_data['accountId'], language=None)
-                
-                st.markdown("**📅 Scheduled for:**")
-                schedule_time = datetime.fromisoformat(platform_data['schedule'])
-                st.write(schedule_time.strftime("%B %d, %Y"))
-                st.write(schedule_time.strftime("%I:%M %p PDT"))
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        # Final API payload preview
-        with st.expander("🔍 View Technical Details (API Payload)", expanded=False):
-            for platform_data in platforms_config:
-                payload = build_post_payload(
-                    content=platform_data['content'],
-                    scheduled_time=platform_data['schedule'],
-                    timezone="America/Los_Angeles",
-                    platforms_config=[{
-                        "accountId": platform_data['accountId'],
-                        "mediaItems": platform_data['mediaItems']
-                    }]
-                )
-                
-                st.markdown(f"**{platform_data['platform']} API Payload:**")
-                st.json(payload)
-                st.markdown("---")
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        # Submit button with modern styling
-        st.markdown("""
-            <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
-                        padding: 2rem; border-radius: 16px; text-align: center;'>
-                <h3 style='margin-top: 0;'>🚀 Ready to Launch?</h3>
-                <p style='color: #666; margin: 0;'>Schedule your posts across all selected platforms</p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            if st.button("🚀 Schedule Posts to All Platforms", type="primary", use_container_width=True):
-                if not st.session_state.api_key:
-                    st.error("❌ Please enter your API key in the sidebar!")
-                else:
-                    with st.spinner("📤 Scheduling your posts across platforms..."):
-                        success_count = 0
-                        error_count = 0
-                        
-                        progress_bar = st.progress(0)
-                        status_text = st.empty()
-                        
-                        for idx, platform_data in enumerate(platforms_config):
-                            status_text.text(f"Posting to {platform_data['platform']}...")
-                            
-                            payload = build_post_payload(
-                                content=platform_data['content'],
-                                scheduled_time=platform_data['schedule'],
-                                timezone="America/Los_Angeles",
-                                platforms_config=[{
-                                    "accountId": platform_data['accountId'],
-                                    "mediaItems": platform_data['mediaItems']
-                                }]
-                            )
-                            
-                            response = send_post_to_api(st.session_state.api_key, payload)
-                            
-                            if response and response.status_code in [200, 201]:
-                                success_count += 1
-                                st.success(f"✅ {platform_data['platform']}: Post scheduled successfully!")
-                            else:
-                                error_count += 1
-                                error_msg = response.json() if response else "Connection error"
-                                st.error(f"❌ {platform_data['platform']}: Failed to schedule post")
-                                with st.expander("View Error Details"):
-                                    st.error(f"Error: {error_msg}")
-                            
-                            progress_bar.progress((idx + 1) / len(platforms_config))
-                        
-                        status_text.empty()
-                        progress_bar.empty()
-                        
-                        st.markdown("<br>", unsafe_allow_html=True)
-                        
-                        if error_count == 0:
-                            st.balloons()
-                            st.markdown("""
-                                <div style='background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); 
-                                            padding: 2rem; border-radius: 16px; text-align: center;'>
-                                    <h2 style='margin: 0; color: #155724;'>🎉 Success!</h2>
-                                    <p style='color: #155724; margin: 0.5rem 0 0 0;'>All {success_count} posts scheduled successfully!</p>
-                                </div>
-                            """, unsafe_allow_html=True)
-                        else:
-                            st.markdown(f"""
-                                <div style='background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); 
-                                            padding: 2rem; border-radius: 16px; text-align: center;'>
-                                    <h3 style='margin: 0; color: #856404;'>⚠️ Partial Success</h3>
-                                    <p style='color: #856404; margin: 0.5rem 0 0 0;'>{success_count} successful, {error_count} failed</p>
-                                </div>
-                            """, unsafe_allow_html=True)
-    
-    else:
+    if not (enable_instagram or enable_linkedin or enable_facebook or enable_twitter):
         st.markdown("""
             <div style='background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); 
                         padding: 3rem; border-radius: 16px; text-align: center; margin: 3rem 0;'>
@@ -2496,15 +1878,55 @@ with tab4:
         </div>
     """, unsafe_allow_html=True)
     
-    # Check API key
-    if not st.session_state.api_key:
-        st.markdown("""
-            <div style='background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); 
-                        padding: 2rem; border-radius: 16px; text-align: center; margin: 2rem 0;'>
-                <h3 style='margin: 0; color: #856404;'>⚠️ API Key Required</h3>
-                <p style='color: #856404; margin: 0.5rem 0 0 0;'>Please enter your GetLate API Key in the sidebar to use this feature</p>
-            </div>
-        """, unsafe_allow_html=True)
+    # Display configured account IDs in a nice info box
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                    padding: 1.5rem; border-radius: 16px; margin: 1.5rem 0;'>
+            <h3 style='margin-top: 0;'>📋 Configured Account IDs</h3>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.markdown("**▶️ YouTube**")
+        st.text_input("YT ID", value=YOUTUBE_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab4_yt_display")
+    with col2:
+        st.markdown("**📷 Instagram**")
+        st.text_input("IG ID", value=INSTAGRAM_VIDEO_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab4_ig_display")
+    with col3:
+        st.markdown("**🎵 TikTok**")
+        st.text_input("TT ID", value=TIKTOK_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab4_tt_display")
+    with col4:
+        st.markdown("**👥 Facebook**")
+        st.text_input("FB ID", value=FACEBOOK_VIDEO_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab4_fb_display")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Transcript upload section
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                    padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
+            <h3 style='margin-top: 0;'>📄 Upload Transcript (Optional)</h3>
+            <p style='color: #666; margin: 0.5rem 0 0 0;'>Upload a transcript file to help generate captions and tags</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    transcript_file_tab4 = st.file_uploader(
+        "📁 Drop your transcript file here",
+        accept_multiple_files=False,
+        type=['txt'],
+        key="transcript_tab4",
+        help="Upload a .txt transcript file"
+    )
+    
+    if transcript_file_tab4:
+        st.success(f"✅ Transcript uploaded: {transcript_file_tab4.name}")
+        # Read and display preview
+        transcript_content_tab4 = transcript_file_tab4.read().decode('utf-8')
+        with st.expander("👁️ Preview Transcript"):
+            st.text_area("Transcript Content", value=transcript_content_tab4[:500] + "..." if len(transcript_content_tab4) > 500 else transcript_content_tab4, height=150, disabled=True, label_visibility="collapsed")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
     
     # Video upload section with modern card
     st.markdown("""
@@ -2571,6 +1993,15 @@ with tab4:
         )
         st.session_state.video_master_content = video_master_content
         
+        # Generate Caption and Tags buttons
+        col_btn1, col_btn2 = st.columns(2)
+        with col_btn1:
+            if st.button("✨ Generate Caption", key="generate_caption_tab4", help="Generate caption from transcript (Coming Soon)"):
+                st.info("🚧 Caption generation feature coming soon!")
+        with col_btn2:
+            if st.button("🏷️ Generate Tags", key="generate_tags_tab4", help="Generate tags from transcript (Coming Soon)"):
+                st.info("🚧 Tag generation feature coming soon!")
+        
         # Master tags/hashtags
         video_master_tags = st.text_input(
             "#️⃣ Tags/Hashtags (comma-separated)",
@@ -2605,197 +2036,6 @@ with tab4:
         else:
             st.session_state.video_master_schedule = video_master_schedule_iso
     
-    # Post to All Platforms Section
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("""
-        <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                    padding: 2.5rem; border-radius: 16px; text-align: center; margin: 1.5rem 0;
-                    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);'>
-            <h3 style='margin: 0 0 0.5rem 0; color: #ffffff; font-size: 1.5rem; font-weight: 700;'>
-                🚀 Post Video to All Platforms
-            </h3>
-            <p style='margin: 0; font-size: 1rem; color: #ffffff; opacity: 1;'>
-                Upload your video and post to all selected platforms at once
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("🎬 Post to All Selected Platforms", use_container_width=True, type="primary", key="video_push_to_all_btn"):
-            if not st.session_state.api_key:
-                st.error("❌ Please enter your API key in the sidebar!")
-            elif not video_file:
-                st.error("❌ Please upload a video first!")
-            else:
-                # Upload video first
-                with st.spinner("📤 Uploading video to GetLate..."):
-                    video_file.seek(0)
-                    files = {'files': (video_file.name, video_file, 'video/mp4')}
-                    headers = {"Authorization": f"Bearer {st.session_state.api_key}"}
-                    
-                    try:
-                        response = requests.post(
-                            "https://getlate.dev/api/v1/media",
-                            headers=headers,
-                            files=files
-                        )
-                        
-                        if response.status_code in [200, 201]:
-                            result = response.json()
-                            video_url = result['files'][0]['url']
-                            
-                            # Upload thumbnail if provided
-                            thumbnail_url = None
-                            if thumbnail_file:
-                                thumbnail_url = upload_image_to_getlate(thumbnail_file, st.session_state.api_key)
-                            
-                            # Build list of platforms to post to
-                            platforms_to_post = []
-                            
-                            if video_enable_youtube and st.session_state.get('yt_account_id'):
-                                platforms_to_post.append({
-                                    "platform": "YouTube",
-                                    "accountId": st.session_state.yt_account_id,
-                                    "content": st.session_state.get('yt_content_value', st.session_state.video_master_content),
-                                    "schedule": st.session_state.get('yt_schedule', st.session_state.video_master_schedule),
-                                    "videoUrl": video_url,
-                                    "thumbnailUrl": thumbnail_url,
-                                    "platformSpecificData": {
-                                        "tags": st.session_state.get('yt_tags', '').split(',') if st.session_state.get('yt_tags') else [],
-                                        "videoTitle": st.session_state.get('yt_title', ''),
-                                        "videoDescription": st.session_state.get('yt_description', ''),
-                                        "videoCategory": st.session_state.get('yt_category', '22'),
-                                        "videoPrivacy": st.session_state.get('yt_privacy', 'public'),
-                                        "videoLicense": "youtube",
-                                        "videoMadeForKids": st.session_state.get('yt_made_for_kids', False),
-                                        "videoEmbeddable": True,
-                                        "videoNotifySubscribers": st.session_state.get('yt_notify', True)
-                                    }
-                                })
-                            
-                            if video_enable_instagram and st.session_state.get('ig_video_account_id'):
-                                content_type = st.session_state.get('ig_content_type', 'reel')
-                                platform_data = {
-                                    "platform": f"Instagram {content_type.title()}",
-                                    "accountId": st.session_state.ig_video_account_id,
-                                    "content": st.session_state.get('ig_video_content_value', st.session_state.video_master_content),
-                                    "schedule": st.session_state.get('ig_video_schedule', st.session_state.video_master_schedule),
-                                    "videoUrl": video_url
-                                }
-                                
-                                if content_type == 'story':
-                                    platform_data["platformSpecificData"] = {
-                                        "contentType": "story"
-                                    }
-                                
-                                platforms_to_post.append(platform_data)
-                            
-                            if video_enable_tiktok and st.session_state.get('tt_account_id'):
-                                platforms_to_post.append({
-                                    "platform": "TikTok",
-                                    "accountId": st.session_state.tt_account_id,
-                                    "content": st.session_state.get('tt_content_value', st.session_state.video_master_content),
-                                    "schedule": st.session_state.get('tt_schedule', st.session_state.video_master_schedule),
-                                    "videoUrl": video_url,
-                                    "platformSpecificData": {
-                                        "tiktokSettings": {
-                                            "privacy_level": st.session_state.get('tt_privacy', 'public'),
-                                            "allow_comment": st.session_state.get('tt_comments', True),
-                                            "allow_duet": st.session_state.get('tt_duet', True),
-                                            "allow_stitch": st.session_state.get('tt_stitch', True),
-                                            "commercial_content_type": st.session_state.get('tt_commercial', False),
-                                            "content_preview_confirmed": True,
-                                            "express_consent_given": True,
-                                            "video_made_with_ai": st.session_state.get('tt_ai', False)
-                                        }
-                                    }
-                                })
-                            
-                            if video_enable_facebook and st.session_state.get('fb_video_account_id'):
-                                content_type = st.session_state.get('fb_video_content_type', 'video')
-                                platform_data = {
-                                    "platform": f"Facebook {content_type.title()}",
-                                    "accountId": st.session_state.fb_video_account_id,
-                                    "content": st.session_state.get('fb_video_content_value', st.session_state.video_master_content),
-                                    "schedule": st.session_state.get('fb_video_schedule', st.session_state.video_master_schedule),
-                                    "videoUrl": video_url
-                                }
-                                
-                                if content_type == 'story':
-                                    platform_data["platformSpecificData"] = {
-                                        "contentType": "story"
-                                    }
-                                elif thumbnail_url:
-                                    platform_data["thumbnailUrl"] = thumbnail_url
-                                    if st.session_state.get('fb_first_comment'):
-                                        platform_data["platformSpecificData"] = {
-                                            "firstComment": st.session_state.fb_first_comment
-                                        }
-                                
-                                platforms_to_post.append(platform_data)
-                            
-                            if not platforms_to_post:
-                                st.error("❌ No platforms configured! Please enable platforms and enter Account IDs.")
-                            else:
-                                # Post to all platforms
-                                with st.spinner(f"📤 Posting to {len(platforms_to_post)} platform(s)..."):
-                                    success_count = 0
-                                    error_count = 0
-                                    
-                                    progress_bar = st.progress(0)
-                                    status_text = st.empty()
-                                    
-                                    for idx, platform_data in enumerate(platforms_to_post):
-                                        status_text.text(f"Posting to {platform_data['platform']}...")
-                                        
-                                        # Build payload for this platform
-                                        payload = {
-                                            "content": platform_data['content'],
-                                            "scheduledFor": platform_data['schedule'],
-                                            "timezone": "America/Los_Angeles",
-                                            "platforms": [{
-                                                "accountId": platform_data['accountId'],
-                                                "mediaItems": [{
-                                                    "url": platform_data['videoUrl']
-                                                }]
-                                            }]
-                                        }
-                                        
-                                        # Add thumbnail if available
-                                        if platform_data.get('thumbnailUrl'):
-                                            payload["platforms"][0]["mediaItems"][0]["thumbnailUrl"] = platform_data['thumbnailUrl']
-                                        
-                                        # Add platform-specific data
-                                        if platform_data.get('platformSpecificData'):
-                                            payload["platforms"][0]["platformSpecificData"] = platform_data['platformSpecificData']
-                                        
-                                        response = send_post_to_api(st.session_state.api_key, payload)
-                                        
-                                        if response and response.status_code in [200, 201]:
-                                            success_count += 1
-                                        else:
-                                            error_count += 1
-                                            error_msg = response.json() if response else "Connection error"
-                                            st.error(f"❌ {platform_data['platform']}: Failed - {error_msg}")
-                                        
-                                        progress_bar.progress((idx + 1) / len(platforms_to_post))
-                                    
-                                    status_text.empty()
-                                    progress_bar.empty()
-                                    
-                                    st.markdown("<br>", unsafe_allow_html=True)
-                                    
-                                    if error_count == 0:
-                                        st.balloons()
-                                        st.success(f"🎉 Successfully posted video to all {success_count} platform(s)!")
-                                    else:
-                                        st.warning(f"⚠️ Posted to {success_count} platform(s), {error_count} failed")
-                        else:
-                            st.error(f"❌ Failed to upload video: {response.text}")
-                    except Exception as e:
-                        st.error(f"❌ Error uploading video: {str(e)}")
-    
     st.markdown("<br>", unsafe_allow_html=True)
     
     # Platform selection with modern cards
@@ -2820,551 +2060,7 @@ with tab4:
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # YouTube Shorts Configuration
-    if video_enable_youtube:
-        st.markdown("""
-            <div style='background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%); 
-                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
-                <div style='background: white; padding: 2rem; border-radius: 15px;'>
-                    <h3 style='margin-top: 0; color: #FF0000;'>▶️ YouTube Shorts Configuration</h3>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        with st.container():
-            col1, col2 = st.columns([2, 1])
-            
-            with col1:
-                yt_account_id = st.text_input(
-                    "🆔 YouTube Account ID",
-                    key="yt_account_id",
-                    placeholder="Enter your YouTube account ID"
-                )
-                
-                if yt_account_id:
-                    st.caption("✅ Account ID saved")
-                
-                # Initialize content value in session state
-                if 'yt_content_value' not in st.session_state:
-                    st.session_state.yt_content_value = ""
-                if 'yt_refresh_counter' not in st.session_state:
-                    st.session_state.yt_refresh_counter = 0
-                
-                yt_title = st.text_input(
-                    "📝 Video Title",
-                    value="",
-                    key="yt_title",
-                    placeholder="My Awesome YouTube Short"
-                )
-                
-                yt_description = st.text_area(
-                    "💬 Video Description",
-                    value=st.session_state.yt_content_value,
-                    height=100,
-                    key=f"yt_content_area_{st.session_state.yt_refresh_counter}",
-                    placeholder="Description for your YouTube Short..."
-                )
-                if yt_description != st.session_state.yt_content_value:
-                    st.session_state.yt_content_value = yt_description
-                
-                yt_tags = st.text_input(
-                    "#️⃣ Tags (comma-separated)",
-                    key="yt_tags",
-                    placeholder="shorts, fun, video"
-                )
-                
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    yt_category = st.selectbox(
-                        "📂 Category",
-                        options=["22", "1", "2", "10", "15", "17", "19", "20", "23", "24", "25", "26", "27", "28"],
-                        key="yt_category",
-                        help="22=People & Blogs, 1=Film & Animation, 2=Autos & Vehicles, 10=Music, etc."
-                    )
-                    
-                    yt_privacy = st.selectbox(
-                        "🔒 Privacy",
-                        options=["public", "unlisted", "private"],
-                        key="yt_privacy"
-                    )
-                
-                with col_b:
-                    yt_made_for_kids = st.checkbox(
-                        "👶 Made for Kids",
-                        value=False,
-                        key="yt_made_for_kids"
-                    )
-                    
-                    yt_notify = st.checkbox(
-                        "🔔 Notify Subscribers",
-                        value=True,
-                        key="yt_notify"
-                    )
-            
-            with col2:
-                use_master_yt = st.button("📋 Use Master", key="yt_use_master_btn", use_container_width=True)
-                
-                if use_master_yt:
-                    st.session_state.yt_content_value = st.session_state.video_master_content
-                    if 'yt_refresh_counter' not in st.session_state:
-                        st.session_state.yt_refresh_counter = 0
-                    st.session_state.yt_refresh_counter += 1
-                    st.rerun()
-                
-                st.markdown("**📅 Schedule**")
-                use_master_schedule_yt = st.checkbox("Use master schedule", value=True, key="yt_master_sched")
-                
-                if not use_master_schedule_yt:
-                    yt_date = st.date_input("Date", value=default_date, key="yt_schedule_date")
-                    yt_time = st.time_input("Time (PDT)", value=default_date.time(), key="yt_schedule_time")
-                    yt_datetime = datetime.combine(yt_date, yt_time)
-                    yt_datetime_pdt = pdt.localize(yt_datetime)
-                    st.session_state.yt_schedule = yt_datetime_pdt.isoformat()
-                else:
-                    st.session_state.yt_schedule = st.session_state.video_master_schedule
-    
-    # Instagram Configuration (Reel or Story)
-    if video_enable_instagram:
-        st.markdown("""
-            <div style='background: linear-gradient(135deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); 
-                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
-                <div style='background: white; padding: 2rem; border-radius: 15px;'>
-                    <h3 style='margin-top: 0; color: #bc1888;'>📷 Instagram Configuration</h3>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        with st.container():
-            col1, col2 = st.columns([2, 1])
-            
-            with col1:
-                ig_video_account_id = st.text_input(
-                    "🆔 Instagram Account ID",
-                    key="ig_video_account_id",
-                    placeholder="Enter your Instagram account ID"
-                )
-                
-                if ig_video_account_id:
-                    st.caption("✅ Account ID saved")
-                
-                # Content type selector
-                ig_content_type = st.radio(
-                    "📱 Content Type",
-                    options=["reel", "story"],
-                    key="ig_content_type",
-                    horizontal=True
-                )
-                
-                # Initialize content value in session state
-                if 'ig_video_content_value' not in st.session_state:
-                    st.session_state.ig_video_content_value = ""
-                if 'ig_video_refresh_counter' not in st.session_state:
-                    st.session_state.ig_video_refresh_counter = 0
-                
-                ig_video_content = st.text_area(
-                    "💬 Caption",
-                    value=st.session_state.ig_video_content_value,
-                    height=100,
-                    key=f"ig_video_content_area_{st.session_state.ig_video_refresh_counter}",
-                    placeholder="Your Instagram caption..."
-                )
-                if ig_video_content != st.session_state.ig_video_content_value:
-                    st.session_state.ig_video_content_value = ig_video_content
-            
-            with col2:
-                use_master_ig_video = st.button("📋 Use Master", key="ig_video_use_master_btn", use_container_width=True)
-                
-                if use_master_ig_video:
-                    st.session_state.ig_video_content_value = st.session_state.video_master_content
-                    if 'ig_video_refresh_counter' not in st.session_state:
-                        st.session_state.ig_video_refresh_counter = 0
-                    st.session_state.ig_video_refresh_counter += 1
-                    st.rerun()
-                
-                st.markdown("**📅 Schedule**")
-                use_master_schedule_ig = st.checkbox("Use master schedule", value=True, key="ig_video_master_sched")
-                
-                if not use_master_schedule_ig:
-                    ig_video_date = st.date_input("Date", value=default_date, key="ig_video_schedule_date")
-                    ig_video_time = st.time_input("Time (PDT)", value=default_date.time(), key="ig_video_schedule_time")
-                    ig_video_datetime = datetime.combine(ig_video_date, ig_video_time)
-                    ig_video_datetime_pdt = pdt.localize(ig_video_datetime)
-                    st.session_state.ig_video_schedule = ig_video_datetime_pdt.isoformat()
-                else:
-                    st.session_state.ig_video_schedule = st.session_state.video_master_schedule
-    
-    # TikTok Configuration
-    if video_enable_tiktok:
-        st.markdown("""
-            <div style='background: linear-gradient(135deg, #000000 0%, #EE1D52 100%); 
-                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
-                <div style='background: white; padding: 2rem; border-radius: 15px;'>
-                    <h3 style='margin-top: 0; color: #EE1D52;'>🎵 TikTok Configuration</h3>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        with st.container():
-            col1, col2 = st.columns([2, 1])
-            
-            with col1:
-                tt_account_id = st.text_input(
-                    "🆔 TikTok Account ID",
-                    key="tt_account_id",
-                    placeholder="Enter your TikTok account ID"
-                )
-                
-                if tt_account_id:
-                    st.caption("✅ Account ID saved")
-                
-                # Initialize content value in session state
-                if 'tt_content_value' not in st.session_state:
-                    st.session_state.tt_content_value = ""
-                if 'tt_refresh_counter' not in st.session_state:
-                    st.session_state.tt_refresh_counter = 0
-                
-                tt_content = st.text_area(
-                    "💬 Caption",
-                    value=st.session_state.tt_content_value,
-                    height=100,
-                    key=f"tt_content_area_{st.session_state.tt_refresh_counter}",
-                    placeholder="Your TikTok caption with hashtags..."
-                )
-                if tt_content != st.session_state.tt_content_value:
-                    st.session_state.tt_content_value = tt_content
-                
-                st.markdown("**⚙️ TikTok Settings**")
-                col_a, col_b, col_c = st.columns(3)
-                
-                with col_a:
-                    tt_privacy = st.selectbox(
-                        "🔒 Privacy",
-                        options=["public", "private", "friends"],
-                        key="tt_privacy"
-                    )
-                    
-                    tt_comments = st.checkbox(
-                        "💬 Allow Comments",
-                        value=True,
-                        key="tt_comments"
-                    )
-                
-                with col_b:
-                    tt_duet = st.checkbox(
-                        "🎭 Allow Duet",
-                        value=True,
-                        key="tt_duet"
-                    )
-                    
-                    tt_stitch = st.checkbox(
-                        "✂️ Allow Stitch",
-                        value=True,
-                        key="tt_stitch"
-                    )
-                
-                with col_c:
-                    tt_commercial = st.checkbox(
-                        "💼 Commercial Content",
-                        value=False,
-                        key="tt_commercial"
-                    )
-                    
-                    tt_ai = st.checkbox(
-                        "🤖 Made with AI",
-                        value=False,
-                        key="tt_ai"
-                    )
-            
-            with col2:
-                use_master_tt = st.button("📋 Use Master", key="tt_use_master_btn", use_container_width=True)
-                
-                if use_master_tt:
-                    st.session_state.tt_content_value = st.session_state.video_master_content
-                    if 'tt_refresh_counter' not in st.session_state:
-                        st.session_state.tt_refresh_counter = 0
-                    st.session_state.tt_refresh_counter += 1
-                    st.rerun()
-                
-                st.markdown("**📅 Schedule**")
-                use_master_schedule_tt = st.checkbox("Use master schedule", value=True, key="tt_master_sched")
-                
-                if not use_master_schedule_tt:
-                    tt_date = st.date_input("Date", value=default_date, key="tt_schedule_date")
-                    tt_time = st.time_input("Time (PDT)", value=default_date.time(), key="tt_schedule_time")
-                    tt_datetime = datetime.combine(tt_date, tt_time)
-                    tt_datetime_pdt = pdt.localize(tt_datetime)
-                    st.session_state.tt_schedule = tt_datetime_pdt.isoformat()
-                else:
-                    st.session_state.tt_schedule = st.session_state.video_master_schedule
-    
-    # Facebook Configuration (Video or Story)
-    if video_enable_facebook:
-        st.markdown("""
-            <div style='background: linear-gradient(135deg, #1877f2 0%, #0c63d4 100%); 
-                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
-                <div style='background: white; padding: 2rem; border-radius: 15px;'>
-                    <h3 style='margin-top: 0; color: #1877f2;'>👥 Facebook Configuration</h3>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        with st.container():
-            col1, col2 = st.columns([2, 1])
-            
-            with col1:
-                fb_video_account_id = st.text_input(
-                    "🆔 Facebook Account ID",
-                    key="fb_video_account_id",
-                    placeholder="Enter your Facebook account ID"
-                )
-                
-                if fb_video_account_id:
-                    st.caption("✅ Account ID saved")
-                
-                # Content type selector
-                fb_video_content_type = st.radio(
-                    "📱 Content Type",
-                    options=["video", "story"],
-                    key="fb_video_content_type",
-                    horizontal=True
-                )
-                
-                # Initialize content value in session state
-                if 'fb_video_content_value' not in st.session_state:
-                    st.session_state.fb_video_content_value = ""
-                if 'fb_video_refresh_counter' not in st.session_state:
-                    st.session_state.fb_video_refresh_counter = 0
-                
-                fb_video_content = st.text_area(
-                    "💬 Post Content",
-                    value=st.session_state.fb_video_content_value,
-                    height=100,
-                    key=f"fb_video_content_area_{st.session_state.fb_video_refresh_counter}",
-                    placeholder="Your Facebook video post content..."
-                )
-                if fb_video_content != st.session_state.fb_video_content_value:
-                    st.session_state.fb_video_content_value = fb_video_content
-                
-                if fb_video_content_type == "video":
-                    fb_first_comment = st.text_input(
-                        "💭 First Comment (Optional)",
-                        key="fb_first_comment",
-                        placeholder="Let me know what you think about this video!"
-                    )
-            
-            with col2:
-                use_master_fb_video = st.button("📋 Use Master", key="fb_video_use_master_btn", use_container_width=True)
-                
-                if use_master_fb_video:
-                    st.session_state.fb_video_content_value = st.session_state.video_master_content
-                    if 'fb_video_refresh_counter' not in st.session_state:
-                        st.session_state.fb_video_refresh_counter = 0
-                    st.session_state.fb_video_refresh_counter += 1
-                    st.rerun()
-                
-                st.markdown("**📅 Schedule**")
-                use_master_schedule_fb = st.checkbox("Use master schedule", value=True, key="fb_video_master_sched")
-                
-                if not use_master_schedule_fb:
-                    fb_video_date = st.date_input("Date", value=default_date, key="fb_video_schedule_date")
-                    fb_video_time = st.time_input("Time (PDT)", value=default_date.time(), key="fb_video_schedule_time")
-                    fb_video_datetime = datetime.combine(fb_video_date, fb_video_time)
-                    fb_video_datetime_pdt = pdt.localize(fb_video_datetime)
-                    st.session_state.fb_video_schedule = fb_video_datetime_pdt.isoformat()
-                else:
-                    st.session_state.fb_video_schedule = st.session_state.video_master_schedule
-    
-    # Individual posting section
-    if (video_enable_youtube or video_enable_instagram or video_enable_tiktok or video_enable_facebook):
-        st.markdown("<br><br>", unsafe_allow_html=True)
-        st.markdown("""
-            <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
-                        padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
-                <h3 style='margin-top: 0; text-align: center;'>📤 Individual Platform Posting</h3>
-                <p style='color: #666; margin: 0; text-align: center;'>Post to platforms individually with their specific settings</p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        cols = st.columns(4)
-        
-        if video_enable_youtube:
-            with cols[0]:
-                if st.button("▶️ Post to YouTube", use_container_width=True, key="post_youtube_btn"):
-                    if not video_file:
-                        st.error("❌ Upload a video first!")
-                    elif not st.session_state.get('yt_account_id'):
-                        st.error("❌ Enter YouTube Account ID!")
-                    else:
-                        with st.spinner("📤 Posting to YouTube..."):
-                            # Upload video
-                            video_file.seek(0)
-                            files = {'files': (video_file.name, video_file, 'video/mp4')}
-                            headers = {"Authorization": f"Bearer {st.session_state.api_key}"}
-                            response = requests.post("https://getlate.dev/api/v1/media", headers=headers, files=files)
-                            
-                            if response.status_code in [200, 201]:
-                                video_url = response.json()['files'][0]['url']
-                                thumbnail_url = None
-                                if thumbnail_file:
-                                    thumbnail_url = upload_image_to_getlate(thumbnail_file, st.session_state.api_key)
-                                
-                                payload = {
-                                    "content": st.session_state.get('yt_content_value', ''),
-                                    "scheduledFor": st.session_state.get('yt_schedule', st.session_state.video_master_schedule),
-                                    "timezone": "America/Los_Angeles",
-                                    "platforms": [{
-                                        "accountId": st.session_state.yt_account_id,
-                                        "platformSpecificData": {
-                                            "tags": st.session_state.get('yt_tags', '').split(',') if st.session_state.get('yt_tags') else [],
-                                            "videoTitle": st.session_state.get('yt_title', ''),
-                                            "videoDescription": st.session_state.get('yt_content_value', ''),
-                                            "videoCategory": st.session_state.get('yt_category', '22'),
-                                            "videoPrivacy": st.session_state.get('yt_privacy', 'public'),
-                                            "videoLicense": "youtube",
-                                            "videoMadeForKids": st.session_state.get('yt_made_for_kids', False),
-                                            "videoEmbeddable": True,
-                                            "videoNotifySubscribers": st.session_state.get('yt_notify', True)
-                                        },
-                                        "mediaItems": [{"url": video_url, "thumbnailUrl": thumbnail_url}] if thumbnail_url else [{"url": video_url}]
-                                    }]
-                                }
-                                
-                                result = send_post_to_api(st.session_state.api_key, payload)
-                                if result and result.status_code in [200, 201]:
-                                    st.success("✅ Posted to YouTube!")
-                                else:
-                                    st.error(f"❌ Failed: {result.json() if result else 'Connection error'}")
-        
-        if video_enable_instagram:
-            with cols[1]:
-                if st.button("📷 Post to Instagram", use_container_width=True, key="post_instagram_btn"):
-                    if not video_file:
-                        st.error("❌ Upload a video first!")
-                    elif not st.session_state.get('ig_video_account_id'):
-                        st.error("❌ Enter Instagram Account ID!")
-                    else:
-                        with st.spinner("📤 Posting to Instagram..."):
-                            # Upload video
-                            video_file.seek(0)
-                            files = {'files': (video_file.name, video_file, 'video/mp4')}
-                            headers = {"Authorization": f"Bearer {st.session_state.api_key}"}
-                            response = requests.post("https://getlate.dev/api/v1/media", headers=headers, files=files)
-                            
-                            if response.status_code in [200, 201]:
-                                video_url = response.json()['files'][0]['url']
-                                
-                                payload = {
-                                    "content": st.session_state.get('ig_video_content_value', ''),
-                                    "scheduledFor": st.session_state.get('ig_video_schedule', st.session_state.video_master_schedule),
-                                    "timezone": "America/Los_Angeles",
-                                    "platforms": [{
-                                        "accountId": st.session_state.ig_video_account_id,
-                                        "mediaItems": [{"url": video_url}]
-                                    }]
-                                }
-                                
-                                if st.session_state.get('ig_content_type') == 'story':
-                                    payload["platforms"][0]["platformSpecificData"] = {"contentType": "story"}
-                                
-                                result = send_post_to_api(st.session_state.api_key, payload)
-                                if result and result.status_code in [200, 201]:
-                                    st.success("✅ Posted to Instagram!")
-                                else:
-                                    st.error(f"❌ Failed: {result.json() if result else 'Connection error'}")
-        
-        if video_enable_tiktok:
-            with cols[2]:
-                if st.button("🎵 Post to TikTok", use_container_width=True, key="post_tiktok_btn"):
-                    if not video_file:
-                        st.error("❌ Upload a video first!")
-                    elif not st.session_state.get('tt_account_id'):
-                        st.error("❌ Enter TikTok Account ID!")
-                    else:
-                        with st.spinner("📤 Posting to TikTok..."):
-                            # Upload video
-                            video_file.seek(0)
-                            files = {'files': (video_file.name, video_file, 'video/mp4')}
-                            headers = {"Authorization": f"Bearer {st.session_state.api_key}"}
-                            response = requests.post("https://getlate.dev/api/v1/media", headers=headers, files=files)
-                            
-                            if response.status_code in [200, 201]:
-                                video_url = response.json()['files'][0]['url']
-                                
-                                payload = {
-                                    "content": st.session_state.get('tt_content_value', ''),
-                                    "scheduledFor": st.session_state.get('tt_schedule', st.session_state.video_master_schedule),
-                                    "timezone": "America/Los_Angeles",
-                                    "platforms": [{
-                                        "accountId": st.session_state.tt_account_id,
-                                        "platformSpecificData": {
-                                            "tiktokSettings": {
-                                                "privacy_level": st.session_state.get('tt_privacy', 'public'),
-                                                "allow_comment": st.session_state.get('tt_comments', True),
-                                                "allow_duet": st.session_state.get('tt_duet', True),
-                                                "allow_stitch": st.session_state.get('tt_stitch', True),
-                                                "commercial_content_type": st.session_state.get('tt_commercial', False),
-                                                "content_preview_confirmed": True,
-                                                "express_consent_given": True,
-                                                "video_made_with_ai": st.session_state.get('tt_ai', False)
-                                            }
-                                        },
-                                        "mediaItems": [{"url": video_url}]
-                                    }]
-                                }
-                                
-                                result = send_post_to_api(st.session_state.api_key, payload)
-                                if result and result.status_code in [200, 201]:
-                                    st.success("✅ Posted to TikTok!")
-                                else:
-                                    st.error(f"❌ Failed: {result.json() if result else 'Connection error'}")
-        
-        if video_enable_facebook:
-            with cols[3]:
-                if st.button("👥 Post to Facebook", use_container_width=True, key="post_facebook_btn"):
-                    if not video_file:
-                        st.error("❌ Upload a video first!")
-                    elif not st.session_state.get('fb_video_account_id'):
-                        st.error("❌ Enter Facebook Account ID!")
-                    else:
-                        with st.spinner("📤 Posting to Facebook..."):
-                            # Upload video
-                            video_file.seek(0)
-                            files = {'files': (video_file.name, video_file, 'video/mp4')}
-                            headers = {"Authorization": f"Bearer {st.session_state.api_key}"}
-                            response = requests.post("https://getlate.dev/api/v1/media", headers=headers, files=files)
-                            
-                            if response.status_code in [200, 201]:
-                                video_url = response.json()['files'][0]['url']
-                                thumbnail_url = None
-                                if thumbnail_file:
-                                    thumbnail_url = upload_image_to_getlate(thumbnail_file, st.session_state.api_key)
-                                
-                                payload = {
-                                    "content": st.session_state.get('fb_video_content_value', ''),
-                                    "scheduledFor": st.session_state.get('fb_video_schedule', st.session_state.video_master_schedule),
-                                    "timezone": "America/Los_Angeles",
-                                    "platforms": [{
-                                        "accountId": st.session_state.fb_video_account_id,
-                                        "mediaItems": [{"url": video_url}]
-                                    }]
-                                }
-                                
-                                if st.session_state.get('fb_video_content_type') == 'story':
-                                    payload["platforms"][0]["platformSpecificData"] = {"contentType": "story"}
-                                elif thumbnail_url:
-                                    payload["platforms"][0]["mediaItems"][0]["thumbnailUrl"] = thumbnail_url
-                                    if st.session_state.get('fb_first_comment'):
-                                        payload["platforms"][0]["platformSpecificData"] = {
-                                            "firstComment": st.session_state.fb_first_comment
-                                        }
-                                
-                                result = send_post_to_api(st.session_state.api_key, payload)
-                                if result and result.status_code in [200, 201]:
-                                    st.success("✅ Posted to Facebook!")
-                                else:
-                                    st.error(f"❌ Failed: {result.json() if result else 'Connection error'}")
-    
-    else:
+    if not (video_enable_youtube or video_enable_instagram or video_enable_tiktok or video_enable_facebook):
         st.markdown("""
             <div style='background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); 
                         padding: 3rem; border-radius: 16px; text-align: center; margin: 3rem 0;'>
@@ -3372,51 +2068,4 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            
