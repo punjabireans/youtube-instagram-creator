@@ -1544,6 +1544,7 @@ with tab2:
             <p style='color: #666; margin: 1rem 0 0 0; font-size: 1.1rem;'>This feature is currently under development</p>
         </div>
     """, unsafe_allow_html=True)
+
 # ============================================================================
 # TAB 3: CREATE CAROUSEL/FEED POST
 # ============================================================================
@@ -1675,38 +1676,59 @@ with tab3:
             else:
                 with st.spinner("🔄 Sending data to generate caption..."):
                     try:
-                        # Prepare files for webhook
-                        files = []
+                        # First, upload images to GetLate to get public URLs
+                        image_urls = []
+                        with st.spinner("📤 Uploading images to get public URLs..."):
+                            for img in carousel_images:
+                                url = upload_image_to_getlate(img, FIXED_API_KEY)
+                                if url:
+                                    image_urls.append(url)
                         
-                        # Add images
-                        for idx, img_file in enumerate(carousel_images):
-                            img_file.seek(0)
-                            files.append(('images', (img_file.name, img_file.getvalue(), img_file.type)))
-                        
-                        # Add transcript if available
-                        if transcript_file_tab3:
-                            transcript_file_tab3.seek(0)
-                            files.append(('transcript', (transcript_file_tab3.name, transcript_file_tab3.getvalue(), 'text/plain')))
-                        
-                        # Send to webhook
-                        webhook_url = "https://hook.us2.make.com/mz87lk80py2p2dr5dtn924mdjuox2bg7"
-                        response = requests.post(webhook_url, files=files, timeout=30)
-                        
-                        if response.status_code == 200:
-                            try:
-                                # Try to parse JSON response
-                                result = response.json()
-                                
-                                # Check if response has caption field
-                                if isinstance(result, dict) and 'caption' in result:
-                                    st.session_state.webhook_updating = True
-                                    st.session_state.master_content = result['caption']
-                                    st.session_state.master_content_key += 1  # Force widget recreation
-                                    st.session_state.webhook_updating = False
-                                    st.success("✅ Caption generated successfully!")
-                                    st.rerun()
-                                else:
-                                    # If response is just text, use it directly
+                        if not image_urls:
+                            st.error("❌ Failed to upload images. Please try again.")
+                        else:
+                            # Prepare data for webhook
+                            data = {
+                                'image_urls': ','.join(image_urls)  # Send as comma-separated string
+                            }
+                            
+                            # Add transcript as plain text if available
+                            if transcript_file_tab3:
+                                transcript_file_tab3.seek(0)
+                                transcript_text = transcript_file_tab3.read().decode('utf-8')
+                                data['transcript'] = transcript_text
+                            
+                            # Send to webhook as JSON
+                            webhook_url = "https://hook.us2.make.com/mz87lk80py2p2dr5dtn924mdjuox2bg7"
+                            response = requests.post(webhook_url, json=data, timeout=30)
+                            
+                            if response.status_code == 200:
+                                try:
+                                    # Try to parse JSON response
+                                    result = response.json()
+                                    
+                                    # Check if response has caption field
+                                    if isinstance(result, dict) and 'caption' in result:
+                                        st.session_state.webhook_updating = True
+                                        st.session_state.master_content = result['caption']
+                                        st.session_state.master_content_key += 1  # Force widget recreation
+                                        st.session_state.webhook_updating = False
+                                        st.success("✅ Caption generated successfully!")
+                                        st.rerun()
+                                    else:
+                                        # If response is just text, use it directly
+                                        response_text = response.text.strip()
+                                        if response_text:
+                                            st.session_state.webhook_updating = True
+                                            st.session_state.master_content = response_text
+                                            st.session_state.master_content_key += 1  # Force widget recreation
+                                            st.session_state.webhook_updating = False
+                                            st.success("✅ Caption generated successfully!")
+                                            st.rerun()
+                                        else:
+                                            st.info("📬 Request sent! Waiting for caption...")
+                                except ValueError:
+                                    # If not JSON, treat as plain text
                                     response_text = response.text.strip()
                                     if response_text:
                                         st.session_state.webhook_updating = True
@@ -1717,21 +1739,9 @@ with tab3:
                                         st.rerun()
                                     else:
                                         st.info("📬 Request sent! Waiting for caption...")
-                            except ValueError:
-                                # If not JSON, treat as plain text
-                                response_text = response.text.strip()
-                                if response_text:
-                                    st.session_state.webhook_updating = True
-                                    st.session_state.master_content = response_text
-                                    st.session_state.master_content_key += 1  # Force widget recreation
-                                    st.session_state.webhook_updating = False
-                                    st.success("✅ Caption generated successfully!")
-                                    st.rerun()
-                                else:
-                                    st.info("📬 Request sent! Waiting for caption...")
-                        else:
-                            st.error(f"❌ Failed to send request: {response.status_code}")
-                            st.error(f"Response: {response.text}")
+                            else:
+                                st.error(f"❌ Failed to send request: {response.status_code}")
+                                st.error(f"Response: {response.text}")
                     
                     except requests.exceptions.Timeout:
                         st.error("❌ Request timed out. Please try again.")
@@ -2949,6 +2959,7 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
+
 
 
 
