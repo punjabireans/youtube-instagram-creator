@@ -1629,7 +1629,7 @@ with tab3:
     
     col1, col2 = st.columns([2, 1])
     
-       with col1:
+    with col1:
         # The text_area value should always come from session_state
         master_content = st.text_area(
             "✍️ Post Content",
@@ -2227,21 +2227,21 @@ with tab4:
     col1, col2 = st.columns([2, 1])
     
     with col1:
-    # Initialize session state for video master content
-    if 'video_master_content' not in st.session_state:
-        st.session_state.video_master_content = ""
-    
-    # The text_area value should always come from session_state
-    video_master_content = st.text_area(
-        "✍️ Video Caption/Description",
-        value=st.session_state.video_master_content,
-        height=150,
-        placeholder="Write your video caption/description here... This will be your default content for all platforms.",
-        key="video_master_content_input"
-    )
-    # Only update session state if user manually changed it
-    if video_master_content != st.session_state.video_master_content:
-        st.session_state.video_master_content = video_master_content
+        # Initialize session state for video master content
+        if 'video_master_content' not in st.session_state:
+            st.session_state.video_master_content = ""
+        
+        # The text_area value should always come from session_state
+        video_master_content = st.text_area(
+            "✍️ Video Caption/Description",
+            value=st.session_state.video_master_content,
+            height=150,
+            placeholder="Write your video caption/description here... This will be your default content for all platforms.",
+            key="video_master_content_input"
+        )
+        # Only update session state if user manually changed it
+        if video_master_content != st.session_state.video_master_content:
+            st.session_state.video_master_content = video_master_content
         
         # Transcript upload in collapsible section
         with st.expander("📄 Upload Transcript (Optional)"):
@@ -2931,5 +2931,3 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
-
-
