@@ -1629,6 +1629,10 @@ with tab3:
     col1, col2 = st.columns([2, 1])
     
     with col1:
+        # Initialize if needed
+        if 'master_content' not in st.session_state:
+            st.session_state.master_content = ""
+        
         # The text_area value should always come from session_state
         master_content = st.text_area(
             "✍️ Post Content",
@@ -1637,8 +1641,12 @@ with tab3:
             placeholder="Write your post content here... This will be your default content for all platforms.",
             key="master_content_input"
         )
-        # Only update session state if user manually changed it
-        if master_content != st.session_state.master_content:
+        
+        # Update session state when user types (but not during webhook updates)
+        if 'webhook_updating' not in st.session_state:
+            st.session_state.webhook_updating = False
+        
+        if not st.session_state.webhook_updating and master_content != st.session_state.master_content:
             st.session_state.master_content = master_content
         
         # Transcript upload in collapsible section
@@ -1656,7 +1664,7 @@ with tab3:
                 st.success(f"✅ {transcript_file_tab3.name}")
                 transcript_content = transcript_file_tab3.read().decode('utf-8')
                 st.text_area("Preview", value=transcript_content[:300] + "..." if len(transcript_content) > 300 else transcript_content, height=100, disabled=True, label_visibility="collapsed")
-        #Heree
+        
         # Generate Caption button with webhook functionality
         if st.button("✨ Generate Caption", key="generate_caption_tab3", help="Generate caption from images and transcript"):
             if not carousel_images:
@@ -1692,15 +1700,19 @@ with tab3:
                                 
                                 # Check if response has caption field
                                 if isinstance(result, dict) and 'caption' in result:
+                                    st.session_state.webhook_updating = True
                                     st.session_state.master_content = result['caption']
                                     st.session_state.debug_action = f"Set from JSON caption: {result['caption'][:50]}"
+                                    st.session_state.webhook_updating = False
                                     st.rerun()
                                 else:
                                     # If response is just text, use it directly
                                     response_text = response.text.strip()
                                     if response_text:
+                                        st.session_state.webhook_updating = True
                                         st.session_state.master_content = response_text
                                         st.session_state.debug_action = f"Set from plain text: {response_text[:50]}"
+                                        st.session_state.webhook_updating = False
                                         st.rerun()
                                     else:
                                         st.session_state.debug_action = "Response was empty"
@@ -1710,8 +1722,10 @@ with tab3:
                                 st.session_state.debug_json_error = str(e)
                                 response_text = response.text.strip()
                                 if response_text:
+                                    st.session_state.webhook_updating = True
                                     st.session_state.master_content = response_text
                                     st.session_state.debug_action = f"Set from plain text (not JSON): {response_text[:50]}"
+                                    st.session_state.webhook_updating = False
                                     st.rerun()
                                 else:
                                     st.session_state.debug_action = "Response was empty after JSON parse failed"
@@ -1736,7 +1750,7 @@ with tab3:
             st.success(f"🔍 Action Taken: {st.session_state.debug_action}")
         if 'master_content' in st.session_state and st.session_state.master_content:
             st.info(f"🔍 Current master_content: {st.session_state.master_content[:100]}")
-       
+    
     with col2:
         st.markdown("**📅 Master Schedule (PDT)**")
         
@@ -2155,7 +2169,6 @@ with tab3:
                     st.session_state.tw_schedule = tw_datetime_pdt.isoformat()
                 else:
                     st.session_state.tw_schedule = st.session_state.master_schedule
-
 # ============================================================================
 # TAB 4: CREATE SHORT FORM VIDEO POST
 # ============================================================================
@@ -2949,6 +2962,7 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
+
 
 
 
