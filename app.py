@@ -1693,21 +1693,17 @@ with tab3:
                         response = requests.post(webhook_url, files=files, timeout=30)
                         
                         if response.status_code == 200:
-                            # Store debug info in session state
-                            st.session_state.debug_response = response.text[:200]
-                            
                             try:
                                 # Try to parse JSON response
                                 result = response.json()
-                                st.session_state.debug_json = str(result)
                                 
                                 # Check if response has caption field
                                 if isinstance(result, dict) and 'caption' in result:
                                     st.session_state.webhook_updating = True
                                     st.session_state.master_content = result['caption']
                                     st.session_state.master_content_key += 1  # Force widget recreation
-                                    st.session_state.debug_action = f"Set from JSON caption: {result['caption'][:50]}"
                                     st.session_state.webhook_updating = False
+                                    st.success("✅ Caption generated successfully!")
                                     st.rerun()
                                 else:
                                     # If response is just text, use it directly
@@ -1716,25 +1712,22 @@ with tab3:
                                         st.session_state.webhook_updating = True
                                         st.session_state.master_content = response_text
                                         st.session_state.master_content_key += 1  # Force widget recreation
-                                        st.session_state.debug_action = f"Set from plain text: {response_text[:50]}"
                                         st.session_state.webhook_updating = False
+                                        st.success("✅ Caption generated successfully!")
                                         st.rerun()
                                     else:
-                                        st.session_state.debug_action = "Response was empty"
                                         st.info("📬 Request sent! Waiting for caption...")
-                            except ValueError as e:
+                            except ValueError:
                                 # If not JSON, treat as plain text
-                                st.session_state.debug_json_error = str(e)
                                 response_text = response.text.strip()
                                 if response_text:
                                     st.session_state.webhook_updating = True
                                     st.session_state.master_content = response_text
                                     st.session_state.master_content_key += 1  # Force widget recreation
-                                    st.session_state.debug_action = f"Set from plain text (not JSON): {response_text[:50]}"
                                     st.session_state.webhook_updating = False
+                                    st.success("✅ Caption generated successfully!")
                                     st.rerun()
                                 else:
-                                    st.session_state.debug_action = "Response was empty after JSON parse failed"
                                     st.info("📬 Request sent! Waiting for caption...")
                         else:
                             st.error(f"❌ Failed to send request: {response.status_code}")
@@ -1744,18 +1737,6 @@ with tab3:
                         st.error("❌ Request timed out. Please try again.")
                     except Exception as e:
                         st.error(f"❌ Error: {str(e)}")
-        
-        # Display persistent debug info
-        if 'debug_response' in st.session_state:
-            st.info(f"🔍 Last Response: {st.session_state.debug_response}")
-        if 'debug_json' in st.session_state:
-            st.info(f"🔍 Parsed JSON: {st.session_state.debug_json}")
-        if 'debug_json_error' in st.session_state:
-            st.warning(f"🔍 JSON Parse Error: {st.session_state.debug_json_error}")
-        if 'debug_action' in st.session_state:
-            st.success(f"🔍 Action Taken: {st.session_state.debug_action}")
-        if 'master_content' in st.session_state and st.session_state.master_content:
-            st.info(f"🔍 Current master_content: {st.session_state.master_content[:100]}")
     
     with col2:
         st.markdown("**📅 Master Schedule (PDT)**")
@@ -2968,6 +2949,7 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
+
 
 
 
