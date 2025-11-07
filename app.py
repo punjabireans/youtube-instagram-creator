@@ -1659,65 +1659,73 @@ with tab3:
                 st.text_area("Preview", value=transcript_content[:300] + "..." if len(transcript_content) > 300 else transcript_content, height=100, disabled=True, label_visibility="collapsed")
         
         # Generate Caption button with webhook functionality
-        if st.button("✨ Generate Caption", key="generate_caption_tab3", help="Generate caption from images and transcript"):
-            if not carousel_images:
-                st.warning("⚠️ Please upload images first!")
-            else:
-                with st.spinner("🔄 Sending data to generate caption..."):
-                    try:
-                        # Prepare files for webhook
-                        files = []
-                        
-                        # Add images
-                        for idx, img_file in enumerate(carousel_images):
-                            img_file.seek(0)
-                            files.append(('images', (img_file.name, img_file.getvalue(), img_file.type)))
-                        
-                        # Add transcript if available
-                        if transcript_file_tab3:
-                            transcript_file_tab3.seek(0)
-                            files.append(('transcript', (transcript_file_tab3.name, transcript_file_tab3.getvalue(), 'text/plain')))
-                        
-                        # Send to webhook
-                        webhook_url = "https://hook.us2.make.com/mz87lk80py2p2dr5dtn924mdjuox2bg7"
-                        response = requests.post(webhook_url, files=files, timeout=30)
-                        
-                        if response.status_code == 200:
-                            try:
-                                # Try to parse JSON response
-                                result = response.json()
-                                
-                                # Check if response has caption field
-                                if isinstance(result, dict) and 'caption' in result:
-                                    st.session_state.master_content = result['caption']
-                                    st.success("✅ Caption generated successfully!")
-                                    st.rerun()
-                                else:
-                                    # If response is just text, use it directly
-                                    response_text = response.text.strip()
-                                    if response_text:
-                                        st.session_state.master_content = response_text
-                                        st.success("✅ Caption generated successfully!")
-                                        st.rerun()
-                                    else:
-                                        st.info("📬 Request sent! Waiting for caption...")
-                            except ValueError:
-                                # If not JSON, treat as plain text
-                                response_text = response.text.strip()
-                                if response_text:
-                                    st.session_state.master_content = response_text
-                                    st.success("✅ Caption generated successfully!")
-                                    st.rerun()
-                                else:
-                                    st.info("📬 Request sent! Waiting for caption...")
-                        else:
-                            st.error(f"❌ Failed to send request: {response.status_code}")
-                            st.error(f"Response: {response.text}")
+if st.button("✨ Generate Caption", key="generate_caption_tab3", help="Generate caption from images and transcript"):
+    if not carousel_images:
+        st.warning("⚠️ Please upload images first!")
+    else:
+        with st.spinner("🔄 Sending data to generate caption..."):
+            try:
+                # Prepare files for webhook
+                files = []
+                
+                # Add images
+                for idx, img_file in enumerate(carousel_images):
+                    img_file.seek(0)
+                    files.append(('images', (img_file.name, img_file.getvalue(), img_file.type)))
+                
+                # Add transcript if available
+                if transcript_file_tab3:
+                    transcript_file_tab3.seek(0)
+                    files.append(('transcript', (transcript_file_tab3.name, transcript_file_tab3.getvalue(), 'text/plain')))
+                
+                # Send to webhook
+                webhook_url = "https://hook.us2.make.com/mz87lk80py2p2dr5dtn924mdjuox2bg7"
+                response = requests.post(webhook_url, files=files, timeout=30)
+                
+                if response.status_code == 200:
+                    # Debug: Show what we received
+                    st.info(f"🔍 DEBUG - Response text: {response.text[:100]}")
                     
-                    except requests.exceptions.Timeout:
-                        st.error("❌ Request timed out. Please try again.")
-                    except Exception as e:
-                        st.error(f"❌ Error: {str(e)}")
+                    try:
+                        # Try to parse JSON response
+                        result = response.json()
+                        st.info(f"🔍 DEBUG - Parsed as JSON: {result}")
+                        
+                        # Check if response has caption field
+                        if isinstance(result, dict) and 'caption' in result:
+                            st.session_state.master_content = result['caption']
+                            st.success("✅ Caption generated successfully!")
+                            st.info(f"🔍 DEBUG - Set session_state to: {st.session_state.master_content}")
+                            st.rerun()
+                        else:
+                            # If response is just text, use it directly
+                            response_text = response.text.strip()
+                            if response_text:
+                                st.session_state.master_content = response_text
+                                st.success("✅ Caption generated successfully!")
+                                st.info(f"🔍 DEBUG - Set session_state to: {st.session_state.master_content}")
+                                st.rerun()
+                            else:
+                                st.info("📬 Request sent! Waiting for caption...")
+                    except ValueError as e:
+                        # If not JSON, treat as plain text
+                        st.info(f"🔍 DEBUG - Not JSON, error: {str(e)}")
+                        response_text = response.text.strip()
+                        if response_text:
+                            st.session_state.master_content = response_text
+                            st.success("✅ Caption generated successfully!")
+                            st.info(f"🔍 DEBUG - Set session_state to: {st.session_state.master_content}")
+                            st.rerun()
+                        else:
+                            st.info("📬 Request sent! Waiting for caption...")
+                else:
+                    st.error(f"❌ Failed to send request: {response.status_code}")
+                    st.error(f"Response: {response.text}")
+            
+            except requests.exceptions.Timeout:
+                st.error("❌ Request timed out. Please try again.")
+            except Exception as e:
+                st.error(f"❌ Error: {str(e)}")
     
     with col2:
         st.markdown("**📅 Master Schedule (PDT)**")
@@ -2931,3 +2939,4 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
+
