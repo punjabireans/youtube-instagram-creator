@@ -2225,30 +2225,6 @@ with tab4:
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Transcript upload section
-    st.markdown("""
-        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
-                    padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
-            <h3 style='margin-top: 0;'>📄 Upload Transcript (Optional)</h3>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    transcript_file_tab4 = st.file_uploader(
-        "📁 Drop your transcript file here",
-        accept_multiple_files=False,
-        type=['txt'],
-        key="transcript_tab4",
-        help="Upload a .txt transcript file to help generate captions"
-    )
-    
-    if transcript_file_tab4:
-        st.success(f"✅ {transcript_file_tab4.name}")
-        transcript_content = transcript_file_tab4.read().decode('utf-8')
-        with st.expander("📄 Preview Transcript", expanded=False):
-            st.text_area("Transcript Content", value=transcript_content[:500] + "..." if len(transcript_content) > 500 else transcript_content, height=200, disabled=True, label_visibility="collapsed")
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
     # Master content editor
     st.markdown("""
         <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); 
@@ -2285,6 +2261,22 @@ with tab4:
         
         if not st.session_state.webhook_updating and video_master_content != st.session_state.video_master_content:
             st.session_state.video_master_content = video_master_content
+        
+        # Transcript upload in collapsible section
+        with st.expander("📄 Upload Transcript (Optional)"):
+            transcript_file_tab4 = st.file_uploader(
+                "Drop your transcript file here",
+                accept_multiple_files=False,
+                type=['txt'],
+                key="transcript_tab4",
+                help="Upload a .txt transcript file to help generate captions",
+                label_visibility="collapsed"
+            )
+            
+            if transcript_file_tab4:
+                st.success(f"✅ {transcript_file_tab4.name}")
+                transcript_content = transcript_file_tab4.read().decode('utf-8')
+                st.text_area("Preview", value=transcript_content[:300] + "..." if len(transcript_content) > 300 else transcript_content, height=100, disabled=True, label_visibility="collapsed")
         
         # Generate Caption and Tags buttons with webhook functionality
         col_btn1, col_btn2 = st.columns(2)
@@ -2701,17 +2693,9 @@ with tab4:
                 else:
                     st.session_state.video_fb_schedule = st.session_state.video_master_schedule
 
-    # Show message if no platforms selected
-    if not (video_enable_youtube or video_enable_instagram or video_enable_tiktok or video_enable_facebook):
-        st.markdown("""
-            <div style='background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); 
-                        padding: 3rem; border-radius: 16px; text-align: center; margin: 3rem 0;'>
-                <h3 style='margin: 0; color: #0c5460;'>👆 Select at least one platform to get started</h3>
-                <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
-            </div>
-        """, unsafe_allow_html=True)
-
-
+# ============================================================================
+# END OF APPLICATION
+# ============================================================================
 
 
 
