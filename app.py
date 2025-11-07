@@ -1632,14 +1632,17 @@ with tab3:
         # Initialize if needed
         if 'master_content' not in st.session_state:
             st.session_state.master_content = ""
+        if 'master_content_key' not in st.session_state:
+            st.session_state.master_content_key = 0
         
         # The text_area value should always come from session_state
+        # Use a dynamic key that changes when webhook updates
         master_content = st.text_area(
             "✍️ Post Content",
             value=st.session_state.master_content,
             height=150,
             placeholder="Write your post content here... This will be your default content for all platforms.",
-            key="master_content_input"
+            key=f"master_content_input_{st.session_state.master_content_key}"
         )
         
         # Update session state when user types (but not during webhook updates)
@@ -1702,6 +1705,7 @@ with tab3:
                                 if isinstance(result, dict) and 'caption' in result:
                                     st.session_state.webhook_updating = True
                                     st.session_state.master_content = result['caption']
+                                    st.session_state.master_content_key += 1  # Force widget recreation
                                     st.session_state.debug_action = f"Set from JSON caption: {result['caption'][:50]}"
                                     st.session_state.webhook_updating = False
                                     st.rerun()
@@ -1711,6 +1715,7 @@ with tab3:
                                     if response_text:
                                         st.session_state.webhook_updating = True
                                         st.session_state.master_content = response_text
+                                        st.session_state.master_content_key += 1  # Force widget recreation
                                         st.session_state.debug_action = f"Set from plain text: {response_text[:50]}"
                                         st.session_state.webhook_updating = False
                                         st.rerun()
@@ -1724,6 +1729,7 @@ with tab3:
                                 if response_text:
                                     st.session_state.webhook_updating = True
                                     st.session_state.master_content = response_text
+                                    st.session_state.master_content_key += 1  # Force widget recreation
                                     st.session_state.debug_action = f"Set from plain text (not JSON): {response_text[:50]}"
                                     st.session_state.webhook_updating = False
                                     st.rerun()
@@ -2962,6 +2968,7 @@ with tab4:
                 <p style='color: #0c5460; margin: 0.5rem 0 0 0;'>Check the boxes above to enable platforms</p>
             </div>
         """, unsafe_allow_html=True)
+
 
 
 
