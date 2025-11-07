@@ -2187,7 +2187,7 @@ with tab4:
         </div>
     """, unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.markdown("**📷 Instagram**")
         st.text_input("IG ID", value=INSTAGRAM_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab4_ig_display")
@@ -2197,6 +2197,9 @@ with tab4:
     with col3:
         st.markdown("**👥 Facebook**")
         st.text_input("FB ID", value=FACEBOOK_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab4_fb_display")
+    with col4:
+        st.markdown("**📺 YouTube**")
+        st.text_input("YT ID", value=YOUTUBE_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab4_yt_display")
     
     st.markdown("<br>", unsafe_allow_html=True)
     
@@ -2451,6 +2454,14 @@ with tab4:
                         "schedule": st.session_state.get('video_fb_schedule', st.session_state.video_master_schedule)
                     })
                 
+                if enable_video_youtube:
+                    video_platforms_to_post.append({
+                        "platform": "YouTube",
+                        "accountId": YOUTUBE_ACCOUNT_ID,
+                        "content": st.session_state.get('video_yt_content_value', st.session_state.video_master_content),
+                        "schedule": st.session_state.get('video_yt_schedule', st.session_state.video_master_schedule)
+                    })
+                
                 if not video_platforms_to_post:
                     st.error("❌ No platforms configured! Please enable platforms below.")
                 else:
@@ -2515,7 +2526,7 @@ with tab4:
         </div>
     """, unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         enable_video_instagram = st.checkbox("📷 **Instagram**", value=False, key="enable_video_ig")
@@ -2523,6 +2534,8 @@ with tab4:
         enable_video_linkedin = st.checkbox("💼 **LinkedIn**", value=False, key="enable_video_li")
     with col3:
         enable_video_facebook = st.checkbox("👥 **Facebook**", value=False, key="enable_video_fb")
+    with col4:
+        enable_video_youtube = st.checkbox("📺 **YouTube**", value=False, key="enable_video_yt")
     
     st.markdown("<br>", unsafe_allow_html=True)
     
@@ -2692,6 +2705,61 @@ with tab4:
                     st.session_state.video_fb_schedule = video_fb_datetime_pdt.isoformat()
                 else:
                     st.session_state.video_fb_schedule = st.session_state.video_master_schedule
+    
+    # YouTube Video Configuration
+    if enable_video_youtube:
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%); 
+                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
+                <div style='background: white; padding: 2rem; border-radius: 15px;'>
+                    <h3 style='margin-top: 0; color: #FF0000;'>📺 YouTube Video Configuration</h3>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        with st.container():
+            col1, col2 = st.columns([2, 1])
+            
+            with col1:
+                st.info(f"Using Account ID: {YOUTUBE_ACCOUNT_ID}")
+                
+                # Initialize content value in session state
+                if 'video_yt_content_value' not in st.session_state:
+                    st.session_state.video_yt_content_value = ""
+                if 'video_yt_refresh_counter' not in st.session_state:
+                    st.session_state.video_yt_refresh_counter = 0
+                
+                video_yt_content = st.text_area(
+                    "💬 Video Description",
+                    value=st.session_state.video_yt_content_value,
+                    height=100,
+                    key=f"video_yt_content_area_{st.session_state.video_yt_refresh_counter}",
+                    placeholder="Your YouTube video description..."
+                )
+                if video_yt_content != st.session_state.video_yt_content_value:
+                    st.session_state.video_yt_content_value = video_yt_content
+            
+            with col2:
+                use_master_video_yt = st.button("📋 Use Master", key="video_yt_use_master_btn", use_container_width=True)
+                
+                if use_master_video_yt:
+                    st.session_state.video_yt_content_value = st.session_state.video_master_content
+                    if 'video_yt_refresh_counter' not in st.session_state:
+                        st.session_state.video_yt_refresh_counter = 0
+                    st.session_state.video_yt_refresh_counter += 1
+                    st.rerun()
+                
+                st.markdown("**📅 Schedule**")
+                use_master_schedule_video_yt = st.checkbox("Use master schedule", value=True, key="video_yt_master_sched")
+                
+                if not use_master_schedule_video_yt:
+                    video_yt_date = st.date_input("Date", value=default_date, key="video_yt_schedule_date")
+                    video_yt_time = st.time_input("Time (PDT)", value=default_date.time(), key="video_yt_schedule_time")
+                    video_yt_datetime = datetime.combine(video_yt_date, video_yt_time)
+                    video_yt_datetime_pdt = pdt.localize(video_yt_datetime)
+                    st.session_state.video_yt_schedule = video_yt_datetime_pdt.isoformat()
+                else:
+                    st.session_state.video_yt_schedule = st.session_state.video_master_schedule
 
 # ============================================================================
 # END OF APPLICATION
