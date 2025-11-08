@@ -327,7 +327,103 @@ def check_password():
         return False
     else:
         return True
+# ============================================================================
+# CTA IMAGE CREATION FUNCTION (Add this near the top with other functions)
+# ============================================================================
 
+def create_cta_podcast_image(bg_color, bg_image, cta_label, cta_box_color, guest_name, episode_title, podcast_cover):
+    """Create CTA podcast image matching the template"""
+    
+    # Image dimensions
+    POST_SIZE = 1080
+    
+    # Create base image
+    if bg_image:
+        # Use uploaded background image
+        base_img = Image.open(bg_image)
+        base_img = resize_image_to_exact(base_img, POST_SIZE, POST_SIZE)
+    else:
+        # Use solid color
+        base_img = Image.new('RGB', (POST_SIZE, POST_SIZE), color=bg_color)
+    
+    # Create drawing context
+    draw = ImageDraw.Draw(base_img)
+    
+    # --- CTA Label Box (Top-Left) ---
+    cta_box_padding = 20
+    cta_font_size = 80
+    cta_font = get_font(cta_font_size, bold=True)
+    
+    # Calculate CTA box dimensions
+    cta_bbox = draw.textbbox((0, 0), cta_label, font=cta_font)
+    cta_text_width = cta_bbox[2] - cta_bbox[0]
+    cta_text_height = cta_bbox[3] - cta_bbox[1]
+    
+    cta_box_width = cta_text_width + (cta_box_padding * 2)
+    cta_box_height = cta_text_height + (cta_box_padding * 2)
+    
+    # Draw CTA box
+    cta_box_pos = (80, 120)
+    draw.rectangle(
+        [cta_box_pos[0], cta_box_pos[1], 
+         cta_box_pos[0] + cta_box_width, cta_box_pos[1] + cta_box_height],
+        fill=cta_box_color
+    )
+    
+    # Draw CTA text
+    cta_text_pos = (cta_box_pos[0] + cta_box_padding, cta_box_pos[1] + cta_box_padding)
+    draw.text(cta_text_pos, cta_label, fill='#1A2238', font=cta_font)
+    
+    # --- Main Message Text ---
+    main_text = f'Listen to the full conversation with special guest {guest_name} on the "Rena Malik, MD Podcast"'
+    main_font_size = 42
+    main_font = get_font(main_font_size, bold=False)
+    
+    # Wrap text
+    max_width = POST_SIZE - 160
+    wrapped_main_text = wrap_text(main_text, main_font, max_width)
+    
+    # Position main text (centered vertically, left-aligned)
+    main_text_x = 80
+    main_text_y = 450
+    
+    draw.multiline_text(
+        (main_text_x, main_text_y),
+        wrapped_main_text,
+        fill='#1A2238',
+        font=main_font,
+        spacing=10
+    )
+    
+    # --- Episode Info (Bottom-Left) ---
+    episode_text = f"🎙️Episode: {episode_title}"
+    episode_font_size = 32
+    episode_font = get_font(episode_font_size, bold=False)
+    
+    episode_pos = (80, POST_SIZE - 200)
+    draw.text(episode_pos, episode_text, fill='#1A2238', font=episode_font)
+    
+    # --- Podcast Cover (Bottom-Right) ---
+    if podcast_cover:
+        try:
+            cover_img = Image.open(podcast_cover)
+            cover_size = 250
+            cover_img = resize_image_to_exact(cover_img, cover_size, cover_size)
+            
+            # Position in bottom-right
+            cover_x = POST_SIZE - cover_size - 60
+            cover_y = POST_SIZE - cover_size - 60
+            
+            # Paste cover (handle transparency)
+            if cover_img.mode == 'RGBA':
+                base_img.paste(cover_img, (cover_x, cover_y), cover_img)
+            else:
+                base_img.paste(cover_img, (cover_x, cover_y))
+                
+        except Exception as e:
+            st.warning(f"Could not add podcast cover: {str(e)}")
+    
+    return base_img
 
 # ============================================================================
 # YOUTUBE TO INSTAGRAM POST FUNCTIONS
@@ -1532,18 +1628,153 @@ with tab2:
     # Hero section
     st.markdown("""
         <div style='text-align: center; padding: 2rem 0;'>
-            <h1 style='font-size: 2.5rem; margin-bottom: 0.5rem;'>🎙️ CTA Podcast Content Creation</h1>
-            <p style='font-size: 1.1rem; color: #666;'>Create engaging call-to-action content for your podcast episodes</p>
+            <h1 style='font-size: 2.5rem; margin-bottom: 0.5rem;'>🎙️ CTA Podcast Content Creator</h1>
+            <p style='font-size: 1.1rem; color: #666;'>Create engaging call-to-action posts for your podcast episodes</p>
         </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("""
-        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); 
-                    padding: 3rem; border-radius: 16px; text-align: center; margin: 2rem 0;'>
-            <h2 style='margin: 0; color: #667eea;'>🚧 Coming Soon</h2>
-            <p style='color: #666; margin: 1rem 0 0 0; font-size: 1.1rem;'>This feature is currently under development</p>
-        </div>
-    """, unsafe_allow_html=True)
+    # Initialize session state for tab 2
+    if 'tab2_cta_image' not in st.session_state:
+        st.session_state.tab2_cta_image = None
+    
+    # Two column layout
+    col_left, col_right = st.columns([1, 1], gap="large")
+    
+    with col_left:
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                        padding: 2rem; border-radius: 16px; margin-bottom: 1.5rem;'>
+                <h3 style='margin-top: 0;'>🎨 Customize Your CTA</h3>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Background Options
+        st.markdown("### 🖼️ Background Settings")
+        background_option = st.radio(
+            "Choose background type",
+            ["Solid Color", "Upload Image"],
+            horizontal=True,
+            label_visibility="collapsed"
+        )
+        
+        if background_option == "Solid Color":
+            bg_color = st.color_picker("Background Color", value="#E8D58A", help="Pick your background color")
+            bg_image = None
+        else:
+            bg_color = None
+            bg_image = st.file_uploader("Upload Background Image", type=['png', 'jpg', 'jpeg'], help="Upload a custom background image")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Text Customization
+        st.markdown("### ✍️ Text Content")
+        
+        cta_label = st.text_input(
+            "CTA Label",
+            value="[CTA]",
+            help="The label in the top-left box"
+        )
+        
+        cta_box_color = st.color_picker("CTA Box Color", value="#9DB4E8", help="Background color for CTA label box")
+        
+        guest_name = st.text_input(
+            "Guest Name",
+            value="[Guest]",
+            placeholder="Dr. Jane Smith",
+            help="Name of your podcast guest"
+        )
+        
+        episode_title = st.text_input(
+            "Episode Title",
+            value="[Episode Title]",
+            placeholder="Understanding Sleep Science",
+            help="Title of the episode"
+        )
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Podcast Cover/Logo
+        st.markdown("### 🎭 Podcast Cover")
+        podcast_cover = st.file_uploader(
+            "Upload Podcast Cover",
+            type=['png', 'jpg', 'jpeg'],
+            help="Your podcast cover image (will appear in bottom-right)"
+        )
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Generate Button
+        if st.button("🎨 Generate CTA Image", type="primary", use_container_width=True):
+            with st.spinner("✨ Creating your CTA image..."):
+                # Create the CTA image
+                cta_image = create_cta_podcast_image(
+                    bg_color=bg_color,
+                    bg_image=bg_image,
+                    cta_label=cta_label,
+                    cta_box_color=cta_box_color,
+                    guest_name=guest_name,
+                    episode_title=episode_title,
+                    podcast_cover=podcast_cover
+                )
+                
+                st.session_state.tab2_cta_image = cta_image
+                st.success("✅ CTA image generated successfully!")
+    
+    with col_right:
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                        padding: 2rem; border-radius: 16px; margin-bottom: 1.5rem;'>
+                <h3 style='margin-top: 0;'>👀 Preview</h3>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        if st.session_state.tab2_cta_image:
+            # Show preview
+            st.image(st.session_state.tab2_cta_image, use_container_width=True)
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            # Download button
+            img_bytes = BytesIO()
+            st.session_state.tab2_cta_image.save(img_bytes, format='PNG', quality=95)
+            img_bytes.seek(0)
+            
+            st.download_button(
+                label="⬇️ Download CTA Image",
+                data=img_bytes,
+                file_name="podcast_cta.png",
+                mime="image/png",
+                use_container_width=True,
+                type="primary"
+            )
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            st.info("""
+            **📦 Your CTA includes:**
+            - ✅ 1080x1080px Instagram-ready format
+            - ✅ Custom background and colors
+            - ✅ Professional typography
+            - ✅ Podcast branding
+            
+            **💡 Perfect for:**
+            - Instagram posts
+            - Facebook updates
+            - Twitter/X content
+            - Newsletter graphics
+            """)
+        else:
+            # Placeholder
+            st.markdown("""
+                <div style='background: #f7fafc; border: 2px dashed #cbd5e0; border-radius: 16px; 
+                            padding: 4rem 2rem; text-align: center; min-height: 500px; 
+                            display: flex; align-items: center; justify-content: center;'>
+                    <div>
+                        <h3 style='color: #718096; margin: 0;'>👈 Customize your CTA on the left</h3>
+                        <p style='color: #a0aec0; margin-top: 0.5rem;'>Your preview will appear here</p>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
 
 # ============================================================================
 # TAB 3: CREATE CAROUSEL/FEED POST
@@ -3174,6 +3405,7 @@ with tab4:
 # ============================================================================
 # END OF APPLICATION
 # ============================================================================
+
 
 
 
