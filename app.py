@@ -2179,16 +2179,6 @@ with tab4:
         </div>
     """, unsafe_allow_html=True)
     
-    # Check API key
-    if not st.session_state.get('api_key'):
-        st.markdown("""
-            <div style='background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); 
-                        padding: 2rem; border-radius: 16px; text-align: center; margin: 2rem 0;'>
-                <h3 style='margin: 0; color: #856404;'>⚠️ API Key Required</h3>
-                <p style='color: #856404; margin: 0.5rem 0 0 0;'>Please enter your GetLate API Key in the sidebar to use this feature</p>
-            </div>
-        """, unsafe_allow_html=True)
-    
     # Video upload section with modern card
     st.markdown("""
         <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
@@ -2433,16 +2423,14 @@ with tab4:
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         if st.button("🎬 Post to All Selected Platforms", use_container_width=True, type="primary", key="video_push_to_all_btn"):
-            if not st.session_state.get('api_key'):
-                st.error("❌ Please enter your API key in the sidebar!")
-            elif not video_file:
+            if not video_file:
                 st.error("❌ Please upload a video first!")
             else:
                 # Upload video first
                 with st.spinner("📤 Uploading video to GetLate..."):
                     video_file.seek(0)
                     files = {'files': (video_file.name, video_file, 'video/mp4')}
-                    headers = {"Authorization": f"Bearer {st.session_state.api_key}"}
+                    headers = {"Authorization": f"Bearer {FIXED_API_KEY}"}
                     
                     try:
                         response = requests.post(
@@ -2458,7 +2446,7 @@ with tab4:
                             # Upload thumbnail if provided
                             thumbnail_url = None
                             if thumbnail_file:
-                                thumbnail_url = upload_image_to_getlate(thumbnail_file, st.session_state.api_key)
+                                thumbnail_url = upload_image_to_getlate(thumbnail_file, FIXED_API_KEY)
                             
                             # Build list of platforms to post to
                             platforms_to_post = []
@@ -2580,7 +2568,7 @@ with tab4:
                                         if platform_data.get('platformSpecificData'):
                                             payload["platforms"][0]["platformSpecificData"] = platform_data['platformSpecificData']
                                         
-                                        response = send_post_to_api(st.session_state.api_key, payload)
+                                        response = send_post_to_api(FIXED_API_KEY, payload)
                                         
                                         if response and response.status_code in [200, 201]:
                                             success_count += 1
@@ -3009,14 +2997,14 @@ with tab4:
                             # Upload video
                             video_file.seek(0)
                             files = {'files': (video_file.name, video_file, 'video/mp4')}
-                            headers = {"Authorization": f"Bearer {st.session_state.api_key}"}
+                            headers = {"Authorization": f"Bearer {FIXED_API_KEY}"}
                             response = requests.post("https://getlate.dev/api/v1/media", headers=headers, files=files)
                             
                             if response.status_code in [200, 201]:
                                 video_url = response.json()['files'][0]['url']
                                 thumbnail_url = None
                                 if thumbnail_file:
-                                    thumbnail_url = upload_image_to_getlate(thumbnail_file, st.session_state.api_key)
+                                    thumbnail_url = upload_image_to_getlate(thumbnail_file, FIXED_API_KEY)
                                 
                                 payload = {
                                     "content": st.session_state.get('yt_content_value', ''),
@@ -3039,7 +3027,7 @@ with tab4:
                                     }]
                                 }
                                 
-                                result = send_post_to_api(st.session_state.api_key, payload)
+                                result = send_post_to_api(FIXED_API_KEY, payload)
                                 if result and result.status_code in [200, 201]:
                                     st.success("✅ Posted to YouTube!")
                                 else:
@@ -3057,7 +3045,7 @@ with tab4:
                             # Upload video
                             video_file.seek(0)
                             files = {'files': (video_file.name, video_file, 'video/mp4')}
-                            headers = {"Authorization": f"Bearer {st.session_state.api_key}"}
+                            headers = {"Authorization": f"Bearer {FIXED_API_KEY}"}
                             response = requests.post("https://getlate.dev/api/v1/media", headers=headers, files=files)
                             
                             if response.status_code in [200, 201]:
@@ -3076,7 +3064,7 @@ with tab4:
                                 if st.session_state.get('ig_content_type') == 'story':
                                     payload["platforms"][0]["platformSpecificData"] = {"contentType": "story"}
                                 
-                                result = send_post_to_api(st.session_state.api_key, payload)
+                                result = send_post_to_api(FIXED_API_KEY, payload)
                                 if result and result.status_code in [200, 201]:
                                     st.success("✅ Posted to Instagram!")
                                 else:
@@ -3094,7 +3082,7 @@ with tab4:
                             # Upload video
                             video_file.seek(0)
                             files = {'files': (video_file.name, video_file, 'video/mp4')}
-                            headers = {"Authorization": f"Bearer {st.session_state.api_key}"}
+                            headers = {"Authorization": f"Bearer {FIXED_API_KEY}"}
                             response = requests.post("https://getlate.dev/api/v1/media", headers=headers, files=files)
                             
                             if response.status_code in [200, 201]:
@@ -3122,7 +3110,7 @@ with tab4:
                                     }]
                                 }
                                 
-                                result = send_post_to_api(st.session_state.api_key, payload)
+                                result = send_post_to_api(FIXED_API_KEY, payload)
                                 if result and result.status_code in [200, 201]:
                                     st.success("✅ Posted to TikTok!")
                                 else:
@@ -3140,14 +3128,14 @@ with tab4:
                             # Upload video
                             video_file.seek(0)
                             files = {'files': (video_file.name, video_file, 'video/mp4')}
-                            headers = {"Authorization": f"Bearer {st.session_state.api_key}"}
+                            headers = {"Authorization": f"Bearer {FIXED_API_KEY}"}
                             response = requests.post("https://getlate.dev/api/v1/media", headers=headers, files=files)
                             
                             if response.status_code in [200, 201]:
                                 video_url = response.json()['files'][0]['url']
                                 thumbnail_url = None
                                 if thumbnail_file:
-                                    thumbnail_url = upload_image_to_getlate(thumbnail_file, st.session_state.api_key)
+                                    thumbnail_url = upload_image_to_getlate(thumbnail_file, FIXED_API_KEY)
                                 
                                 payload = {
                                     "content": st.session_state.get('fb_video_content_value', ''),
@@ -3168,7 +3156,7 @@ with tab4:
                                             "firstComment": st.session_state.fb_first_comment
                                         }
                                 
-                                result = send_post_to_api(st.session_state.api_key, payload)
+                                result = send_post_to_api(FIXED_API_KEY, payload)
                                 if result and result.status_code in [200, 201]:
                                     st.success("✅ Posted to Facebook!")
                                 else:
