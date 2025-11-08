@@ -2180,7 +2180,7 @@ with tab4:
     """, unsafe_allow_html=True)
     
     # Check API key
-    if not st.session_state.api_key:
+    if not st.session_state.get('api_key'):
         st.markdown("""
             <div style='background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); 
                         padding: 2rem; border-radius: 16px; text-align: center; margin: 2rem 0;'>
@@ -2433,7 +2433,7 @@ with tab4:
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         if st.button("🎬 Post to All Selected Platforms", use_container_width=True, type="primary", key="video_push_to_all_btn"):
-            if not st.session_state.api_key:
+            if not st.session_state.get('api_key'):
                 st.error("❌ Please enter your API key in the sidebar!")
             elif not video_file:
                 st.error("❌ Please upload a video first!")
@@ -3186,6 +3186,7 @@ with tab4:
 # ============================================================================
 # END OF APPLICATION
 # ============================================================================
+
 
 
 
