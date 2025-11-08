@@ -331,7 +331,7 @@ def check_password():
 # CTA IMAGE CREATION FUNCTION (Add this near the top with other functions)
 # ============================================================================
 
-def create_cta_podcast_image(bg_color, bg_image, cta_label, cta_box_color, guest_name, episode_title, podcast_cover):
+def create_cta_podcast_image(bg_color, bg_image, cta_label, cta_box_color, guest_name, episode_title):
     """Create CTA podcast image matching the template"""
     
     # Image dimensions
@@ -403,10 +403,15 @@ def create_cta_podcast_image(bg_color, bg_image, cta_label, cta_box_color, guest
     episode_pos = (80, POST_SIZE - 200)
     draw.text(episode_pos, episode_text, fill='#1A2238', font=episode_font)
     
-    # --- Podcast Cover (Bottom-Right) ---
-    if podcast_cover:
-        try:
-            cover_img = Image.open(podcast_cover)
+    # --- Podcast Cover (Bottom-Right) - LOAD FROM GOOGLE DRIVE ---
+    try:
+        # Your podcast cover Google Drive link
+        PODCAST_COVER_URL = "https://drive.google.com/uc?export=download&id=1Bb2Kc6Y_exps6NV-s73l3DFGV8Nj2Wj3"
+        
+        # Download image from Google Drive
+        response = requests.get(PODCAST_COVER_URL)
+        if response.status_code == 200:
+            cover_img = Image.open(BytesIO(response.content))
             cover_size = 250
             cover_img = resize_image_to_exact(cover_img, cover_size, cover_size)
             
@@ -419,9 +424,11 @@ def create_cta_podcast_image(bg_color, bg_image, cta_label, cta_box_color, guest
                 base_img.paste(cover_img, (cover_x, cover_y), cover_img)
             else:
                 base_img.paste(cover_img, (cover_x, cover_y))
-                
-        except Exception as e:
-            st.warning(f"Could not add podcast cover: {str(e)}")
+        else:
+            st.warning("⚠️ Could not load podcast cover from Google Drive")
+            
+    except Exception as e:
+        st.warning(f"⚠️ Could not add podcast cover: {str(e)}")
     
     return base_img
 
@@ -1693,16 +1700,6 @@ with tab2:
         
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # Podcast Cover/Logo
-        st.markdown("### 🎭 Podcast Cover")
-        podcast_cover = st.file_uploader(
-            "Upload Podcast Cover",
-            type=['png', 'jpg', 'jpeg'],
-            help="Your podcast cover image (will appear in bottom-right)"
-        )
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        
         # Generate Button
         if st.button("🎨 Generate CTA Image", type="primary", use_container_width=True):
             with st.spinner("✨ Creating your CTA image..."):
@@ -1713,8 +1710,7 @@ with tab2:
                     cta_label=cta_label,
                     cta_box_color=cta_box_color,
                     guest_name=guest_name,
-                    episode_title=episode_title,
-                    podcast_cover=podcast_cover
+                    episode_title=episode_title
                 )
                 
                 st.session_state.tab2_cta_image = cta_image
@@ -1755,7 +1751,7 @@ with tab2:
             - ✅ 1080x1080px Instagram-ready format
             - ✅ Custom background and colors
             - ✅ Professional typography
-            - ✅ Podcast branding
+            - ✅ Rena Malik MD Podcast branding
             
             **💡 Perfect for:**
             - Instagram posts
@@ -3405,6 +3401,7 @@ with tab4:
 # ============================================================================
 # END OF APPLICATION
 # ============================================================================
+
 
 
 
