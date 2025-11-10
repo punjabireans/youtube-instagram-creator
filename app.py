@@ -824,7 +824,7 @@ def upload_image_to_getlate(image_file, api_key):
         return None
 
 def send_post_to_api(api_key, post_data):
-    """Send post to GetLate API"""
+    """Send post to GetLate API with improved error handling"""
     endpoint = "https://getlate.dev/api/v1/posts"
     
     headers = {
@@ -833,9 +833,25 @@ def send_post_to_api(api_key, post_data):
     }
     
     try:
-        response = requests.post(endpoint, headers=headers, json=post_data)
+        response = requests.post(
+            endpoint, 
+            headers=headers, 
+            json=post_data,
+            timeout=30
+        )
         return response
+        
+    except requests.exceptions.Timeout:
+        st.error("⏱️ Request timed out after 30 seconds")
+        return None
+    except requests.exceptions.ConnectionError as e:
+        st.error(f"🔌 Connection error: {str(e)}")
+        return None
+    except requests.exceptions.RequestException as e:
+        st.error(f"🌐 Request failed: {str(e)}")
+        return None
     except Exception as e:
+        st.error(f"❌ Unexpected error: {type(e).__name__}: {str(e)}")
         return None
 
 def build_post_payload(content, scheduled_time, timezone, platforms_config):
@@ -2139,14 +2155,28 @@ with tab3:
                             }]
                         )
                         
+                        # DEBUG: Show payload
+                        with st.expander(f"🔍 Debug: {platform_data['platform']} Payload", expanded=False):
+                            st.json(payload)
+                            st.write(f"**Account ID:** {platform_data['accountId']}")
+                            st.write(f"**Media Items:** {len(platform_data['mediaItems'])} items")
+                            st.write(f"**Content Length:** {len(platform_data['content'])} characters")
+                        
                         response = send_post_to_api(FIXED_API_KEY, payload)
                         
                         if response and response.status_code in [200, 201]:
                             success_count += 1
+                            st.success(f"✅ {platform_data['platform']}: Posted successfully!")
                         else:
                             error_count += 1
-                            error_msg = response.json() if response else "Connection error"
-                            st.error(f"❌ {platform_data['platform']}: Failed - {error_msg}")
+                            if response:
+                                try:
+                                    error_msg = response.json()
+                                    st.error(f"❌ {platform_data['platform']}: Failed - {error_msg}")
+                                except:
+                                    st.error(f"❌ {platform_data['platform']}: HTTP {response.status_code} - {response.text}")
+                            else:
+                                st.error(f"❌ {platform_data['platform']}: Connection failed")
                         
                         progress_bar.progress((idx + 1) / len(platforms_to_post))
                     
@@ -3402,6 +3432,7 @@ with tab4:
 # ============================================================================
 # END OF APPLICATION
 # ============================================================================
+
 
 
 
