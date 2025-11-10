@@ -17,7 +17,7 @@ import hashlib
 FIXED_API_KEY = "sk_e49ce1a9dacec6a32b40c405d521a41db3a2d614bbb0e32111a9f39acef48c2b"  # Replace with your actual GetLate API key
 
 # Tab 3 (Multi-Platform Post Creator) Account IDs
-INSTAGRAM_ACCOUNT_ID = "69105863ef0527b8b3cfe9de"  # Replace with your Instagram account ID
+INSTAGRAM_ACCOUNT_ID = "69116f39ef0527b8b3cfea5a"  # Replace with your Instagram account ID
 LINKEDIN_ACCOUNT_ID = "123456"   # Replace with your LinkedIn account ID
 FACEBOOK_ACCOUNT_ID = "123456"   # Replace with your Facebook account ID
 TWITTER_ACCOUNT_ID = "123456"    # Replace with your Twitter account ID
@@ -3402,6 +3402,7 @@ with tab4:
 # ============================================================================
 # END OF APPLICATION
 # ============================================================================
+
 
 
 
