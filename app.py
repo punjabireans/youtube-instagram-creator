@@ -14,7 +14,7 @@ import hashlib
 # CONFIGURATION - INPUT YOUR API KEY AND ACCOUNT IDs HERE
 # ============================================================================
 # TODO: Replace these dummy values with your actual credentials
-FIXED_API_KEY = "sk_8919252a68469676dc73a05a0f1bcaa7236f6a8e49b8d142e4accddc1b18c2a1"  # Replace with your actual GetLate API key
+FIXED_API_KEY = "sk_e49ce1a9dacec6a32b40c405d521a41db3a2d614bbb0e32111a9f39acef48c2b"  # Replace with your actual GetLate API key
 
 # Tab 3 (Multi-Platform Post Creator) Account IDs
 INSTAGRAM_ACCOUNT_ID = "69116f39ef0527b8b3cfea5a"  # Replace with your Instagram account ID
@@ -3401,6 +3401,7 @@ with tab4:
 # ============================================================================
 # END OF APPLICATION
 # ============================================================================
+
 
 
 
