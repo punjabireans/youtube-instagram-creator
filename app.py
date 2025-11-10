@@ -1999,8 +1999,31 @@ with tab3:
         
         st.session_state.master_schedule = master_schedule_iso
     
-    # Post to All Platforms Section
     st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Platform selection with modern cards - MOVED HERE BEFORE THE BUTTON
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                    padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
+            <h3 style='margin-top: 0;'>🌐 Select Your Platforms</h3>
+            <p style='color: #666; margin: 0;'>Choose which platforms to post to</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        enable_instagram = st.checkbox("📷 **Instagram**", value=False, key="enable_ig")
+    with col2:
+        enable_linkedin = st.checkbox("💼 **LinkedIn**", value=False, key="enable_li")
+    with col3:
+        enable_facebook = st.checkbox("👥 **Facebook**", value=False, key="enable_fb")
+    with col4:
+        enable_twitter = st.checkbox("🐦 **Twitter**", value=False, key="enable_tw")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Post to All Platforms Section - NOW AFTER THE CHECKBOXES
     st.markdown("""
         <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                     padding: 2.5rem; border-radius: 16px; text-align: center; margin: 1.5rem 0;
@@ -2093,7 +2116,7 @@ with tab3:
                 })
             
             if not platforms_to_post:
-                st.error("❌ No platforms configured! Please enable platforms below.")
+                st.error("❌ No platforms configured! Please enable platforms above.")
             else:
                 # Post to all platforms
                 with st.spinner(f"📤 Posting to {len(platforms_to_post)} platform(s)..."):
@@ -2137,28 +2160,6 @@ with tab3:
                         st.success(f"🎉 Successfully posted to all {success_count} platform(s)!")
                     else:
                         st.warning(f"⚠️ Posted to {success_count} platform(s), {error_count} failed")
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # Platform selection with modern cards
-    st.markdown("""
-        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
-                    padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
-            <h3 style='margin-top: 0;'>🌐 Select Your Platforms</h3>
-            <p style='color: #666; margin: 0;'>Choose which platforms to post to</p>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        enable_instagram = st.checkbox("📷 **Instagram**", value=False, key="enable_ig")
-    with col2:
-        enable_linkedin = st.checkbox("💼 **LinkedIn**", value=False, key="enable_li")
-    with col3:
-        enable_facebook = st.checkbox("👥 **Facebook**", value=False, key="enable_fb")
-    with col4:
-        enable_twitter = st.checkbox("🐦 **Twitter**", value=False, key="enable_tw")
     
     st.markdown("<br>", unsafe_allow_html=True)
     
@@ -3401,6 +3402,7 @@ with tab4:
 # ============================================================================
 # END OF APPLICATION
 # ============================================================================
+
 
 
 
