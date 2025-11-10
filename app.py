@@ -14,17 +14,17 @@ import hashlib
 # CONFIGURATION - INPUT YOUR API KEY AND ACCOUNT IDs HERE
 # ============================================================================
 # TODO: Replace these dummy values with your actual credentials
-FIXED_API_KEY = "sk_e49ce1a9dacec6a32b40c405d521a41db3a2d614bbb0e32111a9f39acef48c2b"  # Replace with your actual GetLate API key
+FIXED_API_KEY = "sk_8919252a68469676dc73a05a0f1bcaa7236f6a8e49b8d142e4accddc1b18c2a1"  # Replace with your actual GetLate API key
 
 # Tab 3 (Multi-Platform Post Creator) Account IDs
-INSTAGRAM_ACCOUNT_ID = "69116f39ef0527b8b3cfea5a"  # Replace with your Instagram account ID
+INSTAGRAM_ACCOUNT_ID = "123456"  # Replace with your Instagram account ID
 LINKEDIN_ACCOUNT_ID = "123456"   # Replace with your LinkedIn account ID
 FACEBOOK_ACCOUNT_ID = "123456"   # Replace with your Facebook account ID
 TWITTER_ACCOUNT_ID = "123456"    # Replace with your Twitter account ID
 
 # Tab 4 (Short Form Video Creator) Account IDs
 YOUTUBE_ACCOUNT_ID = "69105863ef0527b8b3cfe9de"           # Replace with your YouTube account ID
-INSTAGRAM_VIDEO_ACCOUNT_ID = "69116f39ef0527b8b3cfea5a"  # Replace with your Instagram account ID for videos
+INSTAGRAM_VIDEO_ACCOUNT_ID = "123456"  # Replace with your Instagram account ID for videos
 TIKTOK_ACCOUNT_ID = "123456"           # Replace with your TikTok account ID
 FACEBOOK_VIDEO_ACCOUNT_ID = "123456"   # Replace with your Facebook account ID for videos
 
@@ -1772,36 +1772,627 @@ with tab2:
                 </div>
             """, unsafe_allow_html=True)
 
-def send_post_to_api(api_key, post_data):
-    """Send post to GetLate API with improved error handling"""
-    endpoint = "https://getlate.dev/api/v1/posts"
+# ============================================================================
+# TAB 3: CREATE CAROUSEL/FEED POST
+# ============================================================================
+
+with tab3:
+    # Hero section
+    st.markdown("""
+        <div style='text-align: center; padding: 2rem 0;'>
+            <h1 style='font-size: 2.5rem; margin-bottom: 0.5rem;'>🎨 Multi-Platform Post Creator</h1>
+            <p style='font-size: 1.1rem; color: #666;'>Upload once, post everywhere. Reach your audience across all platforms</p>
+        </div>
+    """, unsafe_allow_html=True)
     
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
+    # Display configured account IDs in a nice info box
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                    padding: 1.5rem; border-radius: 16px; margin: 1.5rem 0;'>
+            <h3 style='margin-top: 0;'>📋 Configured Account IDs</h3>
+        </div>
+    """, unsafe_allow_html=True)
     
-    try:
-        response = requests.post(
-            endpoint, 
-            headers=headers, 
-            json=post_data,
-            timeout=30
-        )
-        return response
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.markdown("**📷 Instagram**")
+        st.text_input("IG ID", value=INSTAGRAM_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab3_ig_display")
+    with col2:
+        st.markdown("**💼 LinkedIn**")
+        st.text_input("LI ID", value=LINKEDIN_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab3_li_display")
+    with col3:
+        st.markdown("**👥 Facebook**")
+        st.text_input("FB ID", value=FACEBOOK_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab3_fb_display")
+    with col4:
+        st.markdown("**🐦 Twitter**")
+        st.text_input("TW ID", value=TWITTER_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab3_tw_display")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Image upload section with modern card
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                    padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
+            <h3 style='margin-top: 0;'>📤 Upload Your Media</h3>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    carousel_images = st.file_uploader(
+        "📁 Drop your images here or click to browse",
+        accept_multiple_files=True,
+        type=['png', 'jpg', 'jpeg'],
+        key="carousel_images",
+        help="Upload images for your carousel or feed post"
+    )
+    
+    if carousel_images:
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.success(f"✅ {len(carousel_images)} image(s) uploaded successfully")
+        with col2:
+            st.metric("📷 Total Images", len(carousel_images))
         
-    except requests.exceptions.Timeout:
-        st.error("⏱️ Request timed out after 30 seconds")
-        return None
-    except requests.exceptions.ConnectionError as e:
-        st.error(f"🔌 Connection error: {str(e)}")
-        return None
-    except requests.exceptions.RequestException as e:
-        st.error(f"🌐 Request failed: {str(e)}")
-        return None
-    except Exception as e:
-        st.error(f"❌ Unexpected error: {type(e).__name__}: {str(e)}")
-        return None
+        # Compact image preview in collapsible grid
+        with st.expander(f"👁️ Preview Uploaded Images ({len(carousel_images)} images)", expanded=False):
+            num_cols = 4
+            cols = st.columns(num_cols)
+            for i, img_file in enumerate(carousel_images):
+                with cols[i % num_cols]:
+                    img = Image.open(img_file)
+                    st.image(img, use_container_width=True, caption=f"#{i+1}")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Master content editor with modern styling
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); 
+                    padding: 2rem; border-radius: 16px; margin: 1.5rem 0; border: 2px solid #667eea;'>
+            <h3 style='margin-top: 0; color: #667eea;'>📝 Master Content Editor</h3>
+            <p style='color: #4a5568; margin: 0.5rem 0 0 0; font-size: 0.95rem;'>
+                ✍️ Create your content once, then push to all selected platforms below
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        # Initialize if needed
+        if 'master_content' not in st.session_state:
+            st.session_state.master_content = ""
+        if 'master_content_key' not in st.session_state:
+            st.session_state.master_content_key = 0
+        
+        # The text_area value should always come from session_state
+        # Use a dynamic key that changes when webhook updates
+        master_content = st.text_area(
+            "✍️ Post Content",
+            value=st.session_state.master_content,
+            height=150,
+            placeholder="Write your post content here... This will be your default content for all platforms.",
+            key=f"master_content_input_{st.session_state.master_content_key}"
+        )
+        
+        # Update session state when user types (but not during webhook updates)
+        if 'webhook_updating' not in st.session_state:
+            st.session_state.webhook_updating = False
+        
+        if not st.session_state.webhook_updating and master_content != st.session_state.master_content:
+            st.session_state.master_content = master_content
+        
+        # Transcript upload in collapsible section
+        with st.expander("📄 Upload Transcript (Optional)"):
+            transcript_file_tab3 = st.file_uploader(
+                "Drop your transcript file here",
+                accept_multiple_files=False,
+                type=['txt'],
+                key="transcript_tab3",
+                help="Upload a .txt transcript file to help generate captions",
+                label_visibility="collapsed"
+            )
+            
+            if transcript_file_tab3:
+                st.success(f"✅ {transcript_file_tab3.name}")
+                transcript_content = transcript_file_tab3.read().decode('utf-8')
+                st.text_area("Preview", value=transcript_content[:300] + "..." if len(transcript_content) > 300 else transcript_content, height=100, disabled=True, label_visibility="collapsed")
+        
+        # Generate Caption button with webhook functionality
+        if st.button("✨ Generate Caption", key="generate_caption_tab3", help="Generate caption from images and transcript"):
+            if not carousel_images:
+                st.warning("⚠️ Please upload images first!")
+            else:
+                with st.spinner("🔄 Sending data to generate caption..."):
+                    try:
+                        # First, upload images to GetLate to get public URLs
+                        image_urls = []
+                        with st.spinner("📤 Uploading images to get public URLs..."):
+                            for img in carousel_images:
+                                url = upload_image_to_getlate(img, FIXED_API_KEY)
+                                if url:
+                                    image_urls.append(url)
+                        
+                        if not image_urls:
+                            st.error("❌ Failed to upload images. Please try again.")
+                        else:
+                            # Prepare data for webhook
+                            data = {
+                                'image_urls': ','.join(image_urls)  # Send as comma-separated string
+                            }
+                            
+                            # Add transcript as plain text if available
+                            if transcript_file_tab3:
+                                transcript_file_tab3.seek(0)
+                                transcript_text = transcript_file_tab3.read().decode('utf-8')
+                                data['transcript'] = transcript_text
+                            
+                            # Send to webhook as JSON
+                            webhook_url = "https://hook.us2.make.com/mz87lk80py2p2dr5dtn924mdjuox2bg7"
+                            response = requests.post(webhook_url, json=data, timeout=30)
+                            
+                            if response.status_code == 200:
+                                try:
+                                    # Try to parse JSON response
+                                    result = response.json()
+                                    
+                                    # Check if response has caption field
+                                    if isinstance(result, dict) and 'caption' in result:
+                                        st.session_state.webhook_updating = True
+                                        st.session_state.master_content = result['caption']
+                                        st.session_state.master_content_key += 1  # Force widget recreation
+                                        st.session_state.webhook_updating = False
+                                        st.success("✅ Caption generated successfully!")
+                                        st.rerun()
+                                    else:
+                                        # If response is just text, use it directly
+                                        response_text = response.text.strip()
+                                        if response_text:
+                                            st.session_state.webhook_updating = True
+                                            st.session_state.master_content = response_text
+                                            st.session_state.master_content_key += 1  # Force widget recreation
+                                            st.session_state.webhook_updating = False
+                                            st.success("✅ Caption generated successfully!")
+                                            st.rerun()
+                                        else:
+                                            st.info("📬 Request sent! Waiting for caption...")
+                                except ValueError:
+                                    # If not JSON, treat as plain text
+                                    response_text = response.text.strip()
+                                    if response_text:
+                                        st.session_state.webhook_updating = True
+                                        st.session_state.master_content = response_text
+                                        st.session_state.master_content_key += 1  # Force widget recreation
+                                        st.session_state.webhook_updating = False
+                                        st.success("✅ Caption generated successfully!")
+                                        st.rerun()
+                                    else:
+                                        st.info("📬 Request sent! Waiting for caption...")
+                            else:
+                                st.error(f"❌ Failed to send request: {response.status_code}")
+                                st.error(f"Response: {response.text}")
+                    
+                    except requests.exceptions.Timeout:
+                        st.error("❌ Request timed out. Please try again.")
+                    except Exception as e:
+                        st.error(f"❌ Error: {str(e)}")
+    
+    with col2:
+        st.markdown("**📅 Master Schedule (PDT)**")
+        
+        default_date = datetime.now() + timedelta(hours=1)
+        
+        master_date = st.date_input(
+            "📆 Date", 
+            value=default_date,
+            key="master_date_input"
+        )
+        master_time = st.time_input(
+            "🕐 Time", 
+            value=default_date.time(),
+            key="master_time_input"
+        )
+        
+        # Combine date and time
+        master_datetime = datetime.combine(master_date, master_time)
+        pdt = pytz.timezone('America/Los_Angeles')
+        master_datetime_pdt = pdt.localize(master_datetime)
+        master_schedule_iso = master_datetime_pdt.isoformat()
+        
+        st.session_state.master_schedule = master_schedule_iso
+    
+    # Post to All Platforms Section
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                    padding: 2.5rem; border-radius: 16px; text-align: center; margin: 1.5rem 0;
+                    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);'>
+            <h3 style='margin: 0 0 0.5rem 0; color: #ffffff; font-size: 1.5rem; font-weight: 700;'>
+                🚀 Post Content to All Platforms
+            </h3>
+            <p style='margin: 0; font-size: 1rem; color: #ffffff; opacity: 1;'>
+                Click below to post your master content to all configured platforms at once
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("📋 Post to All Selected Platforms", use_container_width=True, type="primary", key="push_to_all_btn"):
+            # Build list of platforms to post to
+            platforms_to_post = []
+            
+            if enable_instagram:
+                # Upload images first
+                media_items = []
+                if carousel_images:
+                    with st.spinner("📤 Uploading images for Instagram..."):
+                        for img in carousel_images:
+                            url = upload_image_to_getlate(img, FIXED_API_KEY)
+                            if url:
+                                media_items.append({"url": url})
+                
+                platforms_to_post.append({
+                    "platform": "Instagram",
+                    "accountId": INSTAGRAM_ACCOUNT_ID,
+                    "content": st.session_state.get('ig_content_value', st.session_state.master_content),
+                    "schedule": st.session_state.get('ig_schedule', st.session_state.master_schedule),
+                    "mediaItems": media_items
+                })
+            
+            if enable_linkedin:
+                # Upload images first
+                media_items = []
+                if carousel_images:
+                    with st.spinner("📤 Uploading images for LinkedIn..."):
+                        for img in carousel_images:
+                            url = upload_image_to_getlate(img, FIXED_API_KEY)
+                            if url:
+                                media_items.append({"url": url})
+                
+                platforms_to_post.append({
+                    "platform": "LinkedIn",
+                    "accountId": LINKEDIN_ACCOUNT_ID,
+                    "content": st.session_state.get('li_content_value', st.session_state.master_content),
+                    "schedule": st.session_state.get('li_schedule', st.session_state.master_schedule),
+                    "mediaItems": media_items
+                })
+            
+            if enable_facebook:
+                # Upload images first
+                media_items = []
+                if carousel_images:
+                    with st.spinner("📤 Uploading images for Facebook..."):
+                        for img in carousel_images:
+                            url = upload_image_to_getlate(img, FIXED_API_KEY)
+                            if url:
+                                media_items.append({"url": url})
+                
+                platforms_to_post.append({
+                    "platform": "Facebook",
+                    "accountId": FACEBOOK_ACCOUNT_ID,
+                    "content": st.session_state.get('fb_content_value', st.session_state.master_content),
+                    "schedule": st.session_state.get('fb_schedule', st.session_state.master_schedule),
+                    "mediaItems": media_items
+                })
+            
+            if enable_twitter:
+                # Upload images first
+                media_items = []
+                if carousel_images:
+                    with st.spinner("📤 Uploading images for Twitter..."):
+                        for img in carousel_images:
+                            url = upload_image_to_getlate(img, FIXED_API_KEY)
+                            if url:
+                                media_items.append({"url": url})
+                
+                platforms_to_post.append({
+                    "platform": "Twitter",
+                    "accountId": TWITTER_ACCOUNT_ID,
+                    "content": st.session_state.get('tw_content_value', st.session_state.master_content),
+                    "schedule": st.session_state.get('tw_schedule', st.session_state.master_schedule),
+                    "mediaItems": media_items
+                })
+            
+            if not platforms_to_post:
+                st.error("❌ No platforms configured! Please enable platforms below.")
+            else:
+                # Post to all platforms
+                with st.spinner(f"📤 Posting to {len(platforms_to_post)} platform(s)..."):
+                    success_count = 0
+                    error_count = 0
+                    
+                    progress_bar = st.progress(0)
+                    status_text = st.empty()
+                    
+                    for idx, platform_data in enumerate(platforms_to_post):
+                        status_text.text(f"Posting to {platform_data['platform']}...")
+                        
+                        payload = build_post_payload(
+                            content=platform_data['content'],
+                            scheduled_time=platform_data['schedule'],
+                            timezone="America/Los_Angeles",
+                            platforms_config=[{
+                                "accountId": platform_data['accountId'],
+                                "mediaItems": platform_data['mediaItems']
+                            }]
+                        )
+                        
+                        response = send_post_to_api(FIXED_API_KEY, payload)
+                        
+                        if response and response.status_code in [200, 201]:
+                            success_count += 1
+                        else:
+                            error_count += 1
+                            error_msg = response.json() if response else "Connection error"
+                            st.error(f"❌ {platform_data['platform']}: Failed - {error_msg}")
+                        
+                        progress_bar.progress((idx + 1) / len(platforms_to_post))
+                    
+                    status_text.empty()
+                    progress_bar.empty()
+                    
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    
+                    if error_count == 0:
+                        st.balloons()
+                        st.success(f"🎉 Successfully posted to all {success_count} platform(s)!")
+                    else:
+                        st.warning(f"⚠️ Posted to {success_count} platform(s), {error_count} failed")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Platform selection with modern cards
+    st.markdown("""
+        <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
+                    padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
+            <h3 style='margin-top: 0;'>🌐 Select Your Platforms</h3>
+            <p style='color: #666; margin: 0;'>Choose which platforms to post to</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        enable_instagram = st.checkbox("📷 **Instagram**", value=False, key="enable_ig")
+    with col2:
+        enable_linkedin = st.checkbox("💼 **LinkedIn**", value=False, key="enable_li")
+    with col3:
+        enable_facebook = st.checkbox("👥 **Facebook**", value=False, key="enable_fb")
+    with col4:
+        enable_twitter = st.checkbox("🐦 **Twitter**", value=False, key="enable_tw")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Platform-specific configurations
+    platforms_config = []
+    
+    # Instagram Configuration
+    if enable_instagram:
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); 
+                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
+                <div style='background: white; padding: 2rem; border-radius: 15px;'>
+                    <h3 style='margin-top: 0; color: #bc1888;'>📷 Instagram Configuration</h3>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        with st.container():
+            col1, col2 = st.columns([2, 1])
+            
+            with col1:
+                st.info(f"Using Account ID: {INSTAGRAM_ACCOUNT_ID}")
+                
+                # Initialize content value in session state
+                if 'ig_content_value' not in st.session_state:
+                    st.session_state.ig_content_value = ""
+                if 'ig_refresh_counter' not in st.session_state:
+                    st.session_state.ig_refresh_counter = 0
+                
+                ig_content = st.text_area(
+                    "💬 Caption",
+                    value=st.session_state.ig_content_value,
+                    height=100,
+                    key=f"ig_content_area_{st.session_state.ig_refresh_counter}",
+                    placeholder="Your Instagram caption with hashtags..."
+                )
+                if ig_content != st.session_state.ig_content_value:
+                    st.session_state.ig_content_value = ig_content
+            
+            with col2:
+                use_master_ig = st.button("📋 Use Master", key="ig_use_master_btn", use_container_width=True)
+                
+                if use_master_ig:
+                    st.session_state.ig_content_value = st.session_state.master_content
+                    if 'ig_refresh_counter' not in st.session_state:
+                        st.session_state.ig_refresh_counter = 0
+                    st.session_state.ig_refresh_counter += 1
+                    st.rerun()
+                
+                st.markdown("**📅 Schedule**")
+                use_master_schedule = st.checkbox("Use master schedule", value=True, key="ig_master_sched")
+                
+                if not use_master_schedule:
+                    ig_date = st.date_input("Date", value=default_date, key="ig_schedule_date")
+                    ig_time = st.time_input("Time (PDT)", value=default_date.time(), key="ig_schedule_time")
+                    ig_datetime = datetime.combine(ig_date, ig_time)
+                    ig_datetime_pdt = pdt.localize(ig_datetime)
+                    st.session_state.ig_schedule = ig_datetime_pdt.isoformat()
+                else:
+                    st.session_state.ig_schedule = st.session_state.master_schedule
+    
+    # LinkedIn Configuration
+    if enable_linkedin:
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%); 
+                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
+                <div style='background: white; padding: 2rem; border-radius: 15px;'>
+                    <h3 style='margin-top: 0; color: #0077b5;'>💼 LinkedIn Configuration</h3>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        with st.container():
+            col1, col2 = st.columns([2, 1])
+            
+            with col1:
+                st.info(f"Using Account ID: {LINKEDIN_ACCOUNT_ID}")
+                
+                # Initialize content value in session state
+                if 'li_content_value' not in st.session_state:
+                    st.session_state.li_content_value = ""
+                if 'li_refresh_counter' not in st.session_state:
+                    st.session_state.li_refresh_counter = 0
+                
+                li_content = st.text_area(
+                    "💬 Post Content",
+                    value=st.session_state.li_content_value,
+                    height=100,
+                    key=f"li_content_area_{st.session_state.li_refresh_counter}",
+                    placeholder="Your professional LinkedIn post..."
+                )
+                if li_content != st.session_state.li_content_value:
+                    st.session_state.li_content_value = li_content
+            
+            with col2:
+                use_master_li = st.button("📋 Use Master", key="li_use_master_btn", use_container_width=True)
+                
+                if use_master_li:
+                    st.session_state.li_content_value = st.session_state.master_content
+                    if 'li_refresh_counter' not in st.session_state:
+                        st.session_state.li_refresh_counter = 0
+                    st.session_state.li_refresh_counter += 1
+                    st.rerun()
+                
+                st.markdown("**📅 Schedule**")
+                use_master_schedule_li = st.checkbox("Use master schedule", value=True, key="li_master_sched")
+                
+                if not use_master_schedule_li:
+                    li_date = st.date_input("Date", value=default_date, key="li_schedule_date")
+                    li_time = st.time_input("Time (PDT)", value=default_date.time(), key="li_schedule_time")
+                    li_datetime = datetime.combine(li_date, li_time)
+                    li_datetime_pdt = pdt.localize(li_datetime)
+                    st.session_state.li_schedule = li_datetime_pdt.isoformat()
+                else:
+                    st.session_state.li_schedule = st.session_state.master_schedule
+    
+    # Facebook Configuration
+    if enable_facebook:
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #1877f2 0%, #0c63d4 100%); 
+                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
+                <div style='background: white; padding: 2rem; border-radius: 15px;'>
+                    <h3 style='margin-top: 0; color: #1877f2;'>👥 Facebook Configuration</h3>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        with st.container():
+            col1, col2 = st.columns([2, 1])
+            
+            with col1:
+                st.info(f"Using Account ID: {FACEBOOK_ACCOUNT_ID}")
+                
+                # Initialize content value in session state
+                if 'fb_content_value' not in st.session_state:
+                    st.session_state.fb_content_value = ""
+                if 'fb_refresh_counter' not in st.session_state:
+                    st.session_state.fb_refresh_counter = 0
+                
+                fb_content = st.text_area(
+                    "💬 Post Content",
+                    value=st.session_state.fb_content_value,
+                    height=100,
+                    key=f"fb_content_area_{st.session_state.fb_refresh_counter}",
+                    placeholder="Your Facebook post..."
+                )
+                if fb_content != st.session_state.fb_content_value:
+                    st.session_state.fb_content_value = fb_content
+            
+            with col2:
+                use_master_fb = st.button("📋 Use Master", key="fb_use_master_btn", use_container_width=True)
+                
+                if use_master_fb:
+                    st.session_state.fb_content_value = st.session_state.master_content
+                    if 'fb_refresh_counter' not in st.session_state:
+                        st.session_state.fb_refresh_counter = 0
+                    st.session_state.fb_refresh_counter += 1
+                    st.rerun()
+                
+                st.markdown("**📅 Schedule**")
+                use_master_schedule_fb = st.checkbox("Use master schedule", value=True, key="fb_master_sched")
+                
+                if not use_master_schedule_fb:
+                    fb_date = st.date_input("Date", value=default_date, key="fb_schedule_date")
+                    fb_time = st.time_input("Time (PDT)", value=default_date.time(), key="fb_schedule_time")
+                    fb_datetime = datetime.combine(fb_date, fb_time)
+                    fb_datetime_pdt = pdt.localize(fb_datetime)
+                    st.session_state.fb_schedule = fb_datetime_pdt.isoformat()
+                else:
+                    st.session_state.fb_schedule = st.session_state.master_schedule
+    
+    # Twitter Configuration
+    if enable_twitter:
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #1DA1F2 0%, #0c85d0 100%); 
+                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
+                <div style='background: white; padding: 2rem; border-radius: 15px;'>
+                    <h3 style='margin-top: 0; color: #1DA1F2;'>🐦 Twitter Configuration</h3>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        with st.container():
+            col1, col2 = st.columns([2, 1])
+            
+            with col1:
+                st.info(f"Using Account ID: {TWITTER_ACCOUNT_ID}")
+                
+                # Initialize content value in session state
+                if 'tw_content_value' not in st.session_state:
+                    st.session_state.tw_content_value = ""
+                if 'tw_refresh_counter' not in st.session_state:
+                    st.session_state.tw_refresh_counter = 0
+                
+                tw_content = st.text_area(
+                    "💬 Tweet Content",
+                    value=st.session_state.tw_content_value,
+                    height=100,
+                    key=f"tw_content_area_{st.session_state.tw_refresh_counter}",
+                    placeholder="Your tweet (max 280 characters)...",
+                    max_chars=280
+                )
+                if tw_content != st.session_state.tw_content_value:
+                    st.session_state.tw_content_value = tw_content
+                
+                char_count = len(tw_content)
+                if char_count > 280:
+                    st.error(f"⚠️ Tweet is {char_count - 280} characters over the limit!")
+                elif char_count > 250:
+                    st.warning(f"⚡ {280 - char_count} characters remaining")
+                else:
+                    st.info(f"✍️ {char_count}/280 characters used")
+            
+            with col2:
+                use_master_tw = st.button("📋 Use Master", key="tw_use_master_btn", use_container_width=True)
+                
+                if use_master_tw:
+                    st.session_state.tw_content_value = st.session_state.master_content
+                    if 'tw_refresh_counter' not in st.session_state:
+                        st.session_state.tw_refresh_counter = 0
+                    st.session_state.tw_refresh_counter += 1
+                    st.rerun()
+                
+                st.markdown("**📅 Schedule**")
+                use_master_schedule_tw = st.checkbox("Use master schedule", value=True, key="tw_master_sched")
+                
+                if not use_master_schedule_tw:
+                    tw_date = st.date_input("Date", value=default_date, key="tw_schedule_date")
+                    tw_time = st.time_input("Time (PDT)", value=default_date.time(), key="tw_schedule_time")
+                    tw_datetime = datetime.combine(tw_date, tw_time)
+                    tw_datetime_pdt = pdt.localize(tw_datetime)
+                    st.session_state.tw_schedule = tw_datetime_pdt.isoformat()
+                else:
+                    st.session_state.tw_schedule = st.session_state.master_schedule
 # ============================================================================
 # TAB 4: CREATE SHORT FORM VIDEO POST
 # ============================================================================
@@ -2810,14 +3401,6 @@ with tab4:
 # ============================================================================
 # END OF APPLICATION
 # ============================================================================
-
-
-
-
-
-
-
-
 
 
 
