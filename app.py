@@ -21,6 +21,9 @@ INSTAGRAM_ACCOUNT_ID = "69116f39ef0527b8b3cfea5a"  # Replace with your Instagram
 LINKEDIN_ACCOUNT_ID = "123456"   # Replace with your LinkedIn account ID
 FACEBOOK_ACCOUNT_ID = "123456"   # Replace with your Facebook account ID
 TWITTER_ACCOUNT_ID = "123456"    # Replace with your Twitter account ID
+BLUESKY_ACCOUNT_ID = "123456"    # Replace with your Bluesky account ID
+THREADS_ACCOUNT_ID = "123456"    # Replace with your Threads account ID
+PINTEREST_ACCOUNT_ID = "123456"  # Replace with your Pinterest account ID
 
 # Tab 4 (Short Form Video Creator) Account IDs
 YOUTUBE_ACCOUNT_ID = "69105863ef0527b8b3cfe9de"           # Replace with your YouTube account ID
@@ -885,12 +888,17 @@ def build_post_payload(content, scheduled_time, timezone, platforms_config):
     for platform_data in platforms_config:
         platform_entry = {
             "accountId": platform_data["accountId"],
+            "platform": platform_data.get("platform", "instagram").lower(),  # ADD platform field
             "mediaItems": platform_data.get("mediaItems", [])
         }
+        
+        # Add board_id for Pinterest
+        if "board_id" in platform_data and platform_data["board_id"]:
+            platform_entry["board_id"] = platform_data["board_id"]
+        
         payload["platforms"].append(platform_entry)
     
     return payload
-
 # ============================================================================
 # STREAMLIT APP
 # ============================================================================
@@ -1842,6 +1850,17 @@ with tab3:
         st.markdown("**🐦 Twitter**")
         st.text_input("TW ID", value=TWITTER_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab3_tw_display")
     
+    col5, col6, col7, col8 = st.columns(4)
+    with col5:
+        st.markdown("**🦋 Bluesky**")
+        st.text_input("BS ID", value=BLUESKY_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab3_bs_display")
+    with col6:
+        st.markdown("**🧵 Threads**")
+        st.text_input("TH ID", value=THREADS_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab3_th_display")
+    with col7:
+        st.markdown("**📌 Pinterest**")
+        st.text_input("PT ID", value=PINTEREST_ACCOUNT_ID, disabled=True, label_visibility="collapsed", key="tab3_pt_display")
+    
     st.markdown("<br>", unsafe_allow_html=True)
     
     # Image upload section with modern card
@@ -2036,7 +2055,7 @@ with tab3:
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Platform selection with modern cards - MOVED HERE BEFORE THE BUTTON
+    # Platform selection with modern cards
     st.markdown("""
         <div style='background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); 
                     padding: 2rem; border-radius: 16px; margin: 1.5rem 0;'>
@@ -2056,9 +2075,18 @@ with tab3:
     with col4:
         enable_twitter = st.checkbox("🐦 **Twitter**", value=False, key="enable_tw")
     
+    col5, col6, col7 = st.columns([1, 1, 2])
+    
+    with col5:
+        enable_bluesky = st.checkbox("🦋 **Bluesky**", value=False, key="enable_bs")
+    with col6:
+        enable_threads = st.checkbox("🧵 **Threads**", value=False, key="enable_th")
+    with col7:
+        enable_pinterest = st.checkbox("📌 **Pinterest**", value=False, key="enable_pt")
+    
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Post to All Platforms Section - NOW AFTER THE CHECKBOXES
+    # Post to All Platforms Section
     st.markdown("""
         <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                     padding: 2.5rem; border-radius: 16px; text-align: center; margin: 1.5rem 0;
@@ -2089,7 +2117,7 @@ with tab3:
                                 media_items.append({"url": url})
                 
                 platforms_to_post.append({
-                    "platform": "Instagram",
+                    "platform": "instagram",
                     "accountId": INSTAGRAM_ACCOUNT_ID,
                     "content": st.session_state.get('ig_content_value', st.session_state.master_content),
                     "schedule": st.session_state.get('ig_schedule', st.session_state.master_schedule),
@@ -2107,7 +2135,7 @@ with tab3:
                                 media_items.append({"url": url})
                 
                 platforms_to_post.append({
-                    "platform": "LinkedIn",
+                    "platform": "linkedin",
                     "accountId": LINKEDIN_ACCOUNT_ID,
                     "content": st.session_state.get('li_content_value', st.session_state.master_content),
                     "schedule": st.session_state.get('li_schedule', st.session_state.master_schedule),
@@ -2125,7 +2153,7 @@ with tab3:
                                 media_items.append({"url": url})
                 
                 platforms_to_post.append({
-                    "platform": "Facebook",
+                    "platform": "facebook",
                     "accountId": FACEBOOK_ACCOUNT_ID,
                     "content": st.session_state.get('fb_content_value', st.session_state.master_content),
                     "schedule": st.session_state.get('fb_schedule', st.session_state.master_schedule),
@@ -2143,11 +2171,67 @@ with tab3:
                                 media_items.append({"url": url})
                 
                 platforms_to_post.append({
-                    "platform": "Twitter",
+                    "platform": "twitter",
                     "accountId": TWITTER_ACCOUNT_ID,
                     "content": st.session_state.get('tw_content_value', st.session_state.master_content),
                     "schedule": st.session_state.get('tw_schedule', st.session_state.master_schedule),
                     "mediaItems": media_items
+                })
+            
+            if enable_bluesky:
+                # Upload images first
+                media_items = []
+                if carousel_images:
+                    with st.spinner("📤 Uploading images for Bluesky..."):
+                        for img in carousel_images:
+                            url = upload_image_to_getlate(img, FIXED_API_KEY)
+                            if url:
+                                media_items.append({"url": url})
+                
+                platforms_to_post.append({
+                    "platform": "bluesky",
+                    "accountId": BLUESKY_ACCOUNT_ID,
+                    "content": st.session_state.get('bs_content_value', st.session_state.master_content),
+                    "schedule": st.session_state.get('bs_schedule', st.session_state.master_schedule),
+                    "mediaItems": media_items
+                })
+            
+            if enable_threads:
+                # Upload images first
+                media_items = []
+                if carousel_images:
+                    with st.spinner("📤 Uploading images for Threads..."):
+                        for img in carousel_images:
+                            url = upload_image_to_getlate(img, FIXED_API_KEY)
+                            if url:
+                                media_items.append({"url": url})
+                
+                platforms_to_post.append({
+                    "platform": "threads",
+                    "accountId": THREADS_ACCOUNT_ID,
+                    "content": st.session_state.get('th_content_value', st.session_state.master_content),
+                    "schedule": st.session_state.get('th_schedule', st.session_state.master_schedule),
+                    "mediaItems": media_items
+                })
+            
+            if enable_pinterest:
+                # Upload images first
+                media_items = []
+                if carousel_images:
+                    with st.spinner("📤 Uploading images for Pinterest..."):
+                        for img in carousel_images:
+                            url = upload_image_to_getlate(img, FIXED_API_KEY)
+                            if url:
+                                media_items.append({"url": url})
+                
+                # Pinterest requires board_id
+                platforms_to_post.append({
+                    "platform": "pinterest",
+                    "accountId": PINTEREST_ACCOUNT_ID,
+                    "content": st.session_state.get('pt_content_value', st.session_state.master_content),
+                    "schedule": st.session_state.get('pt_schedule', st.session_state.master_schedule),
+                    "mediaItems": media_items,
+                    "board_id": st.session_state.get('pt_board_id', '')  # Pinterest needs board ID
                 })
             
             if not platforms_to_post:
@@ -2162,22 +2246,31 @@ with tab3:
                     status_text = st.empty()
                     
                     for idx, platform_data in enumerate(platforms_to_post):
-                        status_text.text(f"Posting to {platform_data['platform']}...")
+                        status_text.text(f"Posting to {platform_data['platform'].title()}...")
+                        
+                        # Build platform config
+                        platform_config = {
+                            "accountId": platform_data['accountId'],
+                            "platform": platform_data['platform'],
+                            "mediaItems": platform_data['mediaItems']
+                        }
+                        
+                        # Add board_id for Pinterest
+                        if platform_data['platform'] == 'pinterest' and platform_data.get('board_id'):
+                            platform_config["board_id"] = platform_data['board_id']
                         
                         payload = build_post_payload(
                             content=platform_data['content'],
                             scheduled_time=platform_data['schedule'],
                             timezone="America/Los_Angeles",
-                            platforms_config=[{
-                                "accountId": platform_data['accountId'],
-                                "mediaItems": platform_data['mediaItems']
-                            }]
+                            platforms_config=[platform_config]
                         )
                         
                         # DEBUG: Show payload
-                        with st.expander(f"🔍 Debug: {platform_data['platform']} Payload", expanded=False):
+                        with st.expander(f"🔍 Debug: {platform_data['platform'].title()} Payload", expanded=False):
                             st.json(payload)
                             st.write(f"**Account ID:** {platform_data['accountId']}")
+                            st.write(f"**Platform:** {platform_data['platform']}")
                             st.write(f"**Media Items:** {len(platform_data['mediaItems'])} items")
                             st.write(f"**Content Length:** {len(platform_data['content'])} characters")
                         
@@ -2185,17 +2278,17 @@ with tab3:
                         
                         if response and response.status_code in [200, 201]:
                             success_count += 1
-                            st.success(f"✅ {platform_data['platform']}: Posted successfully!")
+                            st.success(f"✅ {platform_data['platform'].title()}: Posted successfully!")
                         else:
                             error_count += 1
                             if response:
                                 try:
                                     error_msg = response.json()
-                                    st.error(f"❌ {platform_data['platform']}: Failed - {error_msg}")
+                                    st.error(f"❌ {platform_data['platform'].title()}: Failed - {error_msg}")
                                 except:
-                                    st.error(f"❌ {platform_data['platform']}: HTTP {response.status_code} - {response.text}")
+                                    st.error(f"❌ {platform_data['platform'].title()}: HTTP {response.status_code} - {response.text}")
                             else:
-                                st.error(f"❌ {platform_data['platform']}: Connection failed")
+                                st.error(f"❌ {platform_data['platform'].title()}: Connection failed")
                         
                         progress_bar.progress((idx + 1) / len(platforms_to_post))
                     
@@ -2213,7 +2306,6 @@ with tab3:
     st.markdown("<br>", unsafe_allow_html=True)
     
     # Platform-specific configurations
-    platforms_config = []
     
     # Instagram Configuration
     if enable_instagram:
@@ -2443,6 +2535,198 @@ with tab3:
                     st.session_state.tw_schedule = tw_datetime_pdt.isoformat()
                 else:
                     st.session_state.tw_schedule = st.session_state.master_schedule
+    
+    # Bluesky Configuration
+    if enable_bluesky:
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #1185FE 0%, #0A4FBF 100%); 
+                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
+                <div style='background: white; padding: 2rem; border-radius: 15px;'>
+                    <h3 style='margin-top: 0; color: #1185FE;'>🦋 Bluesky Configuration</h3>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        with st.container():
+            col1, col2 = st.columns([2, 1])
+            
+            with col1:
+                st.info(f"Using Account ID: {BLUESKY_ACCOUNT_ID}")
+                
+                # Initialize content value in session state
+                if 'bs_content_value' not in st.session_state:
+                    st.session_state.bs_content_value = ""
+                if 'bs_refresh_counter' not in st.session_state:
+                    st.session_state.bs_refresh_counter = 0
+                
+                bs_content = st.text_area(
+                    "💬 Post Content",
+                    value=st.session_state.bs_content_value,
+                    height=100,
+                    key=f"bs_content_area_{st.session_state.bs_refresh_counter}",
+                    placeholder="Your Bluesky post (max 300 characters)...",
+                    max_chars=300
+                )
+                if bs_content != st.session_state.bs_content_value:
+                    st.session_state.bs_content_value = bs_content
+                
+                char_count = len(bs_content)
+                if char_count > 300:
+                    st.error(f"⚠️ Post is {char_count - 300} characters over the limit!")
+                elif char_count > 270:
+                    st.warning(f"⚡ {300 - char_count} characters remaining")
+                else:
+                    st.info(f"✍️ {char_count}/300 characters used")
+            
+            with col2:
+                use_master_bs = st.button("📋 Use Master", key="bs_use_master_btn", use_container_width=True)
+                
+                if use_master_bs:
+                    st.session_state.bs_content_value = st.session_state.master_content
+                    if 'bs_refresh_counter' not in st.session_state:
+                        st.session_state.bs_refresh_counter = 0
+                    st.session_state.bs_refresh_counter += 1
+                    st.rerun()
+                
+                st.markdown("**📅 Schedule**")
+                use_master_schedule_bs = st.checkbox("Use master schedule", value=True, key="bs_master_sched")
+                
+                if not use_master_schedule_bs:
+                    bs_date = st.date_input("Date", value=default_date, key="bs_schedule_date")
+                    bs_time = st.time_input("Time (PDT)", value=default_date.time(), key="bs_schedule_time")
+                    bs_datetime = datetime.combine(bs_date, bs_time)
+                    bs_datetime_pdt = pdt.localize(bs_datetime)
+                    st.session_state.bs_schedule = bs_datetime_pdt.isoformat()
+                else:
+                    st.session_state.bs_schedule = st.session_state.master_schedule
+    
+    # Threads Configuration
+    if enable_threads:
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #000000 0%, #333333 100%); 
+                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
+                <div style='background: white; padding: 2rem; border-radius: 15px;'>
+                    <h3 style='margin-top: 0; color: #000000;'>🧵 Threads Configuration</h3>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        with st.container():
+            col1, col2 = st.columns([2, 1])
+            
+            with col1:
+                st.info(f"Using Account ID: {THREADS_ACCOUNT_ID}")
+                
+                # Initialize content value in session state
+                if 'th_content_value' not in st.session_state:
+                    st.session_state.th_content_value = ""
+                if 'th_refresh_counter' not in st.session_state:
+                    st.session_state.th_refresh_counter = 0
+                
+                th_content = st.text_area(
+                    "💬 Post Content",
+                    value=st.session_state.th_content_value,
+                    height=100,
+                    key=f"th_content_area_{st.session_state.th_refresh_counter}",
+                    placeholder="Your Threads post (max 500 characters)...",
+                    max_chars=500
+                )
+                if th_content != st.session_state.th_content_value:
+                    st.session_state.th_content_value = th_content
+                
+                char_count = len(th_content)
+                if char_count > 500:
+                    st.error(f"⚠️ Post is {char_count - 500} characters over the limit!")
+                elif char_count > 450:
+                    st.warning(f"⚡ {500 - char_count} characters remaining")
+                else:
+                    st.info(f"✍️ {char_count}/500 characters used")
+            
+            with col2:
+                use_master_th = st.button("📋 Use Master", key="th_use_master_btn", use_container_width=True)
+                
+                if use_master_th:
+                    st.session_state.th_content_value = st.session_state.master_content
+                    if 'th_refresh_counter' not in st.session_state:
+                        st.session_state.th_refresh_counter = 0
+                    st.session_state.th_refresh_counter += 1
+                    st.rerun()
+                
+                st.markdown("**📅 Schedule**")
+                use_master_schedule_th = st.checkbox("Use master schedule", value=True, key="th_master_sched")
+                
+                if not use_master_schedule_th:
+                    th_date = st.date_input("Date", value=default_date, key="th_schedule_date")
+                    th_time = st.time_input("Time (PDT)", value=default_date.time(), key="th_schedule_time")
+                    th_datetime = datetime.combine(th_date, th_time)
+                    th_datetime_pdt = pdt.localize(th_datetime)
+                    st.session_state.th_schedule = th_datetime_pdt.isoformat()
+                else:
+                    st.session_state.th_schedule = st.session_state.master_schedule
+    
+    # Pinterest Configuration
+    if enable_pinterest:
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #E60023 0%, #BD081C 100%); 
+                        padding: 0.1rem; border-radius: 16px; margin: 1.5rem 0;'>
+                <div style='background: white; padding: 2rem; border-radius: 15px;'>
+                    <h3 style='margin-top: 0; color: #E60023;'>📌 Pinterest Configuration</h3>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        with st.container():
+            col1, col2 = st.columns([2, 1])
+            
+            with col1:
+                st.info(f"Using Account ID: {PINTEREST_ACCOUNT_ID}")
+                
+                # Pinterest needs board ID
+                pt_board_id = st.text_input(
+                    "📋 Board ID (Required)",
+                    key="pt_board_id",
+                    placeholder="Enter your Pinterest board ID",
+                    help="Pinterest posts require a board ID"
+                )
+                
+                # Initialize content value in session state
+                if 'pt_content_value' not in st.session_state:
+                    st.session_state.pt_content_value = ""
+                if 'pt_refresh_counter' not in st.session_state:
+                    st.session_state.pt_refresh_counter = 0
+                
+                pt_content = st.text_area(
+                    "💬 Pin Description",
+                    value=st.session_state.pt_content_value,
+                    height=100,
+                    key=f"pt_content_area_{st.session_state.pt_refresh_counter}",
+                    placeholder="Your pin description (max 500 characters)...",
+                    max_chars=500
+                )
+                if pt_content != st.session_state.pt_content_value:
+                    st.session_state.pt_content_value = pt_content
+            
+            with col2:
+                use_master_pt = st.button("📋 Use Master", key="pt_use_master_btn", use_container_width=True)
+                
+                if use_master_pt:
+                    st.session_state.pt_content_value = st.session_state.master_content
+                    if 'pt_refresh_counter' not in st.session_state:
+                        st.session_state.pt_refresh_counter = 0
+                    st.session_state.pt_refresh_counter += 1
+                    st.rerun()
+                
+                st.markdown("**📅 Schedule**")
+                use_master_schedule_pt = st.checkbox("Use master schedule", value=True, key="pt_master_sched")
+                
+                if not use_master_schedule_pt:
+                    pt_date = st.date_input("Date", value=default_date, key="pt_schedule_date")
+                    pt_time = st.time_input("Time (PDT)", value=default_date.time(), key="pt_schedule_time")
+                    pt_datetime = datetime.combine(pt_date, pt_time)
+                    pt_datetime_pdt = pdt.localize(pt_datetime)
+                    st.session_state.pt_schedule = pt_datetime_pdt.isoformat()
+                else:
+                    st.session_state.pt_schedule = st.session_state.master_schedule
 # ============================================================================
 # TAB 4: CREATE SHORT FORM VIDEO POST
 # ============================================================================
@@ -3451,6 +3735,7 @@ with tab4:
 # ============================================================================
 # END OF APPLICATION
 # ============================================================================
+
 
 
 
