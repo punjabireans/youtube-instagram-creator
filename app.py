@@ -824,7 +824,7 @@ def upload_image_to_getlate(image_file, api_key):
         return None
 
 def send_post_to_api(api_key, post_data):
-    """Send post to GetLate API with improved error handling"""
+    """Send post to GetLate API with detailed debugging"""
     endpoint = "https://getlate.dev/api/v1/posts"
     
     headers = {
@@ -832,26 +832,45 @@ def send_post_to_api(api_key, post_data):
         "Content-Type": "application/json"
     }
     
+    # Debug: Show what we're sending
+    st.write("🔍 **Sending Request:**")
+    st.write(f"**Endpoint:** {endpoint}")
+    st.write(f"**API Key (first 20 chars):** {api_key[:20]}...")
+    st.write(f"**Headers:** {headers}")
+    
     try:
+        st.write("📤 Making POST request...")
         response = requests.post(
             endpoint, 
             headers=headers, 
             json=post_data,
             timeout=30
         )
+        
+        st.write(f"✅ **Got Response!**")
+        st.write(f"**Status Code:** {response.status_code}")
+        st.write(f"**Response Headers:** {dict(response.headers)}")
+        st.write(f"**Response Body:** {response.text}")
+        
         return response
         
-    except requests.exceptions.Timeout:
-        st.error("⏱️ Request timed out after 30 seconds")
+    except requests.exceptions.Timeout as e:
+        st.error(f"⏱️ **Timeout Error:** {str(e)}")
         return None
     except requests.exceptions.ConnectionError as e:
-        st.error(f"🔌 Connection error: {str(e)}")
+        st.error(f"🔌 **Connection Error:** {str(e)}")
+        st.error("This usually means: DNS failure, refused connection, or network is unreachable")
+        return None
+    except requests.exceptions.HTTPError as e:
+        st.error(f"📛 **HTTP Error:** {str(e)}")
         return None
     except requests.exceptions.RequestException as e:
-        st.error(f"🌐 Request failed: {str(e)}")
+        st.error(f"🌐 **Request Exception:** {str(e)}")
         return None
     except Exception as e:
-        st.error(f"❌ Unexpected error: {type(e).__name__}: {str(e)}")
+        st.error(f"❌ **Unexpected Error:** {type(e).__name__}: {str(e)}")
+        import traceback
+        st.code(traceback.format_exc())
         return None
 
 def build_post_payload(content, scheduled_time, timezone, platforms_config):
@@ -3432,6 +3451,7 @@ with tab4:
 # ============================================================================
 # END OF APPLICATION
 # ============================================================================
+
 
 
 
