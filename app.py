@@ -879,7 +879,6 @@ def send_post_to_api(api_key, post_data):
 def build_post_payload(content, scheduled_time, timezone, platforms_config):
     """Build the JSON payload for the API request"""
     payload = {
-        "content": content,
         "scheduledFor": scheduled_time,
         "timezone": timezone,
         "platforms": []
@@ -888,7 +887,8 @@ def build_post_payload(content, scheduled_time, timezone, platforms_config):
     for platform_data in platforms_config:
         platform_entry = {
             "accountId": platform_data["accountId"],
-            "platform": platform_data.get("platform", "instagram").lower(),  # ADD platform field
+            "platform": platform_data.get("platform", "instagram").lower(),
+            "content": content,  # Move content here instead of root level
             "mediaItems": platform_data.get("mediaItems", [])
         }
         
@@ -3735,6 +3735,7 @@ with tab4:
 # ============================================================================
 # END OF APPLICATION
 # ============================================================================
+
 
 
 
